@@ -5,6 +5,7 @@ import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.mod.event.WynncraftConnectionEvent;
 import java.nio.file.Path;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
@@ -41,6 +42,7 @@ public class WynnTitles implements ClientModInitializer {
 	private static Account account;
 	private static CatalogStore catalogs;
 	private static TitleCache titles;
+	private static AchievementTracker tracker;
 
 	private KeyMapping openKey;
 	private static boolean loadedThisSession;
@@ -57,6 +59,10 @@ public class WynnTitles implements ClientModInitializer {
 		return titles;
 	}
 
+	public static AchievementTracker tracker() {
+		return tracker;
+	}
+
 	@Override
 	public void onInitializeClient() {
 		WynnTitlesConfig.register();
@@ -70,7 +76,7 @@ public class WynnTitles implements ClientModInitializer {
 		account = new Account(api, new MojangSession(), dir.resolve("session.json"));
 		catalogs = new CatalogStore(api, dir.resolve("catalog.json"));
 		titles = new TitleCache(api);
-		AchievementTracker tracker = new AchievementTracker(
+		tracker = new AchievementTracker(
 				api, account, catalogs, WynntilsDetectors.create(), WynnTitles::announceUnlock, version);
 
 		// Show our own new title right away instead of waiting for the cache to expire.
@@ -85,7 +91,8 @@ public class WynnTitles implements ClientModInitializer {
 				KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "main"))));
 
 		// Only contact the WynnTitles server on Wynncraft, not on every world or server.
-		WynntilsMod.registerEventListener(this);
+		// Wynntils creates its event bus in its own entrypoint, which may run after ours.
+		ClientLifecycleEvents.CLIENT_STARTED.register(client -> WynntilsMod.registerEventListener(this));
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			titles.tick();

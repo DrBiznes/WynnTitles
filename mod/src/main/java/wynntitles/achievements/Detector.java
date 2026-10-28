@@ -12,4 +12,12 @@ public interface Detector {
 	 * met right now, otherwise null.
 	 */
 	JsonObject check(Catalog.Trigger trigger);
+
+	/**
+	 * False if this mod version cannot check the trigger at all, such as a
+	 * statistic added to the catalog after it shipped.
+	 */
+	default boolean supports(Catalog.Trigger trigger) {
+		return true;
+	}
 }

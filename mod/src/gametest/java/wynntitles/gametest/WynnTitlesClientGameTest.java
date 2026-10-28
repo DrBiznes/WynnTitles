@@ -94,7 +94,13 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			context.waitTicks(20);
 			screenshot(context, "wynntitles-titles-tab");
 
-			context.setScreen(TitlesScreen::achievements);
+			// Pretend this mod version cannot detect the first locked achievement,
+			// as if the catalog had gained a trigger type after it shipped.
+			Catalog.Achievement undetectable = catalog.achievements().stream()
+					.filter(a -> !a.id().equals(ownAchievement.id()))
+					.findFirst()
+					.orElseThrow();
+			context.setScreen(() -> TitlesScreen.achievements(a -> !a.id().equals(undetectable.id())));
 			context.waitTicks(20);
 			screenshot(context, "wynntitles-achievements-tab");
 

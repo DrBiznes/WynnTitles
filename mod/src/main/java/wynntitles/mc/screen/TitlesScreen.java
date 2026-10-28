@@ -13,11 +13,13 @@ import io.wispforest.owo.ui.core.OwoUIAdapter;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.Surface;
 import io.wispforest.owo.ui.core.VerticalAlignment;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -46,10 +48,13 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	private static final int TEXT = 0xF3E6C8;
 	private static final int TEXT_DIM = 0xA88E66;
 	private static final int ERROR = 0xFF6B6B;
+	private static final int NEEDS_UPDATE = 0xE89A50;
+	private static final String UPDATE_TO_UNLOCK = "Update WynnTitles to unlock";
 
 	private enum Tab { TITLES, ACHIEVEMENTS }
 
 	private Tab tab = Tab.TITLES;
+	private Predicate<Catalog.Achievement> canDetect = a -> WynnTitles.tracker().canDetect(a);
 	private Me me;
 	private String error;
 	private String selectedPrefix;
@@ -67,6 +72,13 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	public static TitlesScreen achievements() {
 		TitlesScreen screen = new TitlesScreen();
 		screen.tab = Tab.ACHIEVEMENTS;
+		return screen;
+	}
+
+	/** The achievements tab with a stand-in for the tracker, for tests. */
+	public static TitlesScreen achievements(Predicate<Catalog.Achievement> canDetect) {
+		TitlesScreen screen = achievements();
+		screen.canDetect = canDetect;
 		return screen;
 	}
 
@@ -252,7 +264,8 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		rows.padding(Insets.of(2));
 		rows.gap(2);
 		for (Catalog.Achievement achievement : catalog.achievements()) {
-			rows.child(achievementRow(achievement, unlocked.contains(achievement.id())));
+			boolean isUnlocked = unlocked.contains(achievement.id());
+			rows.child(achievementRow(achievement, isUnlocked, !isUnlocked && !canDetect.test(achievement)));
 		}
 
 		var scroll = UIContainers.verticalScroll(Sizing.fixed(296), Sizing.fixed(170), rows);
@@ -260,7 +273,8 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		body.child(scroll);
 	}
 
-	private FlowLayout achievementRow(Catalog.Achievement achievement, boolean unlocked) {
+	/** needsUpdate: this mod version cannot detect the trigger, so it can never unlock. */
+	private FlowLayout achievementRow(Catalog.Achievement achievement, boolean unlocked, boolean needsUpdate) {
 		FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(), Sizing.content());
 		row.padding(Insets.of(2, 2, 3, 4)).verticalAlignment(VerticalAlignment.CENTER);
 		row.gap(5);
@@ -274,14 +288,21 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		if (reward != null) {
 			text.child(new TitleText(() -> TitleRenderer.render(reward), 1f, TEXT));
 		}
+		if (needsUpdate) {
+			text.child(label(Component.literal(UPDATE_TO_UNLOCK), NEEDS_UPDATE));
+		}
 		row.child(text);
 
-		row.tooltip(List.of(
+		List<Component> tooltip = new ArrayList<>(List.of(
 				Component.literal(achievement.name()).withStyle(ChatFormatting.GOLD),
 				Component.literal(achievement.description()).withStyle(ChatFormatting.GRAY),
 				Component.literal(tierLabel(achievement.tier()) + " · " + achievement.points() + " pts"
 								+ (unlocked ? " · Unlocked" : ""))
 						.withStyle(tierColor(achievement.tier()))));
+		if (needsUpdate) {
+			tooltip.add(Component.literal(UPDATE_TO_UNLOCK).withColor(NEEDS_UPDATE));
+		}
+		row.tooltip(tooltip);
 		return row;
 	}
 

@@ -13,13 +13,15 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.ToLongFunction;
 import net.minecraft.world.phys.Vec3;
 import wynntitles.catalog.Catalog.Trigger;
 import wynntitles.mc.Mc;
 
 /**
  * Detectors for every trigger type in the catalog, built on Wynntils models.
- * A catalog entry with a type missing here is skipped until the mod adds it.
+ * A catalog entry this mod cannot check is skipped, and the achievements
+ * screen asks the player to update.
  */
 public final class WynntilsDetectors {
 	private WynntilsDetectors() {}
@@ -31,7 +33,7 @@ public final class WynntilsDetectors {
 		detectors.put("totalProfessionLevel", WynntilsDetectors::totalProfessionLevel);
 		detectors.put("location", WynntilsDetectors::location);
 		detectors.put("inventoryItem", WynntilsDetectors::inventoryItem);
-		detectors.put("statistic", WynntilsDetectors::statistic);
+		detectors.put("statistic", new StatisticDetector());
 		detectors.put("quest", new QuestDetector());
 		return detectors;
 	}
@@ -113,23 +115,31 @@ public final class WynntilsDetectors {
 		return evidence;
 	}
 
-	private static JsonObject statistic(Trigger trigger) {
-		WynnPlayerInfo info = Models.Account.getPlayerInfo();
-		if (info == null || info.globalData().isEmpty()) {
-			return null;
+	/** Lifetime statistics from the Wynncraft API, by catalog name. */
+	private static final class StatisticDetector implements Detector {
+		private static final Map<String, ToLongFunction<GlobalData>> STATISTICS = Map.of(
+				"mobsKilled", GlobalData::mobsKilled,
+				"chestsFound", GlobalData::chestsFound);
+
+		@Override
+		public boolean supports(Trigger trigger) {
+			return STATISTICS.containsKey(trigger.statistic());
 		}
-		GlobalData data = info.globalData().get();
-		long value = switch (trigger.statistic()) {
-			case "mobsKilled" -> data.mobsKilled();
-			case "chestsFound" -> data.chestsFound();
-			default -> -1;
-		};
-		if (value < trigger.amount()) {
-			return null;
+
+		@Override
+		public JsonObject check(Trigger trigger) {
+			WynnPlayerInfo info = Models.Account.getPlayerInfo();
+			if (info == null || info.globalData().isEmpty()) {
+				return null;
+			}
+			long value = STATISTICS.get(trigger.statistic()).applyAsLong(info.globalData().get());
+			if (value < trigger.amount()) {
+				return null;
+			}
+			JsonObject evidence = new JsonObject();
+			evidence.addProperty(trigger.statistic(), value);
+			return evidence;
 		}
-		JsonObject evidence = new JsonObject();
-		evidence.addProperty(trigger.statistic(), value);
-		return evidence;
 	}
 
 	/**

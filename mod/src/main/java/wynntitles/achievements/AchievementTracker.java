@@ -71,10 +71,10 @@ public final class AchievementTracker {
 					|| retryAt.getOrDefault(id, 0L) > now) {
 				continue;
 			}
-			Detector detector = detectors.get(achievement.trigger().type());
-			if (detector == null) {
+			if (!canDetect(achievement)) {
 				continue;
 			}
+			Detector detector = detectors.get(achievement.trigger().type());
 
 			JsonObject evidence;
 			try {
@@ -90,6 +90,12 @@ public final class AchievementTracker {
 				claim(achievement, evidence);
 			}
 		}
+	}
+
+	/** False when this mod version can never claim the achievement and needs an update. */
+	public boolean canDetect(Catalog.Achievement achievement) {
+		Detector detector = detectors.get(achievement.trigger().type());
+		return detector != null && detector.supports(achievement.trigger());
 	}
 
 	private void claim(Catalog.Achievement achievement, JsonObject evidence) {
