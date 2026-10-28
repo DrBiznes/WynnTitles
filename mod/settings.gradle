@@ -1,0 +1,14 @@
+pluginManagement {
+	repositories {
+		maven { url = "https://maven.fabricmc.net/" }
+		mavenCentral()
+		gradlePluginPortal()
+	}
+}
+
+plugins {
+	// Provisions the Java 25 daemon JVM pinned in gradle/gradle-daemon-jvm.properties.
+	id "org.gradle.toolchains.foojay-resolver-convention" version "1.0.0"
+}
+
+rootProject.name = "wynntitles"

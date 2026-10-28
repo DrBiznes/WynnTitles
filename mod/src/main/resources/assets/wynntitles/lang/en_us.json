@@ -1,0 +1,16 @@
+{
+	"key.category.wynntitles.main": "WynnTitles",
+	"key.wynntitles.open": "Open WynnTitles",
+
+	"text.autoconfig.wynntitles.title": "WynnTitles",
+	"text.autoconfig.wynntitles.category.default": "General",
+	"text.autoconfig.wynntitles.category.advanced": "Advanced",
+	"text.autoconfig.wynntitles.option.showTitles": "Show titles",
+	"text.autoconfig.wynntitles.option.showTitles.@Tooltip": "Show other players' titles above their names. Needs Wynntils' custom nametags enabled.",
+	"text.autoconfig.wynntitles.option.announceUnlocks": "Announce unlocks in chat",
+	"text.autoconfig.wynntitles.option.announceUnlocks.@Tooltip": "Post a chat message when you unlock an achievement.",
+	"text.autoconfig.wynntitles.option.serverUrl": "Server URL",
+	"text.autoconfig.wynntitles.option.serverUrl.@Tooltip": "Leave blank to use the official server.",
+	"text.autoconfig.wynntitles.option.previewOwnTitleOnEveryone": "Preview my title on everyone",
+	"text.autoconfig.wynntitles.option.previewOwnTitleOnEveryone.@Tooltip": "Debug option: shows your own title above every player."
+}

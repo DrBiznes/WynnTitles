@@ -1,0 +1,14 @@
+{
+	"schemaVersion": 1,
+	"id": "wynntitles-gametest",
+	"version": "1.0.0",
+	"name": "WynnTitles game tests",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": ["wynntitles.gametest.WynnTitlesClientGameTest"]
+	},
+	"mixins": ["wynntitles-gametest.mixins.json"],
+	"depends": {
+		"wynntitles": "*"
+	}
+}

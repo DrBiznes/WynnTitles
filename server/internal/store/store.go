@@ -1,0 +1,252 @@
+// Package store persists players, sessions, and achievement unlocks in SQLite.
+package store
+
+import (
+	"context"
+	"database/sql"
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
+	_ "modernc.org/sqlite"
+)
+
+// migrations run in order; PRAGMA user_version records how many have been
+// applied. Never edit a migration that has shipped; append a new one instead.
+var migrations = []string{
+	`CREATE TABLE players (
+		uuid            TEXT PRIMARY KEY,
+		username        TEXT NOT NULL,
+		equipped_prefix TEXT,
+		equipped_suffix TEXT,
+		created_at      INTEGER NOT NULL,
+		last_seen_at    INTEGER NOT NULL
+	);
+
+	CREATE TABLE sessions (
+		token_hash TEXT PRIMARY KEY,
+		uuid       TEXT NOT NULL REFERENCES players(uuid),
+		created_at INTEGER NOT NULL,
+		expires_at INTEGER NOT NULL
+	);
+	CREATE INDEX sessions_by_uuid ON sessions(uuid);
+
+	-- One row per player per achievement. Doubles as the audit log for claims:
+	-- moderation revokes by setting revoked_at instead of deleting the row.
+	CREATE TABLE unlocks (
+		uuid           TEXT NOT NULL REFERENCES players(uuid),
+		achievement_id TEXT NOT NULL,
+		trigger_type   TEXT NOT NULL,
+		evidence       TEXT,
+		mod_version    TEXT,
+		claimed_at     INTEGER NOT NULL,
+		revoked_at     INTEGER,
+		revoke_reason  TEXT,
+		PRIMARY KEY (uuid, achievement_id)
+	);`,
+}
+
+type Store struct {
+	db *sql.DB
+}
+
+type Player struct {
+	UUID           string
+	Username       string
+	EquippedPrefix string
+	EquippedSuffix string
+}
+
+type Unlock struct {
+	UUID          string
+	AchievementID string
+	TriggerType   string
+	Evidence      string
+	ModVersion    string
+	ClaimedAt     time.Time
+	Revoked       bool
+}
+
+var ErrNotFound = errors.New("not found")
+
+func Open(path string) (*Store, error) {
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return nil, err
+	}
+
+	dsn := "file:" + path + "?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=foreign_keys(1)"
+	db, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		return nil, err
+	}
+	// SQLite allows one writer at a time. Title lookups are served from memory,
+	// so a single connection is plenty and avoids SQLITE_BUSY entirely.
+	db.SetMaxOpenConns(1)
+
+	s := &Store{db: db}
+	if err := s.migrate(); err != nil {
+		db.Close()
+		return nil, err
+	}
+	return s, nil
+}
+
+func (s *Store) Close() error {
+	return s.db.Close()
+}
+
+func (s *Store) migrate() error {
+	var version int
+	if err := s.db.QueryRow(`PRAGMA user_version`).Scan(&version); err != nil {
+		return err
+	}
+
+	for i := version; i < len(migrations); i++ {
+		tx, err := s.db.Begin()
+		if err != nil {
+			return err
+		}
+		if _, err := tx.Exec(migrations[i]); err != nil {
+			tx.Rollback()
+			return fmt.Errorf("migration %d: %w", i+1, err)
+		}
+		if _, err := tx.Exec(fmt.Sprintf(`PRAGMA user_version = %d`, i+1)); err != nil {
+			tx.Rollback()
+			return err
+		}
+		if err := tx.Commit(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// UpsertPlayer records a login, creating the player on first sight and keeping
+// their username current (Minecraft names can change).
+func (s *Store) UpsertPlayer(ctx context.Context, uuid, username string, now time.Time) error {
+	_, err := s.db.ExecContext(ctx, `
+		INSERT INTO players (uuid, username, created_at, last_seen_at) VALUES (?, ?, ?, ?)
+		ON CONFLICT (uuid) DO UPDATE SET username = excluded.username, last_seen_at = excluded.last_seen_at`,
+		uuid, username, now.UnixMilli(), now.UnixMilli())
+	return err
+}
+
+func (s *Store) Player(ctx context.Context, uuid string) (Player, error) {
+	var p Player
+	var prefix, suffix sql.NullString
+	err := s.db.QueryRowContext(ctx,
+		`SELECT uuid, username, equipped_prefix, equipped_suffix FROM players WHERE uuid = ?`, uuid).
+		Scan(&p.UUID, &p.Username, &prefix, &suffix)
+	if errors.Is(err, sql.ErrNoRows) {
+		return p, ErrNotFound
+	}
+	p.EquippedPrefix, p.EquippedSuffix = prefix.String, suffix.String
+	return p, err
+}
+
+// SetEquipped stores the equipped words; an empty string unequips that slot.
+func (s *Store) SetEquipped(ctx context.Context, uuid, prefix, suffix string) error {
+	_, err := s.db.ExecContext(ctx,
+		`UPDATE players SET equipped_prefix = NULLIF(?, ''), equipped_suffix = NULLIF(?, '') WHERE uuid = ?`,
+		prefix, suffix, uuid)
+	return err
+}
+
+// PlayersWithTitles returns every player who has a prefix or suffix equipped,
+// used to warm the in-memory title cache at startup.
+func (s *Store) PlayersWithTitles(ctx context.Context) ([]Player, error) {
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT uuid, username, equipped_prefix, equipped_suffix FROM players
+		WHERE equipped_prefix IS NOT NULL OR equipped_suffix IS NOT NULL`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var players []Player
+	for rows.Next() {
+		var p Player
+		var prefix, suffix sql.NullString
+		if err := rows.Scan(&p.UUID, &p.Username, &prefix, &suffix); err != nil {
+			return nil, err
+		}
+		p.EquippedPrefix, p.EquippedSuffix = prefix.String, suffix.String
+		players = append(players, p)
+	}
+	return players, rows.Err()
+}
+
+func (s *Store) CreateSession(ctx context.Context, tokenHash, uuid string, now, expires time.Time) error {
+	_, err := s.db.ExecContext(ctx,
+		`INSERT INTO sessions (token_hash, uuid, created_at, expires_at) VALUES (?, ?, ?, ?)`,
+		tokenHash, uuid, now.UnixMilli(), expires.UnixMilli())
+	return err
+}
+
+// SessionUUID returns the player a session token belongs to, or ErrNotFound if
+// the token is unknown or expired.
+func (s *Store) SessionUUID(ctx context.Context, tokenHash string, now time.Time) (string, error) {
+	var uuid string
+	err := s.db.QueryRowContext(ctx,
+		`SELECT uuid FROM sessions WHERE token_hash = ? AND expires_at > ?`, tokenHash, now.UnixMilli()).
+		Scan(&uuid)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", ErrNotFound
+	}
+	return uuid, err
+}
+
+func (s *Store) DeleteSession(ctx context.Context, tokenHash string) error {
+	_, err := s.db.ExecContext(ctx, `DELETE FROM sessions WHERE token_hash = ?`, tokenHash)
+	return err
+}
+
+func (s *Store) DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error) {
+	res, err := s.db.ExecContext(ctx, `DELETE FROM sessions WHERE expires_at <= ?`, now.UnixMilli())
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
+}
+
+// Unlocks returns every unlock for a player, including revoked ones.
+func (s *Store) Unlocks(ctx context.Context, uuid string) ([]Unlock, error) {
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT uuid, achievement_id, trigger_type, COALESCE(evidence, ''), COALESCE(mod_version, ''),
+		       claimed_at, revoked_at IS NOT NULL
+		FROM unlocks WHERE uuid = ? ORDER BY claimed_at`, uuid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var unlocks []Unlock
+	for rows.Next() {
+		var u Unlock
+		var claimedAt int64
+		if err := rows.Scan(&u.UUID, &u.AchievementID, &u.TriggerType, &u.Evidence, &u.ModVersion,
+			&claimedAt, &u.Revoked); err != nil {
+			return nil, err
+		}
+		u.ClaimedAt = time.UnixMilli(claimedAt)
+		unlocks = append(unlocks, u)
+	}
+	return unlocks, rows.Err()
+}
+
+// InsertUnlock records a claim. It returns false without changing anything if
+// the player already has a row for that achievement (claimed or revoked).
+func (s *Store) InsertUnlock(ctx context.Context, u Unlock) (bool, error) {
+	res, err := s.db.ExecContext(ctx, `
+		INSERT INTO unlocks (uuid, achievement_id, trigger_type, evidence, mod_version, claimed_at)
+		VALUES (?, ?, ?, NULLIF(?, ''), NULLIF(?, ''), ?)
+		ON CONFLICT (uuid, achievement_id) DO NOTHING`,
+		u.UUID, u.AchievementID, u.TriggerType, u.Evidence, u.ModVersion, u.ClaimedAt.UnixMilli())
+	if err != nil {
+		return false, err
+	}
+	n, err := res.RowsAffected()
+	return n == 1, err
+}

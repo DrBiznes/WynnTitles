@@ -1,0 +1,11 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "minecraft:damage",
+    "fallback": { "type": "minecraft:model", "model": "minecraft:item/diamond_sword" },
+    "entries": [
+      { "threshold": 0.0390775, "model": { "type": "minecraft:model", "model": "minecraft:item/wynn/prop/quest_scroll" } },
+      { "threshold": 0.0397181, "model": { "type": "minecraft:model", "model": "minecraft:item/diamond_sword" } }
+    ]
+  }
+}

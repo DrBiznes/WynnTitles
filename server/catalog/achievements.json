@@ -1,0 +1,1419 @@
+[
+  {
+    "id": "quest_kings_recruit",
+    "category": "quest",
+    "name": "Welcome to The Province",
+    "description": "Complete the introductory quest to start your journey.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/prop/quest_scroll",
+      "fallback": "minecraft:writable_book"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "King's Recruit"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "King's",
+        "runs": [
+          {
+            "text": "King",
+            "color": "gold",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "flame"
+            }
+          },
+          {
+            "text": "'s",
+            "color": "yellow",
+            "italic": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Recruit",
+        "runs": [
+          {
+            "text": "Recruit",
+            "underlined": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "toxic",
+              "animated": true,
+              "cycleMs": 6000
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "archer_lvl_1",
+    "category": "class_level",
+    "name": "Archer 1",
+    "description": "Level an Archer to level 1.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/weapon/archer/bow_basic_wood",
+      "fallback": "minecraft:bow"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Archer",
+      "level": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Ragni-Bound",
+        "runs": [
+          {
+            "text": "Ragni-Bound",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "ice"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Hunter",
+        "runs": [
+          {
+            "text": "Hunter",
+            "color": "dark_green",
+            "bold": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "archer_lvl_50",
+    "category": "class_level",
+    "name": "Archer 2",
+    "description": "Level an Archer to level 50.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/weapon/archer/bow_basic_gold",
+      "fallback": "minecraft:bow"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Archer",
+      "level": 50
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Rapid",
+        "runs": [
+          {
+            "text": "Rapid",
+            "italic": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "red_purple",
+              "animated": true,
+              "cycleMs": 3500
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Boltslinger",
+        "runs": [
+          {
+            "text": "Bolt",
+            "color": "yellow",
+            "bold": true
+          },
+          {
+            "text": "slinger",
+            "color": "aqua",
+            "strikethrough": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "archer_lvl_100",
+    "category": "class_level",
+    "name": "Archer 3",
+    "description": "Level an Archer to level 100.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/weapon/archer/bow_fire_c",
+      "fallback": "minecraft:bow"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Archer",
+      "level": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Cunning",
+        "runs": [
+          {
+            "text": "Cunning",
+            "color": "green",
+            "italic": true,
+            "underlined": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Trapper",
+        "runs": [
+          {
+            "text": "Trapper",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "forest"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "archer_lvl_120",
+    "category": "class_level",
+    "name": "Archer 4",
+    "description": "Level an Archer to level 120.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/weapon/archer/bow_multi_c",
+      "fallback": "minecraft:bow"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Archer",
+      "level": 120
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Deadly",
+        "runs": [
+          {
+            "text": "Dead",
+            "color": "dark_red",
+            "bold": true
+          },
+          {
+            "text": "ly",
+            "color": "red",
+            "strikethrough": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Sharpshooter",
+        "runs": [
+          {
+            "text": "Sharpshooter",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#ffff55",
+                "#55ffff",
+                "#ffffff"
+              ],
+              "animated": true,
+              "cycleMs": 4200
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "warrior_lvl_1",
+    "category": "class_level",
+    "name": "Warrior 1",
+    "description": "Level a Warrior to level 1.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/weapon/warrior/spear_basic_wood",
+      "fallback": "minecraft:trident"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Warrior",
+      "level": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Fruma-Born",
+        "runs": [
+          {
+            "text": "Fruma-",
+            "color": "#c7c7c7",
+            "bold": true
+          },
+          {
+            "text": "Born",
+            "color": "white",
+            "italic": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Knight",
+        "runs": [
+          {
+            "text": "Knight",
+            "color": "dark_green",
+            "bold": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "warrior_lvl_50",
+    "category": "class_level",
+    "name": "Warrior 2",
+    "description": "Level a Warrior to level 50.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/weapon/warrior/spear_basic_gold",
+      "fallback": "minecraft:trident"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Warrior",
+      "level": 50
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Steadfast",
+        "runs": [
+          {
+            "text": "Steadfast",
+            "bold": true,
+            "underlined": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "flame"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Paladin",
+        "runs": [
+          {
+            "text": "Paladin",
+            "color": "light_purple",
+            "bold": true,
+            "italic": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "warrior_lvl_100",
+    "category": "class_level",
+    "name": "Warrior 3",
+    "description": "Level a Warrior to level 100.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/weapon/warrior/spear_fire_c",
+      "fallback": "minecraft:trident"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Warrior",
+      "level": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Ascending",
+        "runs": [
+          {
+            "text": "Ascending",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "royal",
+              "animated": true,
+              "cycleMs": 4500
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Battle Monk",
+        "runs": [
+          {
+            "text": "Battle",
+            "color": "red",
+            "bold": true
+          },
+          {
+            "text": " ",
+            "color": "gray"
+          },
+          {
+            "text": "Monk",
+            "color": "aqua",
+            "underlined": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "warrior_lvl_120",
+    "category": "class_level",
+    "name": "Warrior 4",
+    "description": "Level a Warrior to level 120.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/weapon/warrior/spear_multi_c",
+      "fallback": "minecraft:trident"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Warrior",
+      "level": 120
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Calamitous",
+        "runs": [
+          {
+            "text": "Calamitous",
+            "bold": true,
+            "strikethrough": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "red",
+              "animated": true,
+              "cycleMs": 3000
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Fallen",
+        "runs": [
+          {
+            "text": "Fallen",
+            "color": "dark_red",
+            "bold": true,
+            "italic": true,
+            "obfuscated": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mage_lvl_1",
+    "category": "class_level",
+    "name": "Mage 1",
+    "description": "Level a Mage to level 1.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/weapon/mage/wand_basic_gold",
+      "fallback": "minecraft:stick"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Mage",
+      "level": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Mystic",
+        "runs": [
+          {
+            "text": "Mystic",
+            "color": "light_purple",
+            "italic": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Dark Wizard",
+        "runs": [
+          {
+            "text": "Dark",
+            "color": "dark_purple",
+            "bold": true
+          },
+          {
+            "text": " ",
+            "color": "gray"
+          },
+          {
+            "text": "Wizard",
+            "color": "blue",
+            "underlined": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mage_lvl_50",
+    "category": "class_level",
+    "name": "Mage 2",
+    "description": "Level a Mage to level 50.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/weapon/mage/wand_basic_diamond",
+      "fallback": "minecraft:stick"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Mage",
+      "level": 50
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Resplendent",
+        "runs": [
+          {
+            "text": "Resplendent",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "sunset"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Light Bender",
+        "runs": [
+          {
+            "text": "Light",
+            "color": "yellow",
+            "bold": true
+          },
+          {
+            "text": " ",
+            "color": "white"
+          },
+          {
+            "text": "Bender",
+            "color": "aqua",
+            "italic": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mage_lvl_100",
+    "category": "class_level",
+    "name": "Mage 3",
+    "description": "Level a Mage to level 100.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/weapon/mage/wand_fire_c",
+      "fallback": "minecraft:stick"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Mage",
+      "level": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Endless",
+        "runs": [
+          {
+            "text": "Endless",
+            "effect": {
+              "type": "gradient",
+              "palette": "void",
+              "animated": true,
+              "cycleMs": 5200
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Riftwalker",
+        "runs": [
+          {
+            "text": "Rift",
+            "color": "dark_purple",
+            "obfuscated": true
+          },
+          {
+            "text": "walker",
+            "color": "light_purple",
+            "bold": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mage_lvl_120",
+    "category": "class_level",
+    "name": "Mage 4",
+    "description": "Level a Mage to level 120.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/weapon/mage/wand_multi_c",
+      "fallback": "minecraft:stick"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Mage",
+      "level": 120
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Chaos",
+        "runs": [
+          {
+            "text": "Chaos",
+            "color": "dark_purple",
+            "bold": true,
+            "obfuscated": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Arcanist",
+        "runs": [
+          {
+            "text": "Arcanist",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#aa00aa",
+                "#5555ff",
+                "#55ffff"
+              ],
+              "animated": true,
+              "cycleMs": 4600
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "assassin_lvl_1",
+    "category": "class_level",
+    "name": "Assassin 1",
+    "description": "Level an Assassin to level 1.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/weapon/assassin/dagger_basic_wood",
+      "fallback": "minecraft:iron_sword"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Assassin",
+      "level": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Veiled",
+        "runs": [
+          {
+            "text": "Veiled",
+            "color": "dark_gray",
+            "italic": true,
+            "obfuscated": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Ninja",
+        "runs": [
+          {
+            "text": "Ninja",
+            "color": "dark_aqua",
+            "bold": true,
+            "underlined": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "assassin_lvl_50",
+    "category": "class_level",
+    "name": "Assassin 2",
+    "description": "Level an Assassin to level 50.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/weapon/assassin/dagger_basic_gold",
+      "fallback": "minecraft:iron_sword"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Assassin",
+      "level": 50
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Vicious",
+        "runs": [
+          {
+            "text": "Vicious",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "red_purple"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Shadestepper",
+        "runs": [
+          {
+            "text": "Shade",
+            "color": "dark_gray",
+            "italic": true
+          },
+          {
+            "text": "stepper",
+            "effect": {
+              "type": "gradient",
+              "palette": "void",
+              "animated": true,
+              "cycleMs": 3600
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "assassin_lvl_100",
+    "category": "class_level",
+    "name": "Assassin 3",
+    "description": "Level an Assassin to level 100.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/weapon/assassin/dagger_fire_c",
+      "fallback": "minecraft:iron_sword"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Assassin",
+      "level": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Mimic",
+        "runs": [
+          {
+            "text": "Mi",
+            "color": "gray",
+            "obfuscated": true
+          },
+          {
+            "text": "mic",
+            "color": "white",
+            "strikethrough": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Trickster",
+        "runs": [
+          {
+            "text": "Trickster",
+            "bold": true,
+            "effect": {
+              "type": "rainbow",
+              "animated": true,
+              "cycleMs": 3900
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "assassin_lvl_120",
+    "category": "class_level",
+    "name": "Assassin 4",
+    "description": "Level an Assassin to level 120.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/weapon/assassin/dagger_multi_c",
+      "fallback": "minecraft:iron_sword"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Assassin",
+      "level": 120
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Gravity",
+        "runs": [
+          {
+            "text": "Gravity",
+            "underlined": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#111111",
+                "#5555ff",
+                "#ff55ff"
+              ],
+              "animated": true,
+              "cycleMs": 4800
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Acrobat",
+        "runs": [
+          {
+            "text": "Acro",
+            "color": "gold",
+            "bold": true
+          },
+          {
+            "text": "bat",
+            "color": "yellow",
+            "italic": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "shaman_lvl_1",
+    "category": "class_level",
+    "name": "Shaman 1",
+    "description": "Level a Shaman to level 1.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/weapon/shaman/relik_basic_wooden",
+      "fallback": "minecraft:blaze_rod"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Shaman",
+      "level": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Distant",
+        "runs": [
+          {
+            "text": "Distant",
+            "effect": {
+              "type": "gradient",
+              "palette": "ocean"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Skyseer",
+        "runs": [
+          {
+            "text": "Sky",
+            "color": "aqua",
+            "bold": true
+          },
+          {
+            "text": "seer",
+            "color": "white",
+            "italic": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "shaman_lvl_50",
+    "category": "class_level",
+    "name": "Shaman 2",
+    "description": "Level a Shaman to level 50.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/weapon/shaman/relik_basic_gold",
+      "fallback": "minecraft:blaze_rod"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Shaman",
+      "level": 50
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Sanguine",
+        "runs": [
+          {
+            "text": "Sanguine",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "red",
+              "animated": true,
+              "cycleMs": 4400
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Acolyte",
+        "runs": [
+          {
+            "text": "Aco",
+            "color": "dark_red",
+            "italic": true
+          },
+          {
+            "text": "lyte",
+            "color": "red",
+            "underlined": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "shaman_lvl_100",
+    "category": "class_level",
+    "name": "Shaman 3",
+    "description": "Level a Shaman to level 100.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/weapon/shaman/relik_fire_c",
+      "fallback": "minecraft:blaze_rod"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Shaman",
+      "level": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Woven",
+        "runs": [
+          {
+            "text": "Wo",
+            "color": "dark_green",
+            "bold": true
+          },
+          {
+            "text": "ven",
+            "effect": {
+              "type": "gradient",
+              "palette": "forest"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Summoner",
+        "runs": [
+          {
+            "text": "Summoner",
+            "effect": {
+              "type": "gradient",
+              "palette": "toxic",
+              "animated": true,
+              "cycleMs": 5000
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "shaman_lvl_120",
+    "category": "class_level",
+    "name": "Shaman 4",
+    "description": "Level a Shaman to level 120.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/weapon/shaman/relik_multi_c",
+      "fallback": "minecraft:blaze_rod"
+    },
+    "trigger": {
+      "type": "combatLevel",
+      "className": "Shaman",
+      "level": 120
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Ancestral",
+        "runs": [
+          {
+            "text": "Ancestral",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "ember"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Ritualist",
+        "runs": [
+          {
+            "text": "Ritual",
+            "color": "dark_purple",
+            "underlined": true
+          },
+          {
+            "text": "ist",
+            "effect": {
+              "type": "gradient",
+              "palette": "royal",
+              "animated": true,
+              "cycleMs": 4100
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "combat_lvl_120",
+    "category": "class_level",
+    "name": "Level 120",
+    "description": "Reach combat level 120 on any class.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/loot/mythic",
+      "fallback": "minecraft:nether_star"
+    },
+    "trigger": {
+      "type": "combatLevelAnyClass",
+      "level": 120
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Transcendent",
+        "runs": [
+          {
+            "text": "Transcendent",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#ff5555",
+                "#ffaa00",
+                "#ffff55",
+                "#55ff55",
+                "#55ffff"
+              ],
+              "animated": true,
+              "cycleMs": 5000
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Paragon",
+        "runs": [
+          {
+            "text": "Paragon",
+            "color": "aqua",
+            "underlined": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "prof_total_50",
+    "category": "profession",
+    "name": "Jack of All Trades (Novice)",
+    "description": "Reach total profession level 50.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/economy/mining/gem_copper",
+      "fallback": "minecraft:iron_pickaxe"
+    },
+    "trigger": {
+      "type": "totalProfessionLevel",
+      "level": 50
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Apprentice",
+        "runs": [
+          {
+            "text": "Apprentice",
+            "color": "gray",
+            "italic": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#aaaaaa",
+                "#ffffff",
+                "#55ff55"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "prof_total_500",
+    "category": "profession",
+    "name": "Jack of All Trades",
+    "description": "Reach total profession level 500.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/economy/mining/gem_diamond",
+      "fallback": "minecraft:diamond_pickaxe"
+    },
+    "trigger": {
+      "type": "totalProfessionLevel",
+      "level": 500
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Master of",
+        "runs": [
+          {
+            "text": "Master",
+            "color": "gold",
+            "bold": true
+          },
+          {
+            "text": " of",
+            "color": "yellow",
+            "italic": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Draft",
+        "runs": [
+          {
+            "text": "Draft",
+            "effect": {
+              "type": "gradient",
+              "palette": "sunset",
+              "animated": true,
+              "cycleMs": 5300
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "loc_great_bridge",
+    "category": "exploration",
+    "name": "Rickeo's Final Stand",
+    "description": "Cross the Great Bridge.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/economy/woodcutting/paper_acacia",
+      "fallback": "minecraft:filled_map"
+    },
+    "trigger": {
+      "type": "location",
+      "territoryName": "Jungle Entrance"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Wildfire",
+        "runs": [
+          {
+            "text": "Wildfire",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "flame",
+              "animated": true,
+              "cycleMs": 3300
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Bane-Slayer",
+        "runs": [
+          {
+            "text": "Bane",
+            "color": "dark_red",
+            "strikethrough": true
+          },
+          {
+            "text": "-",
+            "color": "gray"
+          },
+          {
+            "text": "Slayer",
+            "color": "red",
+            "bold": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "loc_moon",
+    "category": "exploration",
+    "name": "Moon Walker",
+    "description": "Visit the optional moon section of the Recipe For Disaster quest.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/skin/relik/halfmoon_crescent",
+      "fallback": "minecraft:ender_eye"
+    },
+    "trigger": {
+      "type": "location",
+      "territoryName": "The Moon"
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Moon-Walker",
+        "runs": [
+          {
+            "text": "Moon",
+            "color": "white",
+            "bold": true
+          },
+          {
+            "text": "-Walker",
+            "effect": {
+              "type": "gradient",
+              "palette": "ice",
+              "animated": true,
+              "cycleMs": 4700
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "item_le_stack",
+    "category": "collection",
+    "name": "Wealthy Beyond Measure",
+    "description": "Accumulate a massive stack of emeralds.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/pouch/emerald_full",
+      "fallback": "minecraft:emerald_block"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Liquid Emerald",
+      "amount": 64
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Wealthy",
+        "runs": [
+          {
+            "text": "Wealthy",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#00aa00",
+                "#55ff55",
+                "#ffffff"
+              ],
+              "animated": true,
+              "cycleMs": 5600
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Merchant",
+        "runs": [
+          {
+            "text": "Merchant",
+            "color": "gold",
+            "underlined": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "item_li_token",
+    "category": "collection",
+    "name": "Token of Excellence",
+    "description": "Acquire a Legendary Island token.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/loot/legendary",
+      "fallback": "minecraft:gold_nugget"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Legendary Island Token",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Legendary",
+        "runs": [
+          {
+            "text": "Legendary",
+            "color": "gold",
+            "bold": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Hero",
+        "runs": [
+          {
+            "text": "Hero",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "royal"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "stat_mobs_10k",
+    "category": "statistics",
+    "name": "Monster Hunter",
+    "description": "Slay thousands of foes.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/prop/undead_remains_0",
+      "fallback": "minecraft:bone"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "mobsKilled",
+      "amount": 10000
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Bane of",
+        "runs": [
+          {
+            "text": "Bane",
+            "color": "dark_red",
+            "bold": true
+          },
+          {
+            "text": " of",
+            "color": "red",
+            "italic": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Monsters",
+        "runs": [
+          {
+            "text": "Monsters",
+            "color": "dark_purple",
+            "obfuscated": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "stat_chests_1k",
+    "category": "statistics",
+    "name": "Treasure Hunter",
+    "description": "Find hidden riches throughout the world.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/locked_chest",
+      "fallback": "minecraft:chest"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "chestsFound",
+      "amount": 1000
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Seeker of",
+        "runs": [
+          {
+            "text": "Seeker",
+            "effect": {
+              "type": "gradient",
+              "palette": "ocean"
+            }
+          },
+          {
+            "text": " of",
+            "color": "aqua",
+            "italic": true
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Secrets",
+        "runs": [
+          {
+            "text": "Secrets",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "void",
+              "animated": true,
+              "cycleMs": 6200
+            }
+          }
+        ]
+      }
+    }
+  }
+]

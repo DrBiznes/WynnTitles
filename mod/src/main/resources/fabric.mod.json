@@ -1,0 +1,28 @@
+{
+	"schemaVersion": 1,
+	"id": "wynntitles",
+	"version": "${version}",
+	"name": "WynnTitles",
+	"description": "Earn title words from Wynncraft achievements and wear them above your name.",
+	"authors": ["DrBzines"],
+	"license": "MIT",
+	"icon": "assets/wynntitles/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": ["wynntitles.WynnTitles"],
+		"modmenu": ["wynntitles.config.ModMenuIntegration"]
+	},
+	"mixins": ["wynntitles.mixins.json"],
+	"depends": {
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "~${minecraft_version}",
+		"java": ">=${java_version}",
+		"fabric-api": "*",
+		"wynntils": ">=4.2.0",
+		"owo": ">=0.13.0",
+		"cloth-config": "*"
+	},
+	"suggests": {
+		"modmenu": "*"
+	}
+}
