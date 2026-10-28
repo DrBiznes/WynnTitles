@@ -14,5 +14,6 @@ server/data/
 mod/.gradle/
 mod/build/
 mod/run/
+mod/logs/
 mod/out/
 mod/bin/
