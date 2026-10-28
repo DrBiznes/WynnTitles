@@ -51,6 +51,11 @@ fabricApi {
 loom.runs.configureEach {
 	if (name == "clientGameTest") {
 		property "wynntitles.serverUrl", System.getProperty("wynntitles.testServer", "http://localhost:8080")
+		// Optional: also screenshot the screens with a cached Wynncraft pack loaded.
+		def wynnPack = System.getProperty("wynntitles.wynnPack")
+		if (wynnPack) {
+			property "wynntitles.wynnPack", wynnPack
+		}
 	}
 }
 

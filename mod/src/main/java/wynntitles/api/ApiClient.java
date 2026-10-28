@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import wynntitles.api.ApiTypes.AchievementStats;
 import wynntitles.api.ApiTypes.ClaimResult;
 import wynntitles.api.ApiTypes.Me;
 import wynntitles.api.ApiTypes.Session;
@@ -54,6 +55,11 @@ public final class ApiClient {
 			}
 			return new CatalogResponse(parse(resp, Catalog.class), newEtag);
 		});
+	}
+
+	public CompletableFuture<AchievementStats> achievementStats() {
+		return send(request("/v1/stats/achievements").GET().build())
+				.thenApply(resp -> parse(resp, AchievementStats.class));
 	}
 
 	public CompletableFuture<String> challenge(String username) {

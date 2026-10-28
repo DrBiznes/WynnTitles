@@ -243,3 +243,52 @@ func TestCatalogETag(t *testing.T) {
 		t.Fatalf("got %d, want 304", resp.StatusCode)
 	}
 }
+
+func TestAchievementStats(t *testing.T) {
+	h := newHarness(t)
+	token := h.login()
+
+	a := h.cat.Achievements[0]
+	h.do("POST", "/v1/claims", token, map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type}, nil)
+
+	var stats statsResponse
+	if code := h.do("GET", "/v1/stats/achievements", "", nil, &stats); code != 200 {
+		t.Fatalf("stats: got %d", code)
+	}
+	if stats.Players != 1 {
+		t.Fatalf("players = %d, want 1", stats.Players)
+	}
+	if len(stats.Unlocks) != len(h.cat.Achievements) {
+		t.Fatalf("stats cover %d achievements, want all %d", len(stats.Unlocks), len(h.cat.Achievements))
+	}
+	if stats.Unlocks[a.ID] != 1 || stats.Unlocks[h.cat.Achievements[1].ID] != 0 {
+		t.Fatalf("unlocks = %v", stats.Unlocks)
+	}
+}
+
+func TestAchievementStatsAreCached(t *testing.T) {
+	db, err := store.Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	cat, err := catalog.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	now := time.Unix(1000, 0)
+	srv := &Server{Store: db, Catalog: cat, StatsTTL: time.Minute, Now: func() time.Time { return now }}
+	ctx := context.Background()
+
+	before, _ := srv.achievementStats(ctx)
+	if err := db.UpsertPlayer(ctx, testUUID, testUsername, now); err != nil {
+		t.Fatal(err)
+	}
+	if cached, _ := srv.achievementStats(ctx); cached.Players != before.Players {
+		t.Fatalf("players changed within the TTL: %d -> %d", before.Players, cached.Players)
+	}
+	now = now.Add(time.Minute)
+	if fresh, _ := srv.achievementStats(ctx); fresh.Players != 1 {
+		t.Fatalf("players after the TTL = %d, want 1", fresh.Players)
+	}
+}

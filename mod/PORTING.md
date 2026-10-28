@@ -14,6 +14,7 @@ Expect to touch:
 | `mc/screen/*` | owo-ui screens. Check owo-lib's changelog for the target version. |
 | `mc/Icons.java`, `mc/UnlockToast.java`, `mc/screen/AchievementIcon.java` | Resource reloaders, item components (damage, custom model data), toasts and item rendering in GUIs. `icons/ItemModelIndex.java` reads the item model definition format, which Mojang changes every few versions. |
 | `mc/TitleRenderer.java` | Components and styles (rarely changes). |
+| `mc/WynnFonts.java` | `Style.withFont(new FontDescription.Resource(...))` and the font resource path; 1.21.9 changed fonts from ids to `FontDescription`. |
 | `mc/MojangSession.java` | `services().sessionService().joinServer(...)`. |
 | `mc/Nametags.java`, `mixin/WynntilsNametagMixin.java` | Hooks a **private** Wynntils method and constructs its private `CustomNametag` record. Re-check both after every Wynntils update. |
 | `achievements/WynntilsDetectors.java` | Wynntils model APIs. |

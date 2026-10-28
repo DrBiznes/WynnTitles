@@ -24,6 +24,7 @@ import wynntitles.api.ApiClient;
 import wynntitles.api.ApiException;
 import wynntitles.catalog.Catalog;
 import wynntitles.catalog.CatalogStore;
+import wynntitles.catalog.StatsStore;
 import wynntitles.config.WynnTitlesConfig;
 import wynntitles.mc.Commands;
 import wynntitles.mc.Icons;
@@ -31,6 +32,7 @@ import wynntitles.mc.Mc;
 import wynntitles.mc.MojangSession;
 import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.UnlockToast;
+import wynntitles.mc.WynnFonts;
 import wynntitles.mc.screen.TitlesScreen;
 import wynntitles.titles.Title;
 import wynntitles.titles.TitleCache;
@@ -41,6 +43,7 @@ public class WynnTitles implements ClientModInitializer {
 
 	private static Account account;
 	private static CatalogStore catalogs;
+	private static StatsStore stats;
 	private static TitleCache titles;
 	private static AchievementTracker tracker;
 
@@ -53,6 +56,10 @@ public class WynnTitles implements ClientModInitializer {
 
 	public static CatalogStore catalogs() {
 		return catalogs;
+	}
+
+	public static StatsStore stats() {
+		return stats;
 	}
 
 	public static TitleCache titles() {
@@ -75,6 +82,7 @@ public class WynnTitles implements ClientModInitializer {
 		ApiClient api = new ApiClient(WynnTitlesConfig::resolvedServerUrl, version);
 		account = new Account(api, new MojangSession(), dir.resolve("session.json"));
 		catalogs = new CatalogStore(api, dir.resolve("catalog.json"));
+		stats = new StatsStore(api);
 		titles = new TitleCache(api);
 		tracker = new AchievementTracker(
 				api, account, catalogs, WynntilsDetectors.create(), WynnTitles::announceUnlock, version);
@@ -84,6 +92,7 @@ public class WynnTitles implements ClientModInitializer {
 
 		Commands.register();
 		Icons.register();
+		WynnFonts.register();
 		openKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
 				"key.wynntitles.open",
 				InputConstants.Type.KEYSYM,

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/DrBzines/WynnTitles/server/catalog"
@@ -33,14 +34,22 @@ type Server struct {
 	Challenges *auth.Challenges
 	Verifier   auth.Verifier
 	SessionTTL time.Duration
-	Log        *slog.Logger
-	Now        func() time.Time
+	// StatsTTL is how long achievement stats are reused before counting again;
+	// zero counts on every request.
+	StatsTTL time.Duration
+	Log      *slog.Logger
+	Now      func() time.Time
+
+	statsMu sync.Mutex
+	stats   *statsResponse
+	statsAt time.Time
 }
 
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", s.health)
 	mux.HandleFunc("GET /v1/catalog", s.getCatalog)
+	mux.HandleFunc("GET /v1/stats/achievements", s.getAchievementStats)
 	mux.HandleFunc("POST /v1/auth/challenge", s.challenge)
 	mux.HandleFunc("POST /v1/auth/verify", s.verify)
 	mux.HandleFunc("POST /v1/auth/logout", s.authed(s.logout))
@@ -84,6 +93,46 @@ func (s *Server) getCatalog(w http.ResponseWriter, r *http.Request) {
 		"version":      s.Catalog.Version,
 		"achievements": s.Catalog.Achievements,
 	})
+}
+
+type statsResponse struct {
+	// Players is everyone who has logged in with the mod.
+	Players int `json:"players"`
+	// Unlocks has every catalog achievement, mapped to how many players hold it.
+	Unlocks map[string]int `json:"unlocks"`
+}
+
+// getAchievementStats reports how many players hold each achievement, for the
+// rarity the mod shows. Counting scans every unlock, so the result is reused
+// for StatsTTL.
+func (s *Server) getAchievementStats(w http.ResponseWriter, r *http.Request) {
+	stats, err := s.achievementStats(r.Context())
+	if err != nil {
+		s.internalError(w, err)
+		return
+	}
+	w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", int(s.StatsTTL.Seconds())))
+	writeJSON(w, http.StatusOK, stats)
+}
+
+func (s *Server) achievementStats(ctx context.Context) (*statsResponse, error) {
+	s.statsMu.Lock()
+	defer s.statsMu.Unlock()
+	now := s.Now()
+	if s.stats != nil && now.Sub(s.statsAt) < s.StatsTTL {
+		return s.stats, nil
+	}
+
+	players, counts, err := s.Store.UnlockCounts(ctx)
+	if err != nil {
+		return nil, err
+	}
+	stats := &statsResponse{Players: players, Unlocks: make(map[string]int, len(s.Catalog.Achievements))}
+	for _, a := range s.Catalog.Achievements {
+		stats.Unlocks[a.ID] = counts[a.ID]
+	}
+	s.stats, s.statsAt = stats, now
+	return stats, nil
 }
 
 func (s *Server) challenge(w http.ResponseWriter, r *http.Request) {

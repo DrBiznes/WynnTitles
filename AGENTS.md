@@ -13,6 +13,8 @@ cd mod && ./gradlew runClient                                 # dev client again
 cd mod && ./gradlew test -Dwynntitles.testServer=http://localhost:8080   # Java↔Go contract test
 cd mod && ./gradlew test -Dwynntitles.wynnPack="<cached server pack>"     # catalog icons vs the real Wynncraft pack
 python3 scripts/draw-icon-frames.py mod/src/main/resources/assets/wynntitles/textures/gui/sprites/icon   # redraw tier frames
+python3 scripts/draw-ui-sprites.py mod/src/main/resources/assets/wynntitles/textures/gui/sprites/widget  # redraw screen widgets
+WT_WYNN_PACK="<cached server pack>" scripts/smoke-test.sh                                         # also screenshot with the real pack
 ```
 
 ## Rules
@@ -25,4 +27,5 @@ python3 scripts/draw-icon-frames.py mod/src/main/resources/assets/wynntitles/tex
 - Schema changes are new entries appended to `migrations` in `server/internal/store/store.go`; never edit a shipped migration.
 - Never set `WT_OFFLINE_AUTH` in production.
 - Achievement icons name a Wynncraft item model (`icon.model`, relative to `minecraft:item/`) and a vanilla `icon.fallback`. The mod renders whatever the loaded pack shows for that model (`mc/Icons.java`). Never copy textures out of the Wynncraft pack into this repo. After changing icons, run the `wynnPack` test against a cached pack from a Wynncraft profile's `downloads/` folder.
+- Screens follow Wynncraft's menus: build them from `mc/screen/WynnUi.java` (frame, plaque, buttons, wells, palette) and set text through `mc/WynnFonts.java`, which uses the Wynncraft pack's fonts only when they are loaded. Widget sprites come from `scripts/draw-ui-sprites.py`; edit the script, not the PNGs. Never copy textures or font sheets out of the Wynncraft pack.
 - After UI or nametag changes, run `scripts/smoke-test.sh` and look at the screenshots in `mod/build/run/clientGameTest/screenshots`; assertions alone missed invisible text once.

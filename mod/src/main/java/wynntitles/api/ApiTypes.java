@@ -1,6 +1,7 @@
 package wynntitles.api;
 
 import java.util.List;
+import java.util.Map;
 import wynntitles.titles.Title;
 import wynntitles.titles.TitleWord;
 
@@ -35,6 +36,18 @@ public final class ApiTypes {
 	}
 
 	public record Equipped(String prefix, String suffix) {}
+
+	/** How many of the mod's players hold each achievement (GET /v1/stats/achievements). */
+	public record AchievementStats(int players, Map<String, Integer> unlocks) {
+		public AchievementStats {
+			unlocks = unlocks == null ? Map.of() : Map.copyOf(unlocks);
+		}
+
+		/** The share of players holding the achievement, 0 to 100. */
+		public double percent(String achievementId) {
+			return players == 0 ? 0 : 100.0 * unlocks.getOrDefault(achievementId, 0) / players;
+		}
+	}
 
 	public record ClaimResult(String status, String achievementId) {
 		public boolean newlyUnlocked() {

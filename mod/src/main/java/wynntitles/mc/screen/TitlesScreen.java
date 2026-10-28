@@ -1,68 +1,78 @@
 package wynntitles.mc.screen;
 
 import io.wispforest.owo.ui.base.BaseOwoScreen;
-import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.core.Color;
+import io.wispforest.owo.ui.core.CursorStyle;
+import io.wispforest.owo.ui.core.Easing;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.OwoUIAdapter;
+import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.Surface;
 import io.wispforest.owo.ui.core.VerticalAlignment;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.renderer.RenderPipelines;
+import java.util.function.Supplier;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import wynntitles.WynnTitles;
 import wynntitles.api.ApiException;
 import wynntitles.api.ApiTypes.Me;
-import wynntitles.api.ApiTypes.Unlock;
 import wynntitles.catalog.Catalog;
+import wynntitles.mc.Icons;
 import wynntitles.mc.Mc;
 import wynntitles.mc.TitleRenderer;
+import wynntitles.mc.WynnFonts;
 import wynntitles.titles.Title;
 import wynntitles.titles.TitleWord;
 
-/** The in-game home of WynnTitles: pick a title, and browse achievements. */
+/**
+ * The in-game home of WynnTitles, styled like a Wynncraft menu: a framed book
+ * with bookmark tabs for picking a title and browsing achievements.
+ */
 public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
-	private static final Identifier PANEL = sprite("panel");
-	private static final Identifier LIST_BG = sprite("list_bg");
-	private static final Identifier ITEM_HOVER = sprite("list_item_hover");
-	private static final Identifier ITEM_SELECTED = sprite("list_item_selected");
+	// Sized to fit a 427x240 GUI (854x480 at GUI scale 2) with the tabs.
+	private static final int PANEL_WIDTH = 372;
+	private static final int BODY_WIDTH = PANEL_WIDTH - 20;
+	private static final int BODY_HEIGHT = 150;
+	private static final int COLUMN_WIDTH = (BODY_WIDTH - 8) / 2;
+	private static final Identifier TAB = WynnUi.sprite("tab");
+	private static final Identifier TAB_SELECTED = WynnUi.sprite("tab_selected");
 
-	// Light text: both the panel and the list backgrounds are dark brown.
-	private static final int GOLD = 0xE8C050;
-	private static final int TEXT = 0xF3E6C8;
-	private static final int TEXT_DIM = 0xA88E66;
-	private static final int ERROR = 0xFF6B6B;
-	private static final int NEEDS_UPDATE = 0xE89A50;
-	private static final String UPDATE_TO_UNLOCK = "Update WynnTitles to unlock";
+	/** Tab icons name Wynncraft models, like achievement icons; the gametest checks they resolve. */
+	public static final Catalog.Icon TITLES_ICON = new Catalog.Icon("wynn/skin/hat/jagged_crown", "minecraft:name_tag");
+	public static final Catalog.Icon ACHIEVEMENTS_ICON = new Catalog.Icon("wynn/player/content_book", "minecraft:writable_book");
 
-	private enum Tab { TITLES, ACHIEVEMENTS }
+	private enum Tab {
+		TITLES("Titles", TITLES_ICON),
+		ACHIEVEMENTS("Achievements", ACHIEVEMENTS_ICON);
+
+		final String label;
+		final Catalog.Icon icon;
+
+		Tab(String label, Catalog.Icon icon) {
+			this.label = label;
+			this.icon = icon;
+		}
+	}
 
 	private Tab tab = Tab.TITLES;
-	private Predicate<Catalog.Achievement> canDetect = a -> WynnTitles.tracker().canDetect(a);
+	private AchievementsPage achievements = new AchievementsPage(a -> WynnTitles.tracker().canDetect(a));
 	private Me me;
 	private String error;
 	private String selectedPrefix;
 	private String selectedSuffix;
 	private boolean saving;
 
+	private FlowLayout tabs;
+	private FlowLayout header;
 	private FlowLayout body;
-	private LabelComponent status;
+	private FlowLayout footer;
 
 	public TitlesScreen() {
 		super(Component.literal("WynnTitles"));
@@ -78,7 +88,7 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	/** The achievements tab with a stand-in for the tracker, for tests. */
 	public static TitlesScreen achievements(Predicate<Catalog.Achievement> canDetect) {
 		TitlesScreen screen = achievements();
-		screen.canDetect = canDetect;
+		screen.achievements = new AchievementsPage(canDetect);
 		return screen;
 	}
 
@@ -89,37 +99,45 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 
 	@Override
 	protected void build(FlowLayout root) {
-		root.surface(Surface.VANILLA_TRANSLUCENT)
-				.horizontalAlignment(HorizontalAlignment.CENTER)
-				.verticalAlignment(VerticalAlignment.CENTER);
+		root.surface(Surface.VANILLA_TRANSLUCENT);
 
-		FlowLayout panel = UIContainers.verticalFlow(Sizing.fixed(320), Sizing.content());
-		panel.surface(spriteSurface(PANEL))
-				.padding(Insets.of(8))
+		// The tabs come first so the panel's frame covers their inner ends.
+		FlowLayout book = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+		tabs = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
+		tabs.gap(2).horizontalAlignment(HorizontalAlignment.RIGHT).margins(Insets.of(24, 0, 0, -6));
+		book.child(tabs);
+
+		FlowLayout panel = UIContainers.verticalFlow(Sizing.fixed(PANEL_WIDTH), Sizing.content());
+		panel.gap(4);
+		panel.surface(WynnUi.surface(WynnUi.PANEL))
+				.padding(Insets.of(2, 9, 10, 10))
 				.horizontalAlignment(HorizontalAlignment.CENTER);
-		panel.gap(6);
+		// The plaque sits over the top of the frame, like a nameboard.
+		header = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+		body = UIContainers.verticalFlow(Sizing.fill(), Sizing.fixed(BODY_HEIGHT));
+		body.gap(5);
+		body.horizontalAlignment(HorizontalAlignment.CENTER).verticalAlignment(VerticalAlignment.TOP);
+		footer = UIContainers.horizontalFlow(Sizing.fill(), Sizing.fixed(WynnUi.BUTTON_HEIGHT));
+		footer.gap(8);
+		footer.horizontalAlignment(HorizontalAlignment.CENTER).verticalAlignment(VerticalAlignment.CENTER);
+		panel.child(header).child(body).child(footer);
+		book.child(panel);
 
-		panel.child(label(Component.literal("✦ WynnTitles ✦"), GOLD));
-
-		FlowLayout tabs = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-		tabs.gap(4);
-		tabs.child(UIComponents.button(Component.literal("Titles"), b -> switchTab(Tab.TITLES)));
-		tabs.child(UIComponents.button(Component.literal("Achievements"), b -> switchTab(Tab.ACHIEVEMENTS)));
-		panel.child(tabs);
-
-		body = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
-		body.horizontalAlignment(HorizontalAlignment.CENTER);
-		body.gap(6);
-		panel.child(body);
-
-		status = label(Component.empty(), TEXT_DIM);
-		panel.child(status);
-
-		root.child(panel);
+		// Rise into place, like a Wynncraft menu opening.
+		book.positioning(Positioning.relative(50, 58));
+		book.positioning().animate(220, Easing.CUBIC, Positioning.relative(50, 50)).forwards();
+		root.child(book);
 
 		me = WynnTitles.account().me();
 		resetSelection();
-		rebuildBody();
+		rebuild();
+
+		// Rarity is optional: without it the list shows placeholders, not an error.
+		WynnTitles.stats().refresh().whenComplete((stats, t) -> Mc.run(() -> {
+			if (t == null && tab == Tab.ACHIEVEMENTS && me != null) {
+				rebuild();
+			}
+		}));
 
 		WynnTitles.account().refresh().whenComplete((loaded, t) -> Mc.run(() -> {
 			if (t != null) {
@@ -132,13 +150,16 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 					resetSelection();
 				}
 			}
-			rebuildBody();
+			rebuild();
 		}));
 	}
 
 	private void switchTab(Tab next) {
-		tab = next;
-		rebuildBody();
+		if (tab != next) {
+			tab = next;
+			WynnUi.playPageTurn();
+			rebuild();
+		}
 	}
 
 	private void resetSelection() {
@@ -148,84 +169,131 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		}
 	}
 
-	private void rebuildBody() {
+	private void rebuild() {
+		tabs.clearChildren();
+		for (Tab t : Tab.values()) {
+			tabs.child(tabButton(t));
+		}
+		header.clearChildren();
+		header.child(WynnUi.plaque(tab.label));
 		body.clearChildren();
-		if (me == null) {
-			body.child(error == null
-					? label(Component.literal("Logging in..."), TEXT_DIM)
-					: label(Component.literal(error), ERROR));
-			setStatus(Component.empty());
+		footer.clearChildren();
+
+		Catalog catalog = WynnTitles.catalogs().catalog();
+		if (me == null || (tab == Tab.ACHIEVEMENTS && catalog == null)) {
+			body.verticalAlignment(VerticalAlignment.CENTER);
+			body.child(me == null && error != null
+					? WynnUi.label(WynnFonts.body(error), WynnUi.ERROR).maxWidth(PANEL_WIDTH - 40)
+					: WynnUi.label(WynnFonts.body(me == null ? "Logging in..." : "Loading achievements..."), WynnUi.TEXT_DIM));
 			return;
 		}
+		body.verticalAlignment(VerticalAlignment.TOP);
 		if (tab == Tab.TITLES) {
-			buildTitlesTab();
+			buildTitles();
 		} else {
-			buildAchievementsTab();
+			body.child(achievements.build(catalog, me, WynnTitles.stats().stats(), BODY_WIDTH, BODY_HEIGHT));
+			footer.child(achievements.footer(me));
+			if (error != null) {
+				footer.child(WynnUi.label(WynnFonts.body(error), WynnUi.ERROR));
+			}
 		}
-		setStatus(error == null ? Component.empty() : Component.literal(error).withColor(ERROR));
+	}
+
+	private FlowLayout tabButton(Tab t) {
+		boolean selected = t == tab;
+		FlowLayout button = UIContainers.horizontalFlow(Sizing.fixed(selected ? 30 : 26), Sizing.fixed(24));
+		button.surface(WynnUi.surface(selected ? TAB_SELECTED : TAB)).padding(Insets.of(4, 0, 5, 0));
+		button.child(UIComponents.item(Icons.stack(t.icon)));
+		button.tooltip(WynnFonts.body(t.label));
+		button.cursorStyle(CursorStyle.HAND);
+		button.mouseDown().subscribe((click, doubled) -> {
+			switchTab(t);
+			return true;
+		});
+		return button;
 	}
 
 	// ── Titles ─────────────────────────────────────────────────────────────
 
-	private void buildTitlesTab() {
-		body.child(new TitleText(this::preview, 1.5f, TEXT).margins(Insets.vertical(4)));
+	private void buildTitles() {
+		// How the title will look over your head: the title, then your name.
+		FlowLayout nameplate = UIContainers.verticalFlow(Sizing.fill(), Sizing.fixed(36));
+		nameplate.gap(2);
+		nameplate.surface(WynnUi.surface(WynnUi.NAMEPLATE))
+				.horizontalAlignment(HorizontalAlignment.CENTER)
+				.verticalAlignment(VerticalAlignment.CENTER);
+		nameplate.child(new TitleText(this::preview, 1.5f, WynnUi.TEXT));
+		nameplate.child(WynnUi.label(Component.literal(me.username()), 0xFFFFFF));
+		body.child(nameplate);
 
-		FlowLayout columns = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+		FlowLayout columns = UIContainers.horizontalFlow(Sizing.fill(), Sizing.expand());
 		columns.gap(8);
-		columns.child(wordColumn("Prefix", me.words().prefixes(), selectedPrefix, w -> selectedPrefix = w));
-		columns.child(wordColumn("Suffix", me.words().suffixes(), selectedSuffix, w -> selectedSuffix = w));
+		columns.child(wordColumn("Prefix", me.words().prefixes(), () -> selectedPrefix, w -> selectedPrefix = w));
+		columns.child(wordColumn("Suffix", me.words().suffixes(), () -> selectedSuffix, w -> selectedSuffix = w));
 		body.child(columns);
+		titlesFooter();
+	}
 
+	private void titlesFooter() {
+		footer.clearChildren();
 		if (me.words().prefixes().isEmpty() && me.words().suffixes().isEmpty()) {
-			body.child(label(Component.literal("Unlock achievements to earn title words."), TEXT_DIM));
+			footer.child(WynnUi.label(WynnFonts.body("Unlock achievements to earn title words."), WynnUi.TEXT_DIM));
 		}
-
 		boolean changed = !Objects.equals(selectedPrefix, me.equipped().prefix())
 				|| !Objects.equals(selectedSuffix, me.equipped().suffix());
-		ButtonComponent save = UIComponents.button(Component.literal(saving ? "Saving..." : "Equip"), b -> save());
-		save.active(changed && !saving);
-		body.child(save);
+		footer.child(WynnUi.button(saving ? "Saving..." : "Equip", 80, changed && !saving, this::save));
+		if (error != null) {
+			footer.child(WynnUi.label(WynnFonts.body(error), WynnUi.ERROR));
+		}
 	}
 
 	private Component preview() {
 		Title title = Title.of(find(me.words().prefixes(), selectedPrefix), find(me.words().suffixes(), selectedSuffix));
 		return title == null
-				? Component.literal("(no title)").withColor(TEXT_DIM)
+				? WynnFonts.body("No title").withColor(WynnUi.TEXT_DIM)
 				: TitleRenderer.render(title);
 	}
 
-	private FlowLayout wordColumn(String heading, List<TitleWord> words, String selected, Consumer<String> select) {
-		FlowLayout column = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
-		column.gap(2);
-		column.child(label(Component.literal(heading), GOLD));
+	private FlowLayout wordColumn(String heading, List<TitleWord> words, Supplier<String> selected, Consumer<String> select) {
+		FlowLayout column = UIContainers.verticalFlow(Sizing.fixed(COLUMN_WIDTH), Sizing.fill());
+		column.gap(3);
+		column.child(WynnUi.heading(heading).margins(Insets.left(2)));
 
 		FlowLayout rows = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
-		rows.padding(Insets.of(1));
-		rows.child(wordRow(null, selected == null, select));
+		rows.child(wordRow(null, selected, select));
 		for (TitleWord word : words) {
-			rows.child(wordRow(word, word.text().equals(selected), select));
+			rows.child(wordRow(word, selected, select));
 		}
-
-		var scroll = UIContainers.verticalScroll(Sizing.fixed(140), Sizing.fixed(110), rows);
-		scroll.surface(spriteSurface(LIST_BG));
-		column.child(scroll);
+		column.child(WynnUi.well(Sizing.fill(), Sizing.expand(), rows));
 		return column;
 	}
 
-	private FlowLayout wordRow(TitleWord word, boolean selected, Consumer<String> select) {
-		FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(), Sizing.fixed(12));
-		row.padding(Insets.of(2, 0, 4, 0)).verticalAlignment(VerticalAlignment.CENTER);
+	/** Rows restyle themselves as the selection changes, so picking one keeps the list's scroll. */
+	private FlowLayout wordRow(TitleWord word, Supplier<String> selected, Consumer<String> select) {
+		String text = word == null ? null : word.text();
+		FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(), Sizing.fixed(13));
+		row.padding(Insets.of(2, 0, 5, 0)).verticalAlignment(VerticalAlignment.CENTER);
 		row.child(word == null
-				? label(Component.literal("(none)"), TEXT_DIM)
-				: new TitleText(() -> TitleRenderer.render(word), 1f, TEXT));
+				? WynnUi.label(WynnFonts.body("None"), WynnUi.TEXT_DIM)
+				: new TitleText(() -> TitleRenderer.render(word), 1f, WynnUi.TEXT));
 
-		Surface idle = selected ? spriteSurface(ITEM_SELECTED) : Surface.BLANK;
-		row.surface(idle);
-		row.mouseEnter().subscribe(() -> row.surface(selected ? idle : spriteSurface(ITEM_HOVER)));
-		row.mouseLeave().subscribe(() -> row.surface(idle));
+		boolean[] hovered = {false};
+		row.surface((graphics, c) -> {
+			if (Objects.equals(selected.get(), text)) {
+				WynnUi.surface(WynnUi.ROW_SELECTED).draw(graphics, c);
+			} else if (hovered[0]) {
+				WynnUi.surface(WynnUi.ROW_HOVER).draw(graphics, c);
+			}
+		});
+		row.cursorStyle(CursorStyle.HAND);
+		row.mouseEnter().subscribe(() -> hovered[0] = true);
+		row.mouseLeave().subscribe(() -> hovered[0] = false);
 		row.mouseDown().subscribe((click, doubled) -> {
-			select.accept(word == null ? null : word.text());
-			rebuildBody();
+			if (!Objects.equals(selected.get(), text)) {
+				select.accept(text);
+				WynnUi.playClick();
+				titlesFooter();
+			}
 			return true;
 		});
 		return row;
@@ -233,7 +301,7 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 
 	private void save() {
 		saving = true;
-		rebuildBody();
+		titlesFooter();
 		WynnTitles.account().setTitle(selectedPrefix, selectedSuffix).whenComplete((updated, t) -> Mc.run(() -> {
 			saving = false;
 			if (t != null) {
@@ -243,82 +311,11 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 				error = null;
 				resetSelection();
 			}
-			rebuildBody();
+			// Only the footer changes, so the word lists keep their scroll.
+			if (tab == Tab.TITLES) {
+				titlesFooter();
+			}
 		}));
-	}
-
-	// ── Achievements ───────────────────────────────────────────────────────
-
-	private void buildAchievementsTab() {
-		Catalog catalog = WynnTitles.catalogs().catalog();
-		if (catalog == null) {
-			body.child(label(Component.literal("Loading achievements..."), TEXT_DIM));
-			return;
-		}
-
-		Set<String> unlocked = me.unlocked().stream().map(Unlock::achievementId).collect(Collectors.toSet());
-		body.child(label(Component.literal(unlocked.size() + " / " + catalog.achievements().size()
-				+ " unlocked  ·  " + me.points() + (me.points() == 1 ? " point" : " points")), TEXT));
-
-		FlowLayout rows = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
-		rows.padding(Insets.of(2));
-		rows.gap(2);
-		for (Catalog.Achievement achievement : catalog.achievements()) {
-			boolean isUnlocked = unlocked.contains(achievement.id());
-			rows.child(achievementRow(achievement, isUnlocked, !isUnlocked && !canDetect.test(achievement)));
-		}
-
-		var scroll = UIContainers.verticalScroll(Sizing.fixed(296), Sizing.fixed(170), rows);
-		scroll.surface(spriteSurface(LIST_BG));
-		body.child(scroll);
-	}
-
-	/** needsUpdate: this mod version cannot detect the trigger, so it can never unlock. */
-	private FlowLayout achievementRow(Catalog.Achievement achievement, boolean unlocked, boolean needsUpdate) {
-		FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(), Sizing.content());
-		row.padding(Insets.of(2, 2, 3, 4)).verticalAlignment(VerticalAlignment.CENTER);
-		row.gap(5);
-		row.child(new AchievementIcon(achievement, unlocked));
-
-		FlowLayout text = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
-		text.gap(3);
-		MutableComponent name = Component.literal(achievement.name()).withStyle(ChatFormatting.BOLD);
-		text.child(label(name, unlocked ? TEXT : TEXT_DIM));
-		Title reward = Title.of(achievement.rewards().prefix(), achievement.rewards().suffix());
-		if (reward != null) {
-			text.child(new TitleText(() -> TitleRenderer.render(reward), 1f, TEXT));
-		}
-		if (needsUpdate) {
-			text.child(label(Component.literal(UPDATE_TO_UNLOCK), NEEDS_UPDATE));
-		}
-		row.child(text);
-
-		List<Component> tooltip = new ArrayList<>(List.of(
-				Component.literal(achievement.name()).withStyle(ChatFormatting.GOLD),
-				Component.literal(achievement.description()).withStyle(ChatFormatting.GRAY),
-				Component.literal(tierLabel(achievement.tier()) + " · " + achievement.points() + " pts"
-								+ (unlocked ? " · Unlocked" : ""))
-						.withStyle(tierColor(achievement.tier()))));
-		if (needsUpdate) {
-			tooltip.add(Component.literal(UPDATE_TO_UNLOCK).withColor(NEEDS_UPDATE));
-		}
-		row.tooltip(tooltip);
-		return row;
-	}
-
-	private static String tierLabel(String tier) {
-		return tier.isEmpty() ? tier : Character.toUpperCase(tier.charAt(0)) + tier.substring(1);
-	}
-
-	private static ChatFormatting tierColor(String tier) {
-		return Map.of("bronze", ChatFormatting.GOLD, "silver", ChatFormatting.GRAY, "gold", ChatFormatting.YELLOW)
-				.getOrDefault(tier, ChatFormatting.WHITE);
-	}
-
-	// ── Helpers ────────────────────────────────────────────────────────────
-
-	private void setStatus(Component text) {
-		status.text(text);
 	}
 
 	private static TitleWord find(List<TitleWord> words, String text) {
@@ -326,21 +323,6 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 			return null;
 		}
 		return words.stream().filter(w -> w.text().equals(text)).findFirst().orElse(null);
-	}
-
-	private static LabelComponent label(Component text, int color) {
-		LabelComponent label = UIComponents.label(text);
-		label.color(Color.ofRgb(color)).shadow(false);
-		return label;
-	}
-
-	private static Surface spriteSurface(Identifier sprite) {
-		return (graphics, component) -> graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite,
-				component.x(), component.y(), component.width(), component.height());
-	}
-
-	private static Identifier sprite(String name) {
-		return Identifier.fromNamespaceAndPath(WynnTitles.MOD_ID, "widget/" + name);
 	}
 
 	@Override

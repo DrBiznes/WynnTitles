@@ -5,6 +5,7 @@
 //	WT_ADDR         listen address (default ":8080")
 //	WT_DB           SQLite database path (default "data/wynntitles.db")
 //	WT_SESSION_TTL  how long a login lasts (default "720h")
+//	WT_STATS_TTL    how long achievement rarity is cached (default "1m")
 //	WT_MOJANG_URL   Mojang session server (default "https://sessionserver.mojang.com")
 //	WT_OFFLINE_AUTH "true" skips Mojang and trusts any username. Local testing
 //	                with ./gradlew runClient only; never enable it in production.
@@ -43,6 +44,10 @@ func run(log *slog.Logger) error {
 	if err != nil {
 		return err
 	}
+	statsTTL, err := time.ParseDuration(env("WT_STATS_TTL", "1m"))
+	if err != nil {
+		return err
+	}
 
 	cat, err := catalog.Load()
 	if err != nil {
@@ -71,6 +76,7 @@ func run(log *slog.Logger) error {
 		Challenges: auth.NewChallenges(2*time.Minute, 10_000),
 		Verifier:   verifier,
 		SessionTTL: sessionTTL,
+		StatsTTL:   statsTTL,
 		Log:        log,
 		Now:        time.Now,
 	}

@@ -250,3 +250,29 @@ func (s *Store) InsertUnlock(ctx context.Context, u Unlock) (bool, error) {
 	n, err := res.RowsAffected()
 	return n == 1, err
 }
+
+// UnlockCounts returns how many players exist and how many of them hold each
+// achievement, ignoring revoked unlocks.
+func (s *Store) UnlockCounts(ctx context.Context) (int, map[string]int, error) {
+	var players int
+	if err := s.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM players`).Scan(&players); err != nil {
+		return 0, nil, err
+	}
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT achievement_id, COUNT(*) FROM unlocks WHERE revoked_at IS NULL GROUP BY achievement_id`)
+	if err != nil {
+		return 0, nil, err
+	}
+	defer rows.Close()
+
+	counts := map[string]int{}
+	for rows.Next() {
+		var id string
+		var n int
+		if err := rows.Scan(&id, &n); err != nil {
+			return 0, nil, err
+		}
+		counts[id] = n
+	}
+	return players, counts, rows.Err()
+}

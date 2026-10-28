@@ -20,6 +20,7 @@ import wynntitles.account.Account;
 import wynntitles.achievements.AchievementTracker;
 import wynntitles.achievements.Detector;
 import wynntitles.api.ApiClient;
+import wynntitles.api.ApiTypes.AchievementStats;
 import wynntitles.api.ApiTypes.ClaimResult;
 import wynntitles.api.ApiTypes.Me;
 import wynntitles.catalog.Catalog;
@@ -61,6 +62,13 @@ class ServerContractTest {
 		evidence.addProperty("test", true);
 		ClaimResult claim = account.withToken(t -> api.claim(t, first.id(), first.trigger().type(), evidence, "test")).get();
 		assertTrue(claim.newlyUnlocked());
+
+		// Other tests share the server, so only check what this player's claim guarantees.
+		AchievementStats stats = api.achievementStats().get();
+		assertTrue(stats.players() >= 1);
+		assertTrue(stats.unlocks().getOrDefault(first.id(), 0) >= 1, "the claim should be counted");
+		assertEquals(catalog.achievements().size(), stats.unlocks().size());
+		assertTrue(stats.percent(first.id()) > 0 && stats.percent(first.id()) <= 100);
 
 		me = account.setTitle(first.rewards().prefix().text(), first.rewards().suffix().text()).get();
 		assertEquals(1, me.unlocked().size());

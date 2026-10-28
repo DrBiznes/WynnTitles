@@ -13,6 +13,8 @@ server/   Go API server with SQLite; also the home of the achievement catalog
 - **The catalog** (`server/catalog/achievements.json`) is the single source of truth. It is embedded in the server binary and validated at startup. The mod downloads it from `GET /v1/catalog`, so adding an achievement that uses an existing trigger type needs no mod update.
 - **Claims are trusted.** The mod detects triggers with Wynntils data and claims them, and the server records every claim with its evidence in the `unlocks` table. Moderation can revoke a row later by setting `revoked_at`.
 - **Achievement icons** are the achievement's Wynncraft item inside a hexagonal bronze, silver or gold frame. The catalog names an item model from the Wynncraft resource pack (for example `wynn/prop/quest_scroll`) and a vanilla fallback. Whenever resource packs load, the mod indexes the loaded item definitions to find which item and damage or custom model data show that model, so nothing from the pack is copied, and renumbering in a pack update is picked up automatically. Off Wynncraft, or if a model disappears, the fallback item shows.
+- **The screens** (`mod/.../mc/screen`) are owo-ui layouts styled like Wynncraft's own menus: a wood-framed book with bookmark tabs, a parchment plaque and gold buttons. Achievements are a trophy list: categories with their progress, then each achievement with its reward, unlock date and rarity. The sprites are drawn by `scripts/draw-ui-sprites.py`. Text uses the Wynncraft pack's fonts by id (`language/wynncraft` and the small-caps `language/five`) when the loaded packs define them, and the vanilla font otherwise (`mc/WynnFonts.java`); like icons, nothing is copied from the pack.
+- **Rarity** (`GET /v1/stats/achievements`) is the share of WynnTitles players (everyone who has logged in with the mod) holding each achievement, not counting revoked unlocks. The mod names it after Wynncraft's item tiers, from Normal down to Mythic below 1%. The server counts every unlock to answer, so it reuses the result for `WT_STATS_TTL`.
 - **Title lookups** (`POST /v1/titles/batch`) are served from an in-memory map rebuilt from SQLite at startup, so crowded world events never touch the database.
 
 ## Running locally
@@ -23,7 +25,7 @@ Server (needs Go 1.26+):
 cd server && WT_OFFLINE_AUTH=true go run ./cmd/wynntitles
 ```
 
-`WT_OFFLINE_AUTH=true` skips the Mojang check so the dev client's offline account can log in. Never set it in production. Other settings: `WT_ADDR` (default `:8080`), `WT_DB` (default `data/wynntitles.db`), `WT_SESSION_TTL` (default `720h`).
+`WT_OFFLINE_AUTH=true` skips the Mojang check so the dev client's offline account can log in. Never set it in production. Other settings: `WT_ADDR` (default `:8080`), `WT_DB` (default `data/wynntitles.db`), `WT_SESSION_TTL` (default `720h`), `WT_STATS_TTL` (how long rarity is cached, default `1m`).
 
 Mod (Gradle downloads its own Java 25 to run; the mod targets Java 21):
 
@@ -52,6 +54,12 @@ To check every catalog icon against the real Wynncraft pack, point the unit test
 cd mod && ./gradlew test -Dwynntitles.wynnPack="<profile>/downloads/<id>/<hash>"
 ```
 
+To also see the screens the way players do, with the Wynncraft pack's fonts and item models, pass the same cached pack to the smoke test. The client test loads it after its own checks and saves `*-wynnpack` screenshots:
+
+```bash
+WT_WYNN_PACK="<profile>/downloads/<id>/<hash>" scripts/smoke-test.sh
+```
+
 Wynntils only fires nametag events on Wynncraft, so a test-only mixin forwards that one event in singleplayer. Use `scripts/smoke-test.sh --no-game` to skip the client test.
 
 ## API
@@ -60,6 +68,7 @@ Wynntils only fires nametag events on Wynncraft, so a test-only mixin forwards t
 |---|---|---|---|
 | GET | `/healthz` | | Liveness |
 | GET | `/v1/catalog` | | Achievements and title words (ETag cached) |
+| GET | `/v1/stats/achievements` | | `{players, unlocks: {achievementId: count}}` for rarity (cached for `WT_STATS_TTL`) |
 | POST | `/v1/auth/challenge` | | `{username}` → `{serverId}` |
 | POST | `/v1/auth/verify` | | `{username, serverId}` → `{token, uuid, username, expiresAt}` |
 | POST | `/v1/auth/logout` | Bearer | Ends the session |

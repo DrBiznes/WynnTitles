@@ -5,12 +5,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import wynntitles.catalog.Catalog;
 import wynntitles.mc.screen.AchievementIcon;
 
-/** The vanilla advancement toast, with the achievement's framed icon. */
+/** The vanilla advancement toast, with the achievement's framed icon and Wynncraft's fonts. */
 public class UnlockToast implements Toast {
 	private static final Identifier BACKGROUND = Identifier.withDefaultNamespace("toast/advancement");
 	private static final long DISPLAY_MS = 5000;
@@ -42,8 +41,11 @@ public class UnlockToast implements Toast {
 		// The hex is as tall as the toast; only its top and bottom points touch the edge.
 		AchievementIcon.draw(graphics, achievement, true, 3, (height() - AchievementIcon.HEIGHT) / 2);
 		int textX = 3 + AchievementIcon.WIDTH + 4;
-		graphics.drawString(font, Component.literal("Achievement unlocked"), textX, 7, TITLE_COLOR, false);
-		graphics.drawString(font, font.plainSubstrByWidth(achievement.name(), width() - textX - 4), textX, 18,
-				NAME_COLOR, false);
+		graphics.drawString(font, WynnFonts.small("Achievement unlocked"), textX, 7, TITLE_COLOR, false);
+		String name = achievement.name();
+		while (!name.isEmpty() && font.width(WynnFonts.body(name)) > width() - textX - 4) {
+			name = name.substring(0, name.length() - 1);
+		}
+		graphics.drawString(font, WynnFonts.body(name), textX, 18, NAME_COLOR, false);
 	}
 }

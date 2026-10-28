@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -11,6 +12,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.client.player.RemotePlayer;
+import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -23,6 +25,7 @@ import wynntitles.catalog.Catalog;
 import wynntitles.config.WynnTitlesConfig;
 import wynntitles.mc.Icons;
 import wynntitles.mc.UnlockToast;
+import wynntitles.mc.WynnFonts;
 import wynntitles.mc.screen.TitlesScreen;
 
 /**
@@ -110,7 +113,54 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			// Let the toast slide in fully before the shot.
 			context.waitTicks(30);
 			context.takeScreenshot("wynntitles-unlock-toast");
+
+			screenshotWithWynncraftPack(context, ownAchievement);
 		}
+	}
+
+	/**
+	 * With -Dwynntitles.wynnPack pointing at a cached Wynncraft pack (see
+	 * README.md), loads it and shoots the screens again, so the screenshots show
+	 * the pack's fonts and item models the way players see them. The pack stays
+	 * in the run folder, outside the repository.
+	 */
+	private static void screenshotWithWynncraftPack(ClientGameTestContext context, Catalog.Achievement achievement) {
+		String pack = System.getProperty("wynntitles.wynnPack");
+		if (pack == null || pack.isBlank()) {
+			return;
+		}
+		CompletableFuture<Void> reload = context.computeOnClient(client -> {
+			try {
+				Files.copy(Path.of(pack), client.getResourcePackDirectory().resolve("wynncraft.zip"),
+						StandardCopyOption.REPLACE_EXISTING);
+			} catch (Exception e) {
+				throw new AssertionError("could not copy the Wynncraft pack " + pack, e);
+			}
+			PackRepository packs = client.getResourcePackRepository();
+			packs.reload();
+			check(packs.addPack("file/wynncraft.zip"), "the Wynncraft pack did not load from " + pack);
+			client.options.updateResourcePacks(packs);
+			return client.reloadResourcePacks();
+		});
+		context.waitFor(client -> reload.isDone() && client.getOverlay() == null, TIMEOUT_TICKS);
+		context.runOnClient(client -> {
+			check(WynnFonts.loaded(), "the Wynncraft pack should provide its fonts");
+			for (Catalog.Icon icon : List.of(TitlesScreen.TITLES_ICON, TitlesScreen.ACHIEVEMENTS_ICON)) {
+				check(Icons.resolved(icon), "tab icon " + icon.model() + " is not in the Wynncraft pack");
+			}
+		});
+
+		context.setScreen(TitlesScreen::new);
+		context.waitTicks(20);
+		screenshot(context, "wynntitles-titles-tab-wynnpack");
+		context.setScreen(TitlesScreen::achievements);
+		context.waitTicks(20);
+		screenshot(context, "wynntitles-achievements-tab-wynnpack");
+		context.setScreen(() -> null);
+		context.runOnClient(client -> client.getToastManager().clear());
+		context.runOnClient(client -> client.getToastManager().addToast(new UnlockToast(achievement)));
+		context.waitTicks(30);
+		context.takeScreenshot("wynntitles-unlock-toast-wynnpack");
 	}
 
 	/** Icons resolve through the fake pack, and fall back when a model is missing. */

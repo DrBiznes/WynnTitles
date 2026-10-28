@@ -2,7 +2,6 @@
 .idea/
 .vscode/
 *.iml
-scripts/
 
 # server
 server/data/
