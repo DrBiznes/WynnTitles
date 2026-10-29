@@ -23,23 +23,31 @@ import wynntitles.mc.Mc;
 import wynntitles.mc.WynnFonts;
 
 /**
- * The look of WynnTitles' screens, after Wynncraft's own menus: a wood frame
- * with gold fittings, parchment plaques and gold buttons. The sprites come from
- * scripts/draw-ui-sprites.py; sizes noted here must match it.
+ * The look of WynnTitles' screens, after Wynncraft's raid start screen: a regal
+ * purple field between stone pillars, a ribbon for the title, a stone tab bar,
+ * dark stone wells and stone buttons, with gold for highlights. The sprites come from scripts/draw-ui-sprites.py;
+ * sizes noted here must match it.
  */
 final class WynnUi {
-	// Light text: the panel and wells are dark wood.
-	static final int TEXT = 0xF3E6C8;
-	static final int TEXT_DIM = 0xA8916C;
-	static final int GOLD = 0xF2CF4A;
-	/** Dark text on parchment and gold. */
-	static final int INK = 0x3F2812;
-	static final int INK_DISABLED = 0x2A231C;
+	// Light text: the wells are dark stone.
+	static final int TEXT = 0xFFF4DC;
+	static final int TEXT_DIM = 0xB3A9A4;
+	static final int GOLD = 0xF7C948;
+	/** Dark text on stone buttons. */
+	static final int INK = 0x2A2426;
+	static final int INK_DISABLED = 0x3A3438;
+	/** Outlines for white lettering, as on Wynncraft's ribbons. */
+	static final int OUTLINE = 0x1C1719;
 	static final int ERROR = 0xFF6B6B;
 	static final int NEEDS_UPDATE = 0xE89A50;
 	static final int UNLOCKED = 0x8FD86B;
 
 	static final Identifier PANEL = sprite("panel");
+	static final Identifier EYE = sprite("eye");
+	static final Identifier BAR = sprite("bar");
+	static final Identifier TAB = sprite("tab");
+	static final Identifier TAB_HOVER = sprite("tab_hover");
+	static final Identifier TAB_SELECTED = sprite("tab_selected");
 	static final Identifier WELL = sprite("well");
 	static final Identifier NAMEPLATE = sprite("nameplate");
 	static final Identifier ROW_HOVER = sprite("row_hover");
@@ -49,13 +57,12 @@ final class WynnUi {
 	static final int SCROLLBAR_WIDTH = 5;
 	/** How much narrower a well's content is than the well. */
 	static final int WELL_INSET = 3 + 2 + SCROLLBAR_WIDTH + 1;
-	private static final Identifier PLAQUE = sprite("plaque");
+	private static final Identifier RIBBON = sprite("ribbon");
 	private static final Identifier BUTTON = sprite("button");
 	private static final Identifier BUTTON_HOVER = sprite("button_hover");
 	private static final Identifier BUTTON_DISABLED = sprite("button_disabled");
 	private static final Identifier SCROLL_TRACK = sprite("scroll_track");
 	private static final Identifier SCROLL_THUMB = sprite("scroll_thumb");
-	private static final Identifier GEM = sprite("gem");
 
 	private WynnUi() {}
 
@@ -78,12 +85,12 @@ final class WynnUi {
 		return label;
 	}
 
-	/** A parchment nameboard with a heading in small capitals. */
-	static FlowLayout plaque(String text) {
-		FlowLayout plaque = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(15));
-		plaque.padding(Insets.of(4, 0, 10, 10)).surface(surface(PLAQUE));
-		plaque.child(label(WynnFonts.small(text), INK));
-		return plaque;
+	/** The red ribbon across the top edge, with the screen's title in outlined white. */
+	static FlowLayout ribbon(String text) {
+		FlowLayout ribbon = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(20));
+		ribbon.padding(Insets.of(3, 0, 13, 13)).surface(surface(RIBBON));
+		ribbon.child(new OutlinedText(WynnFonts.body(text), 0xFFFFFF, OUTLINE));
+		return ribbon;
 	}
 
 	/** A small-caps label such as a column heading. */
@@ -91,7 +98,7 @@ final class WynnUi {
 		return label(WynnFonts.small(text), GOLD);
 	}
 
-	/** A gold button with dark lettering, like Wynncraft's "Start!". */
+	/** A stone button with dark lettering, like the raid screen's "Ready!". */
 	static ButtonComponent button(String text, int width, boolean active, Runnable onPress) {
 		ButtonComponent button = UIComponents.button(
 				WynnFonts.small(text).withColor(active ? INK : INK_DISABLED), b -> onPress.run());
@@ -125,17 +132,6 @@ final class WynnUi {
 				.padding(Insets.of(3, 3, 3, 2))
 				.surface(surface(WELL));
 		return scroll;
-	}
-
-	/** A thin gold rule with a gem in the middle. */
-	static UIComponent divider(Sizing width) {
-		return UIContainers.horizontalFlow(width, Sizing.fixed(5))
-				.surface((graphics, c) -> {
-					int mid = c.y() + 2;
-					graphics.fill(c.x(), mid, c.x() + c.width(), mid + 1, 0xFF000000 | 0xB0801C);
-					graphics.fill(c.x(), mid + 1, c.x() + c.width(), mid + 2, 0xFF000000 | 0x140D08);
-					blit(graphics, GEM, c.x() + (c.width() - 7) / 2, c.y(), 7, 5);
-				});
 	}
 
 	static void playClick() {

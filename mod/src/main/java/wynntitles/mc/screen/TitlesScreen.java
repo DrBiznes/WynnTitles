@@ -1,7 +1,6 @@
 package wynntitles.mc.screen;
 
 import io.wispforest.owo.ui.base.BaseOwoScreen;
-import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.CursorStyle;
@@ -19,12 +18,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import wynntitles.WynnTitles;
 import wynntitles.api.ApiException;
 import wynntitles.api.ApiTypes.Me;
 import wynntitles.catalog.Catalog;
-import wynntitles.mc.Icons;
 import wynntitles.mc.Mc;
 import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.WynnFonts;
@@ -32,32 +29,33 @@ import wynntitles.titles.Title;
 import wynntitles.titles.TitleWord;
 
 /**
- * The in-game home of WynnTitles, styled like a Wynncraft menu: a framed book
- * with bookmark tabs for picking a title and browsing achievements.
+ * The in-game home of WynnTitles, laid out like Wynncraft's raid start screen:
+ * a ribbon with the title, a stone tab bar to switch between picking a title
+ * and browsing achievements, the page, and its actions along the bottom.
  */
 public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
-	// Sized to fit a 427x240 GUI (854x480 at GUI scale 2) with the tabs.
-	private static final int PANEL_WIDTH = 372;
-	private static final int BODY_WIDTH = PANEL_WIDTH - 20;
-	private static final int BODY_HEIGHT = 150;
+	// The panel is one picture (PANEL_W/H in draw-ui-sprites.py), sized to fit a
+	// 427x240 GUI (854x480 at GUI scale 2). The content stays inside the frame,
+	// clear of the pillars.
+	private static final int PANEL_WIDTH = 416;
+	private static final int PANEL_HEIGHT = 229;
+	private static final int SIDE_INSET = 22;
+	private static final int BODY_WIDTH = PANEL_WIDTH - 2 * SIDE_INSET;
+	// Leaves the footer midway between the page and the pinstripe above the ledge.
+	private static final int BODY_HEIGHT = 141;
+	/** The tab bar centres the eye between two equal halves, whatever the tabs' widths. */
+	private static final int EYE_WIDTH = 14;
+	private static final int TAB_GAP = 10;
+	private static final int TAB_SIDE = (BODY_WIDTH - EYE_WIDTH - 2 * TAB_GAP) / 2;
 	private static final int COLUMN_WIDTH = (BODY_WIDTH - 8) / 2;
-	private static final Identifier TAB = WynnUi.sprite("tab");
-	private static final Identifier TAB_SELECTED = WynnUi.sprite("tab_selected");
-
-	/** Tab icons name Wynncraft models, like achievement icons; the gametest checks they resolve. */
-	public static final Catalog.Icon TITLES_ICON = new Catalog.Icon("wynn/skin/hat/jagged_crown", "minecraft:name_tag");
-	public static final Catalog.Icon ACHIEVEMENTS_ICON = new Catalog.Icon("wynn/player/content_book", "minecraft:writable_book");
-
 	private enum Tab {
-		TITLES("Titles", TITLES_ICON),
-		ACHIEVEMENTS("Achievements", ACHIEVEMENTS_ICON);
+		TITLES("Titles"),
+		ACHIEVEMENTS("Achievements");
 
 		final String label;
-		final Catalog.Icon icon;
 
-		Tab(String label, Catalog.Icon icon) {
+		Tab(String label) {
 			this.label = label;
-			this.icon = icon;
 		}
 	}
 
@@ -69,8 +67,8 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	private String selectedSuffix;
 	private boolean saving;
 
-	private FlowLayout tabs;
 	private FlowLayout header;
+	private FlowLayout tabBar;
 	private FlowLayout body;
 	private FlowLayout footer;
 
@@ -101,32 +99,30 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	protected void build(FlowLayout root) {
 		root.surface(Surface.VANILLA_TRANSLUCENT);
 
-		// The tabs come first so the panel's frame covers their inner ends.
-		FlowLayout book = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-		tabs = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
-		tabs.gap(2).horizontalAlignment(HorizontalAlignment.RIGHT).margins(Insets.of(24, 0, 0, -6));
-		book.child(tabs);
-
-		FlowLayout panel = UIContainers.verticalFlow(Sizing.fixed(PANEL_WIDTH), Sizing.content());
+		FlowLayout panel = UIContainers.verticalFlow(Sizing.fixed(PANEL_WIDTH), Sizing.fixed(PANEL_HEIGHT));
 		panel.gap(4);
 		panel.surface(WynnUi.surface(WynnUi.PANEL))
-				.padding(Insets.of(2, 9, 10, 10))
+				.padding(Insets.of(0, 0, SIDE_INSET, SIDE_INSET))
 				.horizontalAlignment(HorizontalAlignment.CENTER);
-		// The plaque sits over the top of the frame, like a nameboard.
-		header = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+		// The ribbon sits across the top edge of the field.
+		header = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(20));
+		tabBar = UIContainers.horizontalFlow(Sizing.fill(), Sizing.fixed(18));
+		tabBar.gap(TAB_GAP);
+		tabBar.surface(WynnUi.surface(WynnUi.BAR))
+				.horizontalAlignment(HorizontalAlignment.CENTER)
+				.verticalAlignment(VerticalAlignment.CENTER);
 		body = UIContainers.verticalFlow(Sizing.fill(), Sizing.fixed(BODY_HEIGHT));
 		body.gap(5);
 		body.horizontalAlignment(HorizontalAlignment.CENTER).verticalAlignment(VerticalAlignment.TOP);
 		footer = UIContainers.horizontalFlow(Sizing.fill(), Sizing.fixed(WynnUi.BUTTON_HEIGHT));
 		footer.gap(8);
 		footer.horizontalAlignment(HorizontalAlignment.CENTER).verticalAlignment(VerticalAlignment.CENTER);
-		panel.child(header).child(body).child(footer);
-		book.child(panel);
+		panel.child(header).child(tabBar).child(body).child(footer);
 
 		// Rise into place, like a Wynncraft menu opening.
-		book.positioning(Positioning.relative(50, 58));
-		book.positioning().animate(220, Easing.CUBIC, Positioning.relative(50, 50)).forwards();
-		root.child(book);
+		panel.positioning(Positioning.relative(50, 58));
+		panel.positioning().animate(220, Easing.CUBIC, Positioning.relative(50, 50)).forwards();
+		root.child(panel);
 
 		me = WynnTitles.account().me();
 		resetSelection();
@@ -170,12 +166,12 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	}
 
 	private void rebuild() {
-		tabs.clearChildren();
-		for (Tab t : Tab.values()) {
-			tabs.child(tabButton(t));
-		}
 		header.clearChildren();
-		header.child(WynnUi.plaque(tab.label));
+		header.child(WynnUi.ribbon(tab.label));
+		tabBar.clearChildren();
+		tabBar.child(tabSide(Tab.TITLES, HorizontalAlignment.RIGHT));
+		tabBar.child(UIContainers.horizontalFlow(Sizing.fixed(EYE_WIDTH), Sizing.fixed(8)).surface(WynnUi.surface(WynnUi.EYE)));
+		tabBar.child(tabSide(Tab.ACHIEVEMENTS, HorizontalAlignment.LEFT));
 		body.clearChildren();
 		footer.clearChildren();
 
@@ -199,13 +195,26 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		}
 	}
 
+	private FlowLayout tabSide(Tab t, HorizontalAlignment toward) {
+		FlowLayout side = UIContainers.horizontalFlow(Sizing.fixed(TAB_SIDE), Sizing.fixed(14));
+		side.horizontalAlignment(toward).verticalAlignment(VerticalAlignment.CENTER);
+		side.child(tabButton(t));
+		return side;
+	}
+
 	private FlowLayout tabButton(Tab t) {
+		// The name in a frame carved into the bar, so it reads as a button; the
+		// open tab's frame is inset with a gold rim.
 		boolean selected = t == tab;
-		FlowLayout button = UIContainers.horizontalFlow(Sizing.fixed(selected ? 30 : 26), Sizing.fixed(24));
-		button.surface(WynnUi.surface(selected ? TAB_SELECTED : TAB)).padding(Insets.of(4, 0, 5, 0));
-		button.child(UIComponents.item(Icons.stack(t.icon)));
-		button.tooltip(WynnFonts.body(t.label));
+		boolean[] hovered = {false};
+		FlowLayout button = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(14));
+		button.padding(Insets.of(4, 0, 7, 6)).verticalAlignment(VerticalAlignment.TOP);
+		button.surface((graphics, c) -> WynnUi.surface(selected ? WynnUi.TAB_SELECTED
+				: hovered[0] ? WynnUi.TAB_HOVER : WynnUi.TAB).draw(graphics, c));
+		button.child(WynnUi.label(WynnFonts.small(t.label), selected ? WynnUi.GOLD : WynnUi.TEXT));
 		button.cursorStyle(CursorStyle.HAND);
+		button.mouseEnter().subscribe(() -> hovered[0] = true);
+		button.mouseLeave().subscribe(() -> hovered[0] = false);
 		button.mouseDown().subscribe((click, doubled) -> {
 			switchTab(t);
 			return true;

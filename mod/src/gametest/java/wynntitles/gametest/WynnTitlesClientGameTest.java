@@ -145,9 +145,6 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		context.waitFor(client -> reload.isDone() && client.getOverlay() == null, TIMEOUT_TICKS);
 		context.runOnClient(client -> {
 			check(WynnFonts.loaded(), "the Wynncraft pack should provide its fonts");
-			for (Catalog.Icon icon : List.of(TitlesScreen.TITLES_ICON, TitlesScreen.ACHIEVEMENTS_ICON)) {
-				check(Icons.resolved(icon), "tab icon " + icon.model() + " is not in the Wynncraft pack");
-			}
 		});
 
 		context.setScreen(TitlesScreen::new);
