@@ -22,6 +22,7 @@ import wynntitles.api.ApiTypes.Me;
 import wynntitles.api.ApiTypes.Session;
 import wynntitles.catalog.Catalog;
 import wynntitles.titles.Title;
+import wynntitles.titles.TitleStyle;
 
 /**
  * Thin, stateless wrapper over the WynnTitles HTTP API. Every call is async and
@@ -92,6 +93,31 @@ public final class ApiClient {
 				.PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)))
 				.build();
 		return send(req).thenApply(resp -> parse(resp, Me.class));
+	}
+
+	/** Restyles each slot; null goes back to the word's native style. Returns the updated profile. */
+	public CompletableFuture<Me> setStyle(String token, TitleStyle prefix, TitleStyle suffix) {
+		JsonObject body = new JsonObject();
+		body.add("prefix", GSON.toJsonTree(prefix));
+		body.add("suffix", GSON.toJsonTree(suffix));
+		HttpRequest req = request("/v1/me/style")
+				.header("Authorization", "Bearer " + token)
+				.header("Content-Type", "application/json")
+				.PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)))
+				.build();
+		return send(req).thenApply(resp -> parse(resp, Me.class));
+	}
+
+	/** Buys every item or none of them. Returns the updated profile. */
+	public CompletableFuture<Me> buy(String token, List<String> itemIds) {
+		JsonObject body = new JsonObject();
+		body.add("itemIds", GSON.toJsonTree(itemIds));
+		return post("/v1/shop/buy", token, body).thenApply(resp -> parse(resp, Me.class));
+	}
+
+	/** Refunds every purchase and puts both slots back to their native style. */
+	public CompletableFuture<Me> resetPurchases(String token) {
+		return post("/v1/shop/reset", token, new JsonObject()).thenApply(resp -> parse(resp, Me.class));
 	}
 
 	public CompletableFuture<ClaimResult> claim(

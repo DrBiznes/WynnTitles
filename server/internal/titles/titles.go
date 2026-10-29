@@ -63,12 +63,26 @@ func find(words []catalog.Word, text string) (catalog.Word, bool) {
 	return catalog.Word{}, false
 }
 
+// Slot is one equipped word and the shop style it is worn in. A nil Style
+// shows the word's native style.
+type Slot struct {
+	Word  string
+	Style *catalog.Style
+}
+
 // Build joins the equipped words into a display title. Words that are no
 // longer available (renamed in the catalog, or revoked) are dropped, so the
-// result is nil when nothing valid is equipped.
-func Build(words Words, prefix, suffix string) *Title {
-	p, hasPrefix := words.Prefix(prefix)
-	s, hasSuffix := words.Suffix(suffix)
+// result is nil when nothing valid is equipped. Styles must already be checked
+// against the catalog and the player's purchases.
+func Build(cat *catalog.Catalog, words Words, prefix, suffix Slot) *Title {
+	p, hasPrefix := words.Prefix(prefix.Word)
+	s, hasSuffix := words.Suffix(suffix.Word)
+	if hasPrefix && prefix.Style != nil {
+		p = cat.Restyle(p, prefix.Style)
+	}
+	if hasSuffix && suffix.Style != nil {
+		s = cat.Restyle(s, suffix.Style)
+	}
 
 	var t Title
 	if hasPrefix {

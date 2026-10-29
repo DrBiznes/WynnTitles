@@ -16,38 +16,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "King's",
-        "runs": [
-          {
-            "text": "King",
-            "color": "gold",
-            "bold": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "flame"
-            }
-          },
-          {
-            "text": "'s",
-            "color": "yellow",
-            "italic": true
-          }
-        ]
+        "text": "King's"
       },
       "suffix": {
-        "text": "Recruit",
-        "runs": [
-          {
-            "text": "Recruit",
-            "underlined": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "toxic",
-              "animated": true,
-              "cycleMs": 6000
-            }
-          }
-        ]
+        "text": "Recruit"
       }
     }
   },
@@ -69,27 +41,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Ragni-Bound",
-        "runs": [
-          {
-            "text": "Ragni-Bound",
-            "bold": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "ice"
-            }
-          }
-        ]
+        "text": "Ragni-Bound"
       },
       "suffix": {
-        "text": "Hunter",
-        "runs": [
-          {
-            "text": "Hunter",
-            "color": "dark_green",
-            "bold": true
-          }
-        ]
+        "text": "Hunter"
       }
     }
   },
@@ -111,34 +66,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Rapid",
-        "runs": [
-          {
-            "text": "Rapid",
-            "italic": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "red_purple",
-              "animated": true,
-              "cycleMs": 3500
-            }
-          }
-        ]
+        "text": "Rapid"
       },
       "suffix": {
-        "text": "Boltslinger",
-        "runs": [
-          {
-            "text": "Bolt",
-            "color": "yellow",
-            "bold": true
-          },
-          {
-            "text": "slinger",
-            "color": "aqua",
-            "strikethrough": true
-          }
-        ]
+        "text": "Boltslinger"
       }
     }
   },
@@ -160,28 +91,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Cunning",
-        "runs": [
-          {
-            "text": "Cunning",
-            "color": "green",
-            "italic": true,
-            "underlined": true
-          }
-        ]
+        "text": "Cunning"
       },
       "suffix": {
-        "text": "Trapper",
-        "runs": [
-          {
-            "text": "Trapper",
-            "bold": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "forest"
-            }
-          }
-        ]
+        "text": "Trapper"
       }
     }
   },
@@ -206,14 +119,15 @@
         "text": "Deadly",
         "runs": [
           {
-            "text": "Dead",
-            "color": "dark_red",
-            "bold": true
-          },
-          {
-            "text": "ly",
-            "color": "red",
-            "strikethrough": true
+            "text": "Deadly",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#aa0000",
+                "#ff5555"
+              ]
+            }
           }
         ]
       },
@@ -255,29 +169,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Fruma-Born",
-        "runs": [
-          {
-            "text": "Fruma-",
-            "color": "#c7c7c7",
-            "bold": true
-          },
-          {
-            "text": "Born",
-            "color": "white",
-            "italic": true
-          }
-        ]
+        "text": "Fruma-Born"
       },
       "suffix": {
-        "text": "Knight",
-        "runs": [
-          {
-            "text": "Knight",
-            "color": "dark_green",
-            "bold": true
-          }
-        ]
+        "text": "Knight"
       }
     }
   },
@@ -299,29 +194,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Steadfast",
-        "runs": [
-          {
-            "text": "Steadfast",
-            "bold": true,
-            "underlined": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "flame"
-            }
-          }
-        ]
+        "text": "Steadfast"
       },
       "suffix": {
-        "text": "Paladin",
-        "runs": [
-          {
-            "text": "Paladin",
-            "color": "light_purple",
-            "bold": true,
-            "italic": true
-          }
-        ]
+        "text": "Paladin"
       }
     }
   },
@@ -343,38 +219,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Ascending",
-        "runs": [
-          {
-            "text": "Ascending",
-            "bold": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "royal",
-              "animated": true,
-              "cycleMs": 4500
-            }
-          }
-        ]
+        "text": "Ascending"
       },
       "suffix": {
-        "text": "Battle Monk",
-        "runs": [
-          {
-            "text": "Battle",
-            "color": "red",
-            "bold": true
-          },
-          {
-            "text": " ",
-            "color": "gray"
-          },
-          {
-            "text": "Monk",
-            "color": "aqua",
-            "underlined": true
-          }
-        ]
+        "text": "Battle Monk"
       }
     }
   },
@@ -401,7 +249,6 @@
           {
             "text": "Calamitous",
             "bold": true,
-            "strikethrough": true,
             "effect": {
               "type": "gradient",
               "palette": "red",
@@ -418,8 +265,7 @@
             "text": "Fallen",
             "color": "dark_red",
             "bold": true,
-            "italic": true,
-            "obfuscated": true
+            "italic": true
           }
         ]
       }
@@ -443,33 +289,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Mystic",
-        "runs": [
-          {
-            "text": "Mystic",
-            "color": "light_purple",
-            "italic": true
-          }
-        ]
+        "text": "Mystic"
       },
       "suffix": {
-        "text": "Dark Wizard",
-        "runs": [
-          {
-            "text": "Dark",
-            "color": "dark_purple",
-            "bold": true
-          },
-          {
-            "text": " ",
-            "color": "gray"
-          },
-          {
-            "text": "Wizard",
-            "color": "blue",
-            "underlined": true
-          }
-        ]
+        "text": "Dark Wizard"
       }
     }
   },
@@ -491,36 +314,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Resplendent",
-        "runs": [
-          {
-            "text": "Resplendent",
-            "bold": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "sunset"
-            }
-          }
-        ]
+        "text": "Resplendent"
       },
       "suffix": {
-        "text": "Light Bender",
-        "runs": [
-          {
-            "text": "Light",
-            "color": "yellow",
-            "bold": true
-          },
-          {
-            "text": " ",
-            "color": "white"
-          },
-          {
-            "text": "Bender",
-            "color": "aqua",
-            "italic": true
-          }
-        ]
+        "text": "Light Bender"
       }
     }
   },
@@ -542,33 +339,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Endless",
-        "runs": [
-          {
-            "text": "Endless",
-            "effect": {
-              "type": "gradient",
-              "palette": "void",
-              "animated": true,
-              "cycleMs": 5200
-            }
-          }
-        ]
+        "text": "Endless"
       },
       "suffix": {
-        "text": "Riftwalker",
-        "runs": [
-          {
-            "text": "Rift",
-            "color": "dark_purple",
-            "obfuscated": true
-          },
-          {
-            "text": "walker",
-            "color": "light_purple",
-            "bold": true
-          }
-        ]
+        "text": "Riftwalker"
       }
     }
   },
@@ -595,8 +369,7 @@
           {
             "text": "Chaos",
             "color": "dark_purple",
-            "bold": true,
-            "obfuscated": true
+            "bold": true
           }
         ]
       },
@@ -639,26 +412,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Veiled",
-        "runs": [
-          {
-            "text": "Veiled",
-            "color": "dark_gray",
-            "italic": true,
-            "obfuscated": true
-          }
-        ]
+        "text": "Veiled"
       },
       "suffix": {
-        "text": "Ninja",
-        "runs": [
-          {
-            "text": "Ninja",
-            "color": "dark_aqua",
-            "bold": true,
-            "underlined": true
-          }
-        ]
+        "text": "Ninja"
       }
     }
   },
@@ -680,36 +437,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Vicious",
-        "runs": [
-          {
-            "text": "Vicious",
-            "bold": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "red_purple"
-            }
-          }
-        ]
+        "text": "Vicious"
       },
       "suffix": {
-        "text": "Shadestepper",
-        "runs": [
-          {
-            "text": "Shade",
-            "color": "dark_gray",
-            "italic": true
-          },
-          {
-            "text": "stepper",
-            "effect": {
-              "type": "gradient",
-              "palette": "void",
-              "animated": true,
-              "cycleMs": 3600
-            }
-          }
-        ]
+        "text": "Shadestepper"
       }
     }
   },
@@ -731,33 +462,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Mimic",
-        "runs": [
-          {
-            "text": "Mi",
-            "color": "gray",
-            "obfuscated": true
-          },
-          {
-            "text": "mic",
-            "color": "white",
-            "strikethrough": true
-          }
-        ]
+        "text": "Mimic"
       },
       "suffix": {
-        "text": "Trickster",
-        "runs": [
-          {
-            "text": "Trickster",
-            "bold": true,
-            "effect": {
-              "type": "rainbow",
-              "animated": true,
-              "cycleMs": 3900
-            }
-          }
-        ]
+        "text": "Trickster"
       }
     }
   },
@@ -787,7 +495,7 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#111111",
+                "#555555",
                 "#5555ff",
                 "#ff55ff"
               ],
@@ -832,31 +540,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Distant",
-        "runs": [
-          {
-            "text": "Distant",
-            "effect": {
-              "type": "gradient",
-              "palette": "ocean"
-            }
-          }
-        ]
+        "text": "Distant"
       },
       "suffix": {
-        "text": "Skyseer",
-        "runs": [
-          {
-            "text": "Sky",
-            "color": "aqua",
-            "bold": true
-          },
-          {
-            "text": "seer",
-            "color": "white",
-            "italic": true
-          }
-        ]
+        "text": "Skyseer"
       }
     }
   },
@@ -878,34 +565,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Sanguine",
-        "runs": [
-          {
-            "text": "Sanguine",
-            "bold": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "red",
-              "animated": true,
-              "cycleMs": 4400
-            }
-          }
-        ]
+        "text": "Sanguine"
       },
       "suffix": {
-        "text": "Acolyte",
-        "runs": [
-          {
-            "text": "Aco",
-            "color": "dark_red",
-            "italic": true
-          },
-          {
-            "text": "lyte",
-            "color": "red",
-            "underlined": true
-          }
-        ]
+        "text": "Acolyte"
       }
     }
   },
@@ -927,35 +590,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Woven",
-        "runs": [
-          {
-            "text": "Wo",
-            "color": "dark_green",
-            "bold": true
-          },
-          {
-            "text": "ven",
-            "effect": {
-              "type": "gradient",
-              "palette": "forest"
-            }
-          }
-        ]
+        "text": "Woven"
       },
       "suffix": {
-        "text": "Summoner",
-        "runs": [
-          {
-            "text": "Summoner",
-            "effect": {
-              "type": "gradient",
-              "palette": "toxic",
-              "animated": true,
-              "cycleMs": 5000
-            }
-          }
-        ]
+        "text": "Summoner"
       }
     }
   },
@@ -1076,22 +714,7 @@
     },
     "rewards": {
       "suffix": {
-        "text": "Apprentice",
-        "runs": [
-          {
-            "text": "Apprentice",
-            "color": "gray",
-            "italic": true,
-            "effect": {
-              "type": "gradient",
-              "colors": [
-                "#aaaaaa",
-                "#ffffff",
-                "#55ff55"
-              ]
-            }
-          }
-        ]
+        "text": "Apprentice"
       }
     }
   },
@@ -1112,33 +735,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Master of",
-        "runs": [
-          {
-            "text": "Master",
-            "color": "gold",
-            "bold": true
-          },
-          {
-            "text": " of",
-            "color": "yellow",
-            "italic": true
-          }
-        ]
+        "text": "Master of"
       },
       "suffix": {
-        "text": "Draft",
-        "runs": [
-          {
-            "text": "Draft",
-            "effect": {
-              "type": "gradient",
-              "palette": "sunset",
-              "animated": true,
-              "cycleMs": 5300
-            }
-          }
-        ]
+        "text": "Draft"
       }
     }
   },
@@ -1159,38 +759,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Wildfire",
-        "runs": [
-          {
-            "text": "Wildfire",
-            "bold": true,
-            "effect": {
-              "type": "gradient",
-              "palette": "flame",
-              "animated": true,
-              "cycleMs": 3300
-            }
-          }
-        ]
+        "text": "Wildfire"
       },
       "suffix": {
-        "text": "Bane-Slayer",
-        "runs": [
-          {
-            "text": "Bane",
-            "color": "dark_red",
-            "strikethrough": true
-          },
-          {
-            "text": "-",
-            "color": "gray"
-          },
-          {
-            "text": "Slayer",
-            "color": "red",
-            "bold": true
-          }
-        ]
+        "text": "Bane-Slayer"
       }
     }
   },
@@ -1249,33 +821,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Wealthy",
-        "runs": [
-          {
-            "text": "Wealthy",
-            "bold": true,
-            "effect": {
-              "type": "gradient",
-              "colors": [
-                "#00aa00",
-                "#55ff55",
-                "#ffffff"
-              ],
-              "animated": true,
-              "cycleMs": 5600
-            }
-          }
-        ]
+        "text": "Wealthy"
       },
       "suffix": {
-        "text": "Merchant",
-        "runs": [
-          {
-            "text": "Merchant",
-            "color": "gold",
-            "underlined": true
-          }
-        ]
+        "text": "Merchant"
       }
     }
   },
@@ -1301,7 +850,7 @@
         "runs": [
           {
             "text": "Legendary",
-            "color": "gold",
+            "color": "aqua",
             "bold": true
           }
         ]
@@ -1339,29 +888,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Bane of",
-        "runs": [
-          {
-            "text": "Bane",
-            "color": "dark_red",
-            "bold": true
-          },
-          {
-            "text": " of",
-            "color": "red",
-            "italic": true
-          }
-        ]
+        "text": "Bane of"
       },
       "suffix": {
-        "text": "Monsters",
-        "runs": [
-          {
-            "text": "Monsters",
-            "color": "dark_purple",
-            "obfuscated": true
-          }
-        ]
+        "text": "Monsters"
       }
     }
   },
@@ -1383,33 +913,159 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Seeker of",
+        "text": "Seeker of"
+      },
+      "suffix": {
+        "text": "Secrets"
+      }
+    }
+  },
+  {
+    "id": "raid_notg",
+    "category": "raid",
+    "name": "Into the Nest",
+    "description": "Complete the Nest of the Grootslangs.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content/nest_of_the_grootslangs",
+      "fallback": "minecraft:slime_ball"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "Nest of the Grootslangs",
+      "amount": 1
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Grootslayer"
+      }
+    }
+  },
+  {
+    "id": "raid_nol",
+    "category": "raid",
+    "name": "Light of Orphion",
+    "description": "Complete the Orphion's Nexus of Light.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content/nexus_of_light",
+      "fallback": "minecraft:glowstone_dust"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "Orphion's Nexus of Light",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Orphion's"
+      },
+      "suffix": {
+        "text": "Lightbearer"
+      }
+    }
+  },
+  {
+    "id": "raid_tcc",
+    "category": "raid",
+    "name": "Colossus Felled",
+    "description": "Complete The Canyon Colossus.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content/canyon_colossus",
+      "fallback": "minecraft:chiseled_stone_bricks"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "The Canyon Colossus",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Colossal"
+      },
+      "suffix": {
+        "text": "Colossus-Slayer"
+      }
+    }
+  },
+  {
+    "id": "raid_tna",
+    "category": "raid",
+    "name": "It Has a Name",
+    "description": "Complete The Nameless Anomaly.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content/nameless_anomaly",
+      "fallback": "minecraft:echo_shard"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "The Nameless Anomaly",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Greg",
         "runs": [
           {
-            "text": "Seeker",
+            "text": "Greg",
+            "color": "dark_gray",
+            "obfuscated": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "raid_twp",
+    "category": "raid",
+    "name": "Put an End to War",
+    "description": "Defeat Anathema atop the Spire in The Wartorn Palace.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content_book/raid_active",
+      "fallback": "minecraft:golden_sword"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "The Wartorn Palace",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Spire-Crowned",
+        "runs": [
+          {
+            "text": "Spire-Crowned",
+            "bold": true,
             "effect": {
               "type": "gradient",
-              "palette": "ocean"
+              "colors": [
+                "#ffaa00",
+                "#aa0000",
+                "#550000"
+              ]
             }
-          },
-          {
-            "text": " of",
-            "color": "aqua",
-            "italic": true
           }
         ]
       },
       "suffix": {
-        "text": "Secrets",
+        "text": "Warbreaker",
         "runs": [
           {
-            "text": "Secrets",
+            "text": "Warbreaker",
             "bold": true,
             "effect": {
               "type": "gradient",
-              "palette": "void",
+              "palette": "red",
               "animated": true,
-              "cycleMs": 6200
+              "cycleMs": 3600
             }
           }
         ]

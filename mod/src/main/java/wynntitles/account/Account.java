@@ -17,6 +17,7 @@ import wynntitles.api.ApiClient;
 import wynntitles.api.ApiException;
 import wynntitles.api.ApiTypes.Me;
 import wynntitles.api.ApiTypes.Session;
+import wynntitles.titles.TitleStyle;
 
 /**
  * Owns the session token and the player's profile. Logging in needs no setup:
@@ -70,6 +71,18 @@ public final class Account {
 
 	public CompletableFuture<Me> setTitle(String prefix, String suffix) {
 		return withToken(token -> api.setTitle(token, prefix, suffix)).thenApply(this::update);
+	}
+
+	public CompletableFuture<Me> setStyle(TitleStyle prefix, TitleStyle suffix) {
+		return withToken(token -> api.setStyle(token, prefix, suffix)).thenApply(this::update);
+	}
+
+	public CompletableFuture<Me> buy(List<String> itemIds) {
+		return withToken(token -> api.buy(token, itemIds)).thenApply(this::update);
+	}
+
+	public CompletableFuture<Me> resetPurchases() {
+		return withToken(api::resetPurchases).thenApply(this::update);
 	}
 
 	/** Runs an authenticated call, logging in first if needed and once more if the token was rejected. */

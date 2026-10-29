@@ -1,0 +1,295 @@
+[
+  {
+    "id": "color_black",
+    "kind": "color",
+    "name": "Black",
+    "price": 2,
+    "color": "black"
+  },
+  {
+    "id": "color_dark_blue",
+    "kind": "color",
+    "name": "Dark Blue",
+    "price": 2,
+    "color": "dark_blue"
+  },
+  {
+    "id": "color_dark_green",
+    "kind": "color",
+    "name": "Dark Green",
+    "price": 2,
+    "color": "dark_green"
+  },
+  {
+    "id": "color_dark_aqua",
+    "kind": "color",
+    "name": "Dark Aqua",
+    "price": 2,
+    "color": "dark_aqua"
+  },
+  {
+    "id": "color_dark_red",
+    "kind": "color",
+    "name": "Dark Red",
+    "price": 2,
+    "color": "dark_red"
+  },
+  {
+    "id": "color_dark_purple",
+    "kind": "color",
+    "name": "Dark Purple",
+    "price": 2,
+    "color": "dark_purple"
+  },
+  {
+    "id": "color_gold",
+    "kind": "color",
+    "name": "Gold",
+    "price": 2,
+    "color": "gold"
+  },
+  {
+    "id": "color_gray",
+    "kind": "color",
+    "name": "Gray",
+    "price": 2,
+    "color": "gray"
+  },
+  {
+    "id": "color_dark_gray",
+    "kind": "color",
+    "name": "Dark Gray",
+    "price": 2,
+    "color": "dark_gray"
+  },
+  {
+    "id": "color_blue",
+    "kind": "color",
+    "name": "Blue",
+    "price": 2,
+    "color": "blue"
+  },
+  {
+    "id": "color_green",
+    "kind": "color",
+    "name": "Green",
+    "price": 2,
+    "color": "green"
+  },
+  {
+    "id": "color_aqua",
+    "kind": "color",
+    "name": "Aqua",
+    "price": 2,
+    "color": "aqua"
+  },
+  {
+    "id": "color_red",
+    "kind": "color",
+    "name": "Red",
+    "price": 2,
+    "color": "red"
+  },
+  {
+    "id": "color_light_purple",
+    "kind": "color",
+    "name": "Light Purple",
+    "price": 2,
+    "color": "light_purple"
+  },
+  {
+    "id": "color_yellow",
+    "kind": "color",
+    "name": "Yellow",
+    "price": 2,
+    "color": "yellow"
+  },
+  {
+    "id": "palette_red",
+    "kind": "palette",
+    "name": "Crimson",
+    "price": 5,
+    "palette": "red"
+  },
+  {
+    "id": "palette_red_purple",
+    "kind": "palette",
+    "name": "Blood Moon",
+    "price": 5,
+    "palette": "red_purple"
+  },
+  {
+    "id": "palette_flame",
+    "kind": "palette",
+    "name": "Flame",
+    "price": 5,
+    "palette": "flame"
+  },
+  {
+    "id": "palette_ember",
+    "kind": "palette",
+    "name": "Ember",
+    "price": 5,
+    "palette": "ember"
+  },
+  {
+    "id": "palette_sunset",
+    "kind": "palette",
+    "name": "Sunset",
+    "price": 5,
+    "palette": "sunset"
+  },
+  {
+    "id": "palette_ocean",
+    "kind": "palette",
+    "name": "Ocean",
+    "price": 5,
+    "palette": "ocean"
+  },
+  {
+    "id": "palette_ice",
+    "kind": "palette",
+    "name": "Ice",
+    "price": 5,
+    "palette": "ice"
+  },
+  {
+    "id": "palette_toxic",
+    "kind": "palette",
+    "name": "Toxic",
+    "price": 5,
+    "palette": "toxic"
+  },
+  {
+    "id": "palette_forest",
+    "kind": "palette",
+    "name": "Forest",
+    "price": 5,
+    "palette": "forest"
+  },
+  {
+    "id": "palette_royal",
+    "kind": "palette",
+    "name": "Royal",
+    "price": 5,
+    "palette": "royal"
+  },
+  {
+    "id": "palette_void",
+    "kind": "palette",
+    "name": "Void",
+    "price": 5,
+    "palette": "void"
+  },
+  {
+    "id": "animated_red",
+    "kind": "animatedPalette",
+    "name": "Crimson",
+    "price": 8,
+    "palette": "red"
+  },
+  {
+    "id": "animated_red_purple",
+    "kind": "animatedPalette",
+    "name": "Blood Moon",
+    "price": 8,
+    "palette": "red_purple"
+  },
+  {
+    "id": "animated_flame",
+    "kind": "animatedPalette",
+    "name": "Flame",
+    "price": 8,
+    "palette": "flame"
+  },
+  {
+    "id": "animated_ember",
+    "kind": "animatedPalette",
+    "name": "Ember",
+    "price": 8,
+    "palette": "ember"
+  },
+  {
+    "id": "animated_sunset",
+    "kind": "animatedPalette",
+    "name": "Sunset",
+    "price": 8,
+    "palette": "sunset"
+  },
+  {
+    "id": "animated_ocean",
+    "kind": "animatedPalette",
+    "name": "Ocean",
+    "price": 8,
+    "palette": "ocean"
+  },
+  {
+    "id": "animated_ice",
+    "kind": "animatedPalette",
+    "name": "Ice",
+    "price": 8,
+    "palette": "ice"
+  },
+  {
+    "id": "animated_toxic",
+    "kind": "animatedPalette",
+    "name": "Toxic",
+    "price": 8,
+    "palette": "toxic"
+  },
+  {
+    "id": "animated_forest",
+    "kind": "animatedPalette",
+    "name": "Forest",
+    "price": 8,
+    "palette": "forest"
+  },
+  {
+    "id": "animated_royal",
+    "kind": "animatedPalette",
+    "name": "Royal",
+    "price": 8,
+    "palette": "royal"
+  },
+  {
+    "id": "animated_void",
+    "kind": "animatedPalette",
+    "name": "Void",
+    "price": 8,
+    "palette": "void"
+  },
+  {
+    "id": "rainbow",
+    "kind": "rainbow",
+    "name": "Rainbow",
+    "price": 20
+  },
+  {
+    "id": "bold",
+    "kind": "format",
+    "name": "Bold",
+    "price": 3,
+    "format": "bold"
+  },
+  {
+    "id": "italic",
+    "kind": "format",
+    "name": "Italic",
+    "price": 3,
+    "format": "italic"
+  },
+  {
+    "id": "underlined",
+    "kind": "format",
+    "name": "Underlined",
+    "price": 3,
+    "format": "underlined"
+  },
+  {
+    "id": "strikethrough",
+    "kind": "format",
+    "name": "Strikethrough",
+    "price": 3,
+    "format": "strikethrough"
+  }
+]

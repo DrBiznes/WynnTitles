@@ -403,6 +403,29 @@ def row(state):
     return cv, dict(width=16, height=12, border=dict(left=3, right=1, top=1, bottom=1))
 
 
+def chip(state):
+    """16x13 raised tile for a shop item inside a well, border 3: dark stone with a
+    lit top edge, lighter on hover, and a gold rim when picked."""
+    W, H = 16, 13
+    cv = Canvas(W, H)
+    for y in range(H):
+        for x in range(W):
+            d = edge_dist(x, y, W, H)
+            if d == 0:
+                col = OUT
+            elif state == 'selected':
+                col = GOLD if d == 1 else WELL_SHADE
+            elif d == 1 and y == 1:
+                col = STONE_MID
+            elif d == 1 and y == H - 2:
+                col = WELL_SHADE
+            else:
+                col = WELL_LIGHT if state == 'hover' else c('#443d41')
+            cv.set(x, y, col)
+    rounded(cv, 1)
+    return cv, dict(width=W, height=H, border=3)
+
+
 def scroll_track():
     """5x16 scrollbar track, border 2."""
     cv = Canvas(5, 16)
@@ -484,6 +507,9 @@ SPRITES = {
     'well': well(),
     'row_hover': row('hover'),
     'row_selected': row('selected'),
+    'chip': chip('normal'),
+    'chip_hover': chip('hover'),
+    'chip_selected': chip('selected'),
     'scroll_track': scroll_track(),
     'scroll_thumb': scroll_thumb(),
     'nameplate': nameplate(),

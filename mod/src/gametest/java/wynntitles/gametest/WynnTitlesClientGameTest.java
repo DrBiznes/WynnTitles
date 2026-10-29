@@ -27,6 +27,7 @@ import wynntitles.mc.Icons;
 import wynntitles.mc.UnlockToast;
 import wynntitles.mc.WynnFonts;
 import wynntitles.mc.screen.TitlesScreen;
+import wynntitles.titles.TitleStyle;
 
 /**
  * End-to-end smoke test in a real client, fully offline: a local server with
@@ -97,6 +98,28 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			context.waitTicks(20);
 			screenshot(context, "wynntitles-titles-tab");
 
+			// Earn enough points to shop, then wear Greg in its native obfuscated
+			// style next to a bought one, so the styles tab has both to show.
+			for (String id : List.of("raid_tna", "raid_twp")) {
+				Catalog.Achievement raid = catalog.get(id).orElseThrow();
+				join(context.computeOnClient(client -> WynnTitles.account().withToken(token -> api.claim(
+						token, raid.id(), raid.trigger().type(), null, "gametest"))));
+			}
+			join(context.computeOnClient(client -> WynnTitles.account().setTitle(
+					"Greg", ownAchievement.rewards().suffix().text())));
+			join(context.computeOnClient(client -> WynnTitles.account().buy(List.of("palette_flame", "bold"))));
+			me = join(context.computeOnClient(client -> WynnTitles.account().setStyle(
+					null, new TitleStyle("palette_flame", List.of("bold")))));
+			check(me.title().runs().get(0).obfuscated(), "Greg should keep its native style");
+			check(!me.title().runs().get(2).obfuscated() && me.title().runs().get(2).bold(),
+					"the suffix should wear the bought style");
+			context.setScreen(TitlesScreen::styles);
+			context.waitTicks(20);
+			screenshot(context, "wynntitles-styles-tab");
+			context.setScreen(TitlesScreen::shop);
+			context.waitTicks(20);
+			screenshot(context, "wynntitles-shop-tab");
+
 			// Pretend this mod version cannot detect the first locked achievement,
 			// as if the catalog had gained a trigger type after it shipped.
 			Catalog.Achievement undetectable = catalog.achievements().stream()
@@ -150,6 +173,12 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		context.setScreen(TitlesScreen::new);
 		context.waitTicks(20);
 		screenshot(context, "wynntitles-titles-tab-wynnpack");
+		context.setScreen(TitlesScreen::styles);
+		context.waitTicks(20);
+		screenshot(context, "wynntitles-styles-tab-wynnpack");
+		context.setScreen(TitlesScreen::shop);
+		context.waitTicks(20);
+		screenshot(context, "wynntitles-shop-tab-wynnpack");
 		context.setScreen(TitlesScreen::achievements);
 		context.waitTicks(20);
 		screenshot(context, "wynntitles-achievements-tab-wynnpack");

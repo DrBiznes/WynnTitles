@@ -7,14 +7,17 @@ import com.wynntils.models.players.type.wynnplayer.CharacterData;
 import com.wynntils.models.players.type.wynnplayer.GlobalData;
 import com.wynntils.models.players.type.wynnplayer.WynnPlayerInfo;
 import com.wynntils.models.profession.type.ProfessionType;
+import com.wynntils.models.raid.event.RaidEndedEvent;
 import com.wynntils.models.territories.profile.TerritoryProfile;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.ToLongFunction;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.SubscribeEvent;
 import wynntitles.catalog.Catalog.Trigger;
 import wynntitles.mc.Mc;
 
@@ -24,7 +27,14 @@ import wynntitles.mc.Mc;
  * screen asks the player to update.
  */
 public final class WynntilsDetectors {
+	private static final RaidDetector RAIDS = new RaidDetector();
+
 	private WynntilsDetectors() {}
+
+	/** Detectors that listen for Wynntils events; register it once Wynntils has started. */
+	public static Object eventListener() {
+		return RAIDS;
+	}
 
 	public static Map<String, Detector> create() {
 		Map<String, Detector> detectors = new HashMap<>();
@@ -35,6 +45,7 @@ public final class WynntilsDetectors {
 		detectors.put("inventoryItem", WynntilsDetectors::inventoryItem);
 		detectors.put("statistic", new StatisticDetector());
 		detectors.put("quest", new QuestDetector());
+		detectors.put("raid", RAIDS);
 		return detectors;
 	}
 
@@ -186,6 +197,68 @@ public final class WynntilsDetectors {
 				}
 				completedOnAccount = completed;
 			});
+		}
+	}
+
+	/**
+	 * Raid completions on the whole account from the Wynncraft API, refreshed
+	 * every few minutes, and the raids Wynntils saw finish since the game
+	 * started, so a fresh clear unlocks straight away. Wynntils also records
+	 * failed raids in its history, so only its completion event counts.
+	 */
+	private static final class RaidDetector implements Detector {
+		private static final long API_REFRESH_MS = 5 * 60_000;
+
+		private final Map<String, Integer> completedThisSession = new ConcurrentHashMap<>();
+		private volatile Map<String, Integer> completedOnAccount = Map.of();
+		private long lastApiFetch;
+
+		@SubscribeEvent
+		public void onRaidCompleted(RaidEndedEvent.Completed event) {
+			completedThisSession.merge(key(event.getRaid().getRaidKind().getRaidName()), 1, Integer::sum);
+		}
+
+		@Override
+		public JsonObject check(Trigger trigger) {
+			String raid = key(trigger.raidName());
+			int thisSession = completedThisSession.getOrDefault(raid, 0);
+			if (thisSession < trigger.amount()) {
+				refreshFromApi();
+			}
+			// The API catches up with this session's clears, so adding the two
+			// would count those twice.
+			int onAccount = completedOnAccount.getOrDefault(raid, 0);
+			int completions = Math.max(thisSession, onAccount);
+			if (completions < trigger.amount()) {
+				return null;
+			}
+			JsonObject evidence = new JsonObject();
+			evidence.addProperty("source", thisSession >= onAccount ? "raidEvent" : "wynncraftApi");
+			evidence.addProperty("completions", completions);
+			return evidence;
+		}
+
+		private void refreshFromApi() {
+			long now = System.currentTimeMillis();
+			if (now - lastApiFetch < API_REFRESH_MS || Mc.client().player == null) {
+				return;
+			}
+			lastApiFetch = now;
+			Models.Player.getPlayerFullInfo(Mc.client().player.getStringUUID()).thenAccept(info -> {
+				if (info == null || info.globalData().isEmpty() || info.globalData().get().raids() == null) {
+					return;
+				}
+				Map<String, Integer> completed = new HashMap<>();
+				Map<String, Integer> raids = info.globalData().get().raids().completions();
+				if (raids != null) {
+					raids.forEach((name, count) -> completed.merge(key(name), count, Integer::sum));
+				}
+				completedOnAccount = completed;
+			});
+		}
+
+		private static String key(String raidName) {
+			return raidName == null ? "" : raidName.toLowerCase(Locale.ROOT);
 		}
 	}
 }

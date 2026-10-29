@@ -26,6 +26,7 @@ import wynntitles.api.ApiTypes.Me;
 import wynntitles.catalog.Catalog;
 import wynntitles.catalog.CatalogStore;
 import wynntitles.titles.Title;
+import wynntitles.titles.TitleStyle;
 
 /**
  * Runs the mod's API client against a real server to catch JSON mismatches
@@ -82,6 +83,33 @@ class ServerContractTest {
 		assertEquals(me.title(), titles.get(serverUuid));
 		assertTrue(titles.containsKey(nobody));
 		assertNull(titles.get(nobody));
+
+		// The shop: Greg starts obfuscated, and a bought style replaces that. The
+		// mod's own restyle, used for previews, must match what the server wears.
+		assertFalse(catalog.shop().isEmpty());
+		assertTrue(catalog.shop().stream().allMatch(Catalog.ShopItem::supported), "this mod should know every shop item");
+		Catalog.Achievement greg = catalog.get("raid_tna").orElseThrow();
+		assertTrue(greg.rewards().prefix().runs().get(0).obfuscated());
+		account.withToken(t -> api.claim(t, greg.id(), greg.trigger().type(), evidence, "test")).get();
+		me = account.setTitle("Greg", null).get();
+		assertEquals(first.points() + greg.points(), me.balance());
+		assertEquals(greg.rewards().prefix().runs(), me.title().runs());
+
+		me = account.buy(List.of("color_red", "bold")).get();
+		assertEquals(first.points() + greg.points() - 5, me.balance());
+		assertTrue(me.owns("color_red") && me.owns("bold"));
+		TitleStyle style = new TitleStyle("color_red", List.of("bold"));
+		me = account.setStyle(style, null).get();
+		assertEquals(style, me.styles().prefix());
+		assertNull(me.styles().suffix());
+		assertEquals(catalog.restyle(greg.rewards().prefix(), style).runs(), me.title().runs());
+		assertFalse(me.title().runs().get(0).obfuscated());
+		assertEquals(me.title(), api.titles(List.of(serverUuid)).get().get(serverUuid));
+
+		me = account.resetPurchases().get();
+		assertTrue(me.owned().isEmpty());
+		assertNull(me.styles().prefix());
+		assertEquals(first.points() + greg.points(), me.balance());
 
 		// A second Account reuses the cached token instead of logging in again.
 		Account restarted = new Account(api, new FakeSession(uuid, username) {

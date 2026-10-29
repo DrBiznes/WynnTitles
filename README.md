@@ -11,6 +11,8 @@ server/   Go API server with SQLite; also the home of the achievement catalog
 
 - **Login** uses the Mojang session handshake, the same check a Minecraft server does when you join it. The mod asks the server for a challenge, calls Mojang's `joinServer` with it, and the server confirms with Mojang's `hasJoined`. The resulting session token is cached in `config/wynntitles/session.json`.
 - **The catalog** (`server/catalog/achievements.json`) is the single source of truth. It is embedded in the server binary and validated at startup. The mod downloads it from `GET /v1/catalog`, so adding an achievement that uses an existing trigger type needs no mod update.
+- **Title words are plain text** unless their achievement gives them a **native style** (`runs` in the catalog). Only the big ones have one: the level 120s, The Moon, the Legendary Island token, The Wartorn Palace, and Greg from The Nameless Anomaly, whose native style is dark, obfuscated text like the raid's own title. Native styles may use anything, including obfuscated text and custom hex colors.
+- **The style shop** (`server/catalog/shop.json`) sells style pieces for achievement points: solid colors, palettes, animated palettes, rainbow, and bold, italic, underlined and strikethrough. Obfuscated is never sold. Each slot (prefix and suffix) wears either the word's native style or a shop style built from one color source and any formats, and a shop style replaces the native one completely, so restyling Greg reveals the name. The server builds the styled title, so the nametag code only ever sees runs. A player's balance is points earned minus prices paid; purchases record the price paid, so repricing never changes a balance, and a reset refunds everything for free. Prices and items are data, so they can be retuned or added to without a mod update; an older mod hides item kinds it does not know.
 - **Claims are trusted.** The mod detects triggers with Wynntils data and claims them, and the server records every claim with its evidence in the `unlocks` table. Moderation can revoke a row later by setting `revoked_at`.
 - **Achievement icons** are the achievement's Wynncraft item inside a hexagonal bronze, silver or gold frame. The catalog names an item model from the Wynncraft resource pack (for example `wynn/prop/quest_scroll`) and a vanilla fallback. Whenever resource packs load, the mod indexes the loaded item definitions to find which item and damage or custom model data show that model, so nothing from the pack is copied, and renumbering in a pack update is picked up automatically. Off Wynncraft, or if a model disappears, the fallback item shows.
 - **The screens** (`mod/.../mc/screen`) are owo-ui layouts laid out like Wynncraft's raid start screen, in our own regal purple and gold: a field between two stone pillars with a skull on the bottom ledge, a wine-red ribbon for the title, a stone tab bar with the Wynncraft eye carved into it, dark stone wells and stone buttons. Achievements are a trophy list: categories with their progress, then each achievement with its reward, unlock date and rarity. The sprites are drawn by `scripts/draw-ui-sprites.py`. Text uses the Wynncraft pack's fonts by id (`language/wynncraft` and the small-caps `language/five`) when the loaded packs define them, and the vanilla font otherwise (`mc/WynnFonts.java`); like icons, nothing is copied from the pack.
@@ -67,12 +69,15 @@ Wynntils only fires nametag events on Wynncraft, so a test-only mixin forwards t
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
 | GET | `/healthz` | | Liveness |
-| GET | `/v1/catalog` | | Achievements and title words (ETag cached) |
+| GET | `/v1/catalog` | | Achievements, title words and the style shop (ETag cached) |
 | GET | `/v1/stats/achievements` | | `{players, unlocks: {achievementId: count}}` for rarity (cached for `WT_STATS_TTL`) |
 | POST | `/v1/auth/challenge` | | `{username}` → `{serverId}` |
 | POST | `/v1/auth/verify` | | `{username, serverId}` → `{token, uuid, username, expiresAt}` |
 | POST | `/v1/auth/logout` | Bearer | Ends the session |
-| GET | `/v1/me` | Bearer | Unlocks, points, available words, equipped title |
+| GET | `/v1/me` | Bearer | Unlocks, points, balance, owned items, available words, equipped words and styles, title |
 | PUT | `/v1/me/title` | Bearer | `{prefix, suffix}` (null unequips) |
+| PUT | `/v1/me/style` | Bearer | `{prefix, suffix}`, each `{source, formats}` of owned shop item ids or null for the native style |
+| POST | `/v1/shop/buy` | Bearer | `{itemIds: [...]}`, all or nothing |
+| POST | `/v1/shop/reset` | Bearer | Refunds every purchase and returns both slots to their native style |
 | POST | `/v1/claims` | Bearer | `{achievementId, triggerType, evidence, modVersion}` |
 | POST | `/v1/titles/batch` | | `{uuids: [...]}` (max 500) → `{titles: {uuid: title or null}}` |

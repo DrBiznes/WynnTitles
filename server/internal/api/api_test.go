@@ -292,3 +292,88 @@ func TestAchievementStatsAreCached(t *testing.T) {
 		t.Fatalf("players after the TTL = %d, want 1", fresh.Players)
 	}
 }
+
+func TestShopStylesAndReset(t *testing.T) {
+	h := newHarness(t)
+	token := h.login()
+
+	greg, ok := h.cat.Get("raid_tna")
+	if !ok || greg.Rewards.Prefix == nil || !greg.Rewards.Prefix.Runs[0].Obfuscated {
+		t.Fatal("test expects raid_tna to reward an obfuscated prefix")
+	}
+	h.do("POST", "/v1/claims", token, map[string]any{"achievementId": greg.ID, "triggerType": greg.Trigger.Type}, nil)
+	// JSON leaves out false flags, so decode each response into a fresh value.
+	var me meResponse
+	fresh := func() *meResponse {
+		me = meResponse{}
+		return &me
+	}
+	h.do("PUT", "/v1/me/title", token, map[string]string{"prefix": "Greg"}, fresh())
+	if me.Balance != greg.Points || len(me.Owned) != 0 || me.Styles.Prefix != nil {
+		t.Fatalf("before shopping: balance %d, owned %v, style %+v", me.Balance, me.Owned, me.Styles.Prefix)
+	}
+	if !me.Title.Runs[0].Obfuscated {
+		t.Fatalf("Greg should start in its native obfuscated style, got %+v", me.Title.Runs)
+	}
+
+	buy := func(ids ...string) int {
+		return h.do("POST", "/v1/shop/buy", token, map[string]any{"itemIds": ids}, fresh())
+	}
+	if code := buy("glow"); code != 404 {
+		t.Fatalf("unknown item: got %d, want 404", code)
+	}
+	if code := buy("rainbow"); code != 400 {
+		t.Fatalf("buying past the balance: got %d, want 400", code)
+	}
+	// Orders are all or nothing.
+	if code := buy("color_red", "palette_ice"); code != 400 {
+		t.Fatalf("order past the balance: got %d, want 400", code)
+	}
+	h.do("GET", "/v1/me", token, nil, fresh())
+	if len(me.Owned) != 0 {
+		t.Fatalf("a refused order bought %v", me.Owned)
+	}
+
+	style := map[string]any{"prefix": map[string]any{"source": "color_red", "formats": []string{"bold"}}}
+	if code := h.do("PUT", "/v1/me/style", token, style, nil); code != 400 {
+		t.Fatalf("wearing unowned items: got %d, want 400", code)
+	}
+	if code := buy("color_red", "bold"); code != 200 || me.Balance != greg.Points-5 || len(me.Owned) != 2 {
+		t.Fatalf("buy: code %d, balance %d, owned %v", code, me.Balance, me.Owned)
+	}
+	if code := buy("bold"); code != 409 {
+		t.Fatalf("buying twice: got %d, want 409", code)
+	}
+	if code := h.do("PUT", "/v1/me/style", token, map[string]any{"prefix": map[string]any{}}, nil); code != 400 {
+		t.Fatalf("empty style: got %d, want 400", code)
+	}
+
+	// A shop style replaces the native one, which reveals Greg.
+	h.do("PUT", "/v1/me/style", token, style, fresh())
+	want := catalog.Run{Text: "Greg", Color: "red", Bold: true}
+	if me.Title == nil || len(me.Title.Runs) != 1 || me.Title.Runs[0].Color != want.Color ||
+		!me.Title.Runs[0].Bold || me.Title.Runs[0].Obfuscated || me.Title.Runs[0].Effect != nil {
+		t.Fatalf("styled title = %+v, want %+v", me.Title, want)
+	}
+	lookup := func() *titles.Title {
+		var batch struct{ Titles map[string]*titles.Title }
+		h.do("POST", "/v1/titles/batch", "", map[string]any{"uuids": []string{testUUID}}, &batch)
+		return batch.Titles[testUUID]
+	}
+	if got := lookup(); got == nil || got.Runs[0].Obfuscated || got.Runs[0].Color != "red" {
+		t.Fatalf("public title = %+v", got)
+	}
+	h.url = h.start("http://unused.invalid")
+	if got := lookup(); got == nil || got.Runs[0].Color != "red" {
+		t.Fatalf("public title after restart = %+v", got)
+	}
+
+	// Resetting refunds everything and goes back to native.
+	h.do("POST", "/v1/shop/reset", token, nil, fresh())
+	if me.Balance != greg.Points || len(me.Owned) != 0 || me.Styles.Prefix != nil || !me.Title.Runs[0].Obfuscated {
+		t.Fatalf("after reset: balance %d, owned %v, style %+v, title %+v", me.Balance, me.Owned, me.Styles.Prefix, me.Title)
+	}
+	if got := lookup(); got == nil || !got.Runs[0].Obfuscated {
+		t.Fatalf("public title after reset = %+v", got)
+	}
+}

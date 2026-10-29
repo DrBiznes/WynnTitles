@@ -1,6 +1,7 @@
-// Package catalog loads and validates the achievement catalog embedded in the
-// server binary. The catalog is the single source of truth for achievements and
-// title words; the mod downloads it from GET /v1/catalog at runtime.
+// Package catalog loads and validates the achievement catalog and the style
+// shop embedded in the server binary. The catalog is the single source of truth
+// for achievements, title words and shop items; the mod downloads it from
+// GET /v1/catalog at runtime.
 package catalog
 
 import (
@@ -16,6 +17,9 @@ import (
 
 //go:embed achievements.json
 var embedded []byte
+
+//go:embed shop.json
+var embeddedShop []byte
 
 type Effect struct {
 	Type     string   `json:"type"`
@@ -36,8 +40,10 @@ type Run struct {
 	Effect        *Effect `json:"effect,omitempty"`
 }
 
-// Word is a formatted title word. Text is the plain form and must equal the
-// concatenation of every run's text.
+// Word is a title word. Text is the plain form and must equal the
+// concatenation of every run's text. Most words have no runs in
+// achievements.json and are shown plain; a few have a native style, which a
+// shop style replaces.
 type Word struct {
 	Text string `json:"text"`
 	Runs []Run  `json:"runs"`
@@ -59,6 +65,7 @@ type Trigger struct {
 	ItemName      string `json:"itemName,omitempty"`
 	Amount        int    `json:"amount,omitempty"`
 	Statistic     string `json:"statistic,omitempty"`
+	RaidName      string `json:"raidName,omitempty"`
 }
 
 // Icon is drawn inside the tier frame. Model is an item model from the
@@ -84,10 +91,12 @@ type Achievement struct {
 
 type Catalog struct {
 	Achievements []Achievement
+	Shop         []ShopItem
 	// Version is a content hash, used as the ETag for GET /v1/catalog.
 	Version string
 
-	byID map[string]*Achievement
+	byID     map[string]*Achievement
+	shopByID map[string]*ShopItem
 }
 
 var tierPoints = map[string]int{"bronze": 1, "silver": 3, "gold": 5}
@@ -112,20 +121,21 @@ var (
 	vanillaItem = regexp.MustCompile(`^minecraft:[a-z0-9_]+$`)
 )
 
-// Load parses and validates the embedded catalog.
+// Load parses and validates the embedded catalog and shop.
 func Load() (*Catalog, error) {
-	return Parse(embedded)
+	return Parse(embedded, embeddedShop)
 }
 
-// Parse parses and validates a catalog. Unknown fields are rejected so typos
-// in achievements.json fail at startup instead of silently doing nothing.
-func Parse(data []byte) (*Catalog, error) {
-	dec := json.NewDecoder(bytes.NewReader(data))
-	dec.DisallowUnknownFields()
-
+// Parse parses and validates achievements.json and shop.json. Unknown fields
+// are rejected so typos fail at startup instead of silently doing nothing.
+func Parse(achievementsData, shopData []byte) (*Catalog, error) {
 	var achievements []Achievement
-	if err := dec.Decode(&achievements); err != nil {
+	if err := decodeStrict(achievementsData, &achievements); err != nil {
 		return nil, fmt.Errorf("parse catalog: %w", err)
+	}
+	var shop []ShopItem
+	if err := decodeStrict(shopData, &shop); err != nil {
+		return nil, fmt.Errorf("parse shop: %w", err)
 	}
 
 	c := &Catalog{Achievements: achievements, byID: make(map[string]*Achievement, len(achievements))}
@@ -139,14 +149,23 @@ func Parse(data []byte) (*Catalog, error) {
 		}
 		c.byID[a.ID] = a
 	}
+	if err := c.setShop(shop); err != nil {
+		return nil, err
+	}
 
-	normalized, err := json.Marshal(c.Achievements)
+	normalized, err := json.Marshal([]any{c.Achievements, c.Shop})
 	if err != nil {
 		return nil, err
 	}
 	sum := sha256.Sum256(normalized)
 	c.Version = hex.EncodeToString(sum[:8])
 	return c, nil
+}
+
+func decodeStrict(data []byte, v any) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.DisallowUnknownFields()
+	return dec.Decode(v)
 }
 
 func (c *Catalog) Get(id string) (*Achievement, bool) {
@@ -222,6 +241,9 @@ func validateTrigger(t *Trigger) error {
 	case "inventoryItem":
 		need("itemName", t.ItemName != "")
 		need("amount", t.Amount > 0)
+	case "raid":
+		need("raidName", t.RaidName != "")
+		need("amount", t.Amount > 0)
 	case "statistic":
 		need("amount", t.Amount > 0)
 		if !statistics[t.Statistic] {
@@ -242,7 +264,8 @@ func validateWord(w *Word) error {
 		return fmt.Errorf("text is required")
 	}
 	if len(w.Runs) == 0 {
-		return fmt.Errorf("runs must not be empty")
+		w.Runs = []Run{{Text: w.Text}}
+		return nil
 	}
 
 	var joined strings.Builder

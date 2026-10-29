@@ -1,4 +1,5 @@
-// Package store persists players, sessions, and achievement unlocks in SQLite.
+// Package store persists players, sessions, achievement unlocks and style
+// purchases in SQLite.
 package store
 
 import (
@@ -46,6 +47,22 @@ var migrations = []string{
 		revoke_reason  TEXT,
 		PRIMARY KEY (uuid, achievement_id)
 	);`,
+
+	`-- Style shop items a player has bought. Price is what they paid, so
+	-- repricing an item never changes anyone's balance. Resetting deletes the
+	-- rows, which refunds them.
+	CREATE TABLE purchases (
+		uuid         TEXT NOT NULL REFERENCES players(uuid),
+		item_id      TEXT NOT NULL,
+		price        INTEGER NOT NULL,
+		purchased_at INTEGER NOT NULL,
+		PRIMARY KEY (uuid, item_id)
+	);
+
+	-- How each slot is restyled, as catalog.Style JSON. NULL shows the word's
+	-- native style.
+	ALTER TABLE players ADD COLUMN prefix_style TEXT;
+	ALTER TABLE players ADD COLUMN suffix_style TEXT;`,
 }
 
 type Store struct {
@@ -57,6 +74,15 @@ type Player struct {
 	Username       string
 	EquippedPrefix string
 	EquippedSuffix string
+	// PrefixStyle and SuffixStyle are catalog.Style JSON, or empty for the
+	// word's native style.
+	PrefixStyle string
+	SuffixStyle string
+}
+
+type Purchase struct {
+	ItemID string
+	Price  int
 }
 
 type Unlock struct {
@@ -69,7 +95,11 @@ type Unlock struct {
 	Revoked       bool
 }
 
-var ErrNotFound = errors.New("not found")
+var (
+	ErrNotFound        = errors.New("not found")
+	ErrAlreadyOwned    = errors.New("already owned")
+	ErrNotEnoughPoints = errors.New("not enough points")
+)
 
 func Open(path string) (*Store, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
@@ -133,16 +163,24 @@ func (s *Store) UpsertPlayer(ctx context.Context, uuid, username string, now tim
 	return err
 }
 
-func (s *Store) Player(ctx context.Context, uuid string) (Player, error) {
+const playerColumns = `uuid, username, COALESCE(equipped_prefix, ''), COALESCE(equipped_suffix, ''),
+	COALESCE(prefix_style, ''), COALESCE(suffix_style, '')`
+
+type scanner interface {
+	Scan(dest ...any) error
+}
+
+func scanPlayer(row scanner) (Player, error) {
 	var p Player
-	var prefix, suffix sql.NullString
-	err := s.db.QueryRowContext(ctx,
-		`SELECT uuid, username, equipped_prefix, equipped_suffix FROM players WHERE uuid = ?`, uuid).
-		Scan(&p.UUID, &p.Username, &prefix, &suffix)
+	err := row.Scan(&p.UUID, &p.Username, &p.EquippedPrefix, &p.EquippedSuffix, &p.PrefixStyle, &p.SuffixStyle)
+	return p, err
+}
+
+func (s *Store) Player(ctx context.Context, uuid string) (Player, error) {
+	p, err := scanPlayer(s.db.QueryRowContext(ctx, `SELECT `+playerColumns+` FROM players WHERE uuid = ?`, uuid))
 	if errors.Is(err, sql.ErrNoRows) {
 		return p, ErrNotFound
 	}
-	p.EquippedPrefix, p.EquippedSuffix = prefix.String, suffix.String
 	return p, err
 }
 
@@ -154,11 +192,19 @@ func (s *Store) SetEquipped(ctx context.Context, uuid, prefix, suffix string) er
 	return err
 }
 
+// SetStyles stores how each slot is restyled; an empty string goes back to
+// the word's native style.
+func (s *Store) SetStyles(ctx context.Context, uuid, prefixStyle, suffixStyle string) error {
+	_, err := s.db.ExecContext(ctx,
+		`UPDATE players SET prefix_style = NULLIF(?, ''), suffix_style = NULLIF(?, '') WHERE uuid = ?`,
+		prefixStyle, suffixStyle, uuid)
+	return err
+}
+
 // PlayersWithTitles returns every player who has a prefix or suffix equipped,
 // used to warm the in-memory title cache at startup.
 func (s *Store) PlayersWithTitles(ctx context.Context) ([]Player, error) {
-	rows, err := s.db.QueryContext(ctx, `
-		SELECT uuid, username, equipped_prefix, equipped_suffix FROM players
+	rows, err := s.db.QueryContext(ctx, `SELECT `+playerColumns+` FROM players
 		WHERE equipped_prefix IS NOT NULL OR equipped_suffix IS NOT NULL`)
 	if err != nil {
 		return nil, err
@@ -167,12 +213,10 @@ func (s *Store) PlayersWithTitles(ctx context.Context) ([]Player, error) {
 
 	var players []Player
 	for rows.Next() {
-		var p Player
-		var prefix, suffix sql.NullString
-		if err := rows.Scan(&p.UUID, &p.Username, &prefix, &suffix); err != nil {
+		p, err := scanPlayer(rows)
+		if err != nil {
 			return nil, err
 		}
-		p.EquippedPrefix, p.EquippedSuffix = prefix.String, suffix.String
 		players = append(players, p)
 	}
 	return players, rows.Err()
@@ -275,4 +319,86 @@ func (s *Store) UnlockCounts(ctx context.Context) (int, map[string]int, error) {
 		counts[id] = n
 	}
 	return players, counts, rows.Err()
+}
+
+// Purchases returns every shop item a player owns.
+func (s *Store) Purchases(ctx context.Context, uuid string) ([]Purchase, error) {
+	rows, err := s.db.QueryContext(ctx,
+		`SELECT item_id, price FROM purchases WHERE uuid = ? ORDER BY purchased_at, item_id`, uuid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var purchases []Purchase
+	for rows.Next() {
+		var p Purchase
+		if err := rows.Scan(&p.ItemID, &p.Price); err != nil {
+			return nil, err
+		}
+		purchases = append(purchases, p)
+	}
+	return purchases, rows.Err()
+}
+
+// Buy records the purchase of every item, or none of them. earned is the
+// player's points from achievements; the balance left after what they have
+// already spent must cover the whole order. It fails with ErrAlreadyOwned or
+// ErrNotEnoughPoints.
+func (s *Store) Buy(ctx context.Context, uuid string, items []Purchase, earned int, now time.Time) error {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	total := 0
+	for _, item := range items {
+		var owned bool
+		if err := tx.QueryRowContext(ctx,
+			`SELECT EXISTS (SELECT 1 FROM purchases WHERE uuid = ? AND item_id = ?)`, uuid, item.ItemID).
+			Scan(&owned); err != nil {
+			return err
+		}
+		if owned {
+			return ErrAlreadyOwned
+		}
+		total += item.Price
+	}
+
+	var spent int
+	if err := tx.QueryRowContext(ctx,
+		`SELECT COALESCE(SUM(price), 0) FROM purchases WHERE uuid = ?`, uuid).Scan(&spent); err != nil {
+		return err
+	}
+	if earned-spent < total {
+		return ErrNotEnoughPoints
+	}
+
+	for _, item := range items {
+		if _, err := tx.ExecContext(ctx,
+			`INSERT INTO purchases (uuid, item_id, price, purchased_at) VALUES (?, ?, ?, ?)`,
+			uuid, item.ItemID, item.Price, now.UnixMilli()); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
+// ResetPurchases refunds everything a player has bought and puts both slots
+// back to their native style.
+func (s *Store) ResetPurchases(ctx context.Context, uuid string) error {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	if _, err := tx.ExecContext(ctx, `DELETE FROM purchases WHERE uuid = ?`, uuid); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx,
+		`UPDATE players SET prefix_style = NULL, suffix_style = NULL WHERE uuid = ?`, uuid); err != nil {
+		return err
+	}
+	return tx.Commit()
 }

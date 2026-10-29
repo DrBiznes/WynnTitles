@@ -26,12 +26,14 @@ import wynntitles.mc.Mc;
 import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.WynnFonts;
 import wynntitles.titles.Title;
+import wynntitles.titles.TitleStyle;
 import wynntitles.titles.TitleWord;
 
 /**
  * The in-game home of WynnTitles, laid out like Wynncraft's raid start screen:
- * a ribbon with the title, a stone tab bar to switch between picking a title
- * and browsing achievements, the page, and its actions along the bottom.
+ * a ribbon with the title, a stone tab bar to switch between picking a title,
+ * styling it, buying styles and browsing achievements, the page, and its
+ * actions along the bottom.
  */
 public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	// The panel is one picture (PANEL_W/H in draw-ui-sprites.py), sized to fit a
@@ -50,6 +52,8 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	private static final int COLUMN_WIDTH = (BODY_WIDTH - 8) / 2;
 	private enum Tab {
 		TITLES("Titles"),
+		STYLES("Styles"),
+		SHOP("Shop"),
 		ACHIEVEMENTS("Achievements");
 
 		final String label;
@@ -61,6 +65,8 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 
 	private Tab tab = Tab.TITLES;
 	private AchievementsPage achievements = new AchievementsPage(a -> WynnTitles.tracker().canDetect(a));
+	private final StylesPage styles = new StylesPage(this::profileSaved);
+	private final ShopPage shop = new ShopPage(this::profileSaved);
 	private Me me;
 	private String error;
 	private String selectedPrefix;
@@ -80,6 +86,20 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	public static TitlesScreen achievements() {
 		TitlesScreen screen = new TitlesScreen();
 		screen.tab = Tab.ACHIEVEMENTS;
+		return screen;
+	}
+
+	/** Opens straight to the styles tab. */
+	public static TitlesScreen styles() {
+		TitlesScreen screen = new TitlesScreen();
+		screen.tab = Tab.STYLES;
+		return screen;
+	}
+
+	/** Opens straight to the shop tab. */
+	public static TitlesScreen shop() {
+		TitlesScreen screen = new TitlesScreen();
+		screen.tab = Tab.SHOP;
 		return screen;
 	}
 
@@ -162,21 +182,30 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		if (me != null) {
 			selectedPrefix = me.equipped().prefix();
 			selectedSuffix = me.equipped().suffix();
+			styles.reset(me);
 		}
+	}
+
+	/** After wearing, buying or refunding: a refund also takes styles off. */
+	private void profileSaved(Me updated) {
+		me = updated;
+		styles.reset(updated);
+		rebuild();
 	}
 
 	private void rebuild() {
 		header.clearChildren();
 		header.child(WynnUi.ribbon(tab.label));
 		tabBar.clearChildren();
-		tabBar.child(tabSide(Tab.TITLES, HorizontalAlignment.RIGHT));
+		// What you wear on one side of the eye, how you earn and spend points on the other.
+		tabBar.child(tabSide(HorizontalAlignment.RIGHT, Tab.TITLES, Tab.STYLES));
 		tabBar.child(UIContainers.horizontalFlow(Sizing.fixed(EYE_WIDTH), Sizing.fixed(8)).surface(WynnUi.surface(WynnUi.EYE)));
-		tabBar.child(tabSide(Tab.ACHIEVEMENTS, HorizontalAlignment.LEFT));
+		tabBar.child(tabSide(HorizontalAlignment.LEFT, Tab.SHOP, Tab.ACHIEVEMENTS));
 		body.clearChildren();
 		footer.clearChildren();
 
 		Catalog catalog = WynnTitles.catalogs().catalog();
-		if (me == null || (tab == Tab.ACHIEVEMENTS && catalog == null)) {
+		if (me == null || (tab != Tab.TITLES && catalog == null)) {
 			body.verticalAlignment(VerticalAlignment.CENTER);
 			body.child(me == null && error != null
 					? WynnUi.label(WynnFonts.body(error), WynnUi.ERROR).maxWidth(PANEL_WIDTH - 40)
@@ -186,6 +215,14 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		body.verticalAlignment(VerticalAlignment.TOP);
 		if (tab == Tab.TITLES) {
 			buildTitles();
+		} else if (tab == Tab.STYLES) {
+			body.child(styles.build(catalog, me, find(me.words().prefixes(), selectedPrefix),
+					find(me.words().suffixes(), selectedSuffix), BODY_WIDTH, BODY_HEIGHT));
+			footer.child(styles.footer());
+		} else if (tab == Tab.SHOP) {
+			body.child(shop.build(catalog, me, find(me.words().prefixes(), selectedPrefix),
+					find(me.words().suffixes(), selectedSuffix), BODY_WIDTH, BODY_HEIGHT));
+			footer.child(shop.footer());
 		} else {
 			body.child(achievements.build(catalog, me, WynnTitles.stats().stats(), BODY_WIDTH, BODY_HEIGHT));
 			footer.child(achievements.footer(me));
@@ -195,10 +232,13 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		}
 	}
 
-	private FlowLayout tabSide(Tab t, HorizontalAlignment toward) {
+	private FlowLayout tabSide(HorizontalAlignment toward, Tab... tabs) {
 		FlowLayout side = UIContainers.horizontalFlow(Sizing.fixed(TAB_SIDE), Sizing.fixed(14));
+		side.gap(TAB_GAP);
 		side.horizontalAlignment(toward).verticalAlignment(VerticalAlignment.CENTER);
-		side.child(tabButton(t));
+		for (Tab t : tabs) {
+			side.child(tabButton(t));
+		}
 		return side;
 	}
 
@@ -237,8 +277,10 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 
 		FlowLayout columns = UIContainers.horizontalFlow(Sizing.fill(), Sizing.expand());
 		columns.gap(8);
-		columns.child(wordColumn("Prefix", me.words().prefixes(), () -> selectedPrefix, w -> selectedPrefix = w));
-		columns.child(wordColumn("Suffix", me.words().suffixes(), () -> selectedSuffix, w -> selectedSuffix = w));
+		columns.child(wordColumn("Prefix", me.words().prefixes(), me.styles().prefix(),
+				() -> selectedPrefix, w -> selectedPrefix = w));
+		columns.child(wordColumn("Suffix", me.words().suffixes(), me.styles().suffix(),
+				() -> selectedSuffix, w -> selectedSuffix = w));
 		body.child(columns);
 		titlesFooter();
 	}
@@ -257,13 +299,22 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	}
 
 	private Component preview() {
-		Title title = Title.of(find(me.words().prefixes(), selectedPrefix), find(me.words().suffixes(), selectedSuffix));
+		Title title = Title.of(
+				styled(find(me.words().prefixes(), selectedPrefix), me.styles().prefix()),
+				styled(find(me.words().suffixes(), selectedSuffix), me.styles().suffix()));
 		return title == null
 				? WynnFonts.body("No title").withColor(WynnUi.TEXT_DIM)
 				: TitleRenderer.render(title);
 	}
 
-	private FlowLayout wordColumn(String heading, List<TitleWord> words, Supplier<String> selected, Consumer<String> select) {
+	/** The word as it would be worn: in the slot's shop style, or its native one. */
+	private static TitleWord styled(TitleWord word, TitleStyle style) {
+		Catalog catalog = WynnTitles.catalogs().catalog();
+		return catalog == null ? word : catalog.restyle(word, style);
+	}
+
+	private FlowLayout wordColumn(String heading, List<TitleWord> words, TitleStyle style,
+			Supplier<String> selected, Consumer<String> select) {
 		FlowLayout column = UIContainers.verticalFlow(Sizing.fixed(COLUMN_WIDTH), Sizing.fill());
 		column.gap(3);
 		column.child(WynnUi.heading(heading).margins(Insets.left(2)));
@@ -271,7 +322,7 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		FlowLayout rows = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
 		rows.child(wordRow(null, selected, select));
 		for (TitleWord word : words) {
-			rows.child(wordRow(word, selected, select));
+			rows.child(wordRow(styled(word, style), selected, select));
 		}
 		column.child(WynnUi.well(Sizing.fill(), Sizing.expand(), rows));
 		return column;

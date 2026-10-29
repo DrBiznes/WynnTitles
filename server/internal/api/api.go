@@ -55,6 +55,9 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /v1/auth/logout", s.authed(s.logout))
 	mux.HandleFunc("GET /v1/me", s.authed(s.getMe))
 	mux.HandleFunc("PUT /v1/me/title", s.authed(s.putTitle))
+	mux.HandleFunc("PUT /v1/me/style", s.authed(s.putStyle))
+	mux.HandleFunc("POST /v1/shop/buy", s.authed(s.buy))
+	mux.HandleFunc("POST /v1/shop/reset", s.authed(s.resetPurchases))
 	mux.HandleFunc("POST /v1/claims", s.authed(s.claim))
 	mux.HandleFunc("POST /v1/titles/batch", s.batchTitles)
 	return s.recoverer(mux)
@@ -68,11 +71,11 @@ func (s *Server) LoadTitles(ctx context.Context) error {
 		return err
 	}
 	for _, p := range players {
-		words, err := s.availableWords(ctx, p.UUID)
+		me, err := s.me(ctx, p.UUID)
 		if err != nil {
 			return err
 		}
-		s.Titles.Set(p.UUID, titles.Build(words, p.EquippedPrefix, p.EquippedSuffix))
+		s.Titles.Set(p.UUID, me.Title)
 	}
 	return nil
 }
@@ -92,6 +95,7 @@ func (s *Server) getCatalog(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
 		"version":      s.Catalog.Version,
 		"achievements": s.Catalog.Achievements,
+		"shop":         s.Catalog.Shop,
 	})
 }
 
@@ -208,12 +212,17 @@ func (s *Server) logout(w http.ResponseWriter, r *http.Request, uuid string) {
 }
 
 type meResponse struct {
-	UUID     string        `json:"uuid"`
-	Username string        `json:"username"`
-	Unlocked []unlockView  `json:"unlocked"`
+	UUID     string       `json:"uuid"`
+	Username string       `json:"username"`
+	Unlocked []unlockView `json:"unlocked"`
+	// Points is everything earned from achievements; Balance is what is left
+	// to spend in the shop.
 	Points   int           `json:"points"`
+	Balance  int           `json:"balance"`
+	Owned    []string      `json:"owned"`
 	Words    titles.Words  `json:"words"`
 	Equipped equippedView  `json:"equipped"`
+	Styles   stylesView    `json:"styles"`
 	Title    *titles.Title `json:"title"`
 }
 
@@ -225,6 +234,12 @@ type unlockView struct {
 type equippedView struct {
 	Prefix *string `json:"prefix"`
 	Suffix *string `json:"suffix"`
+}
+
+// stylesView has a slot's shop style, or null for the word's native style.
+type stylesView struct {
+	Prefix *catalog.Style `json:"prefix"`
+	Suffix *catalog.Style `json:"suffix"`
 }
 
 func (s *Server) getMe(w http.ResponseWriter, r *http.Request, uuid string) {
@@ -246,7 +261,12 @@ func (s *Server) me(ctx context.Context, uuid string) (*meResponse, error) {
 		return nil, err
 	}
 
-	me := &meResponse{UUID: player.UUID, Username: player.Username, Unlocked: []unlockView{}}
+	purchases, err := s.Store.Purchases(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	me := &meResponse{UUID: player.UUID, Username: player.Username, Unlocked: []unlockView{}, Owned: []string{}}
 	var ids []string
 	for _, u := range unlocks {
 		a, ok := s.Catalog.Get(u.AchievementID)
@@ -258,10 +278,26 @@ func (s *Server) me(ctx context.Context, uuid string) (*meResponse, error) {
 		me.Unlocked = append(me.Unlocked, unlockView{AchievementID: u.AchievementID, ClaimedAt: u.ClaimedAt.UnixMilli()})
 	}
 
+	// Purchases of items since removed from the shop still count as spent
+	// until a reset refunds them.
+	owned := map[string]bool{}
+	me.Balance = me.Points
+	for _, p := range purchases {
+		me.Balance -= p.Price
+		if _, ok := s.Catalog.ShopItem(p.ItemID); ok {
+			owned[p.ItemID] = true
+			me.Owned = append(me.Owned, p.ItemID)
+		}
+	}
+
 	me.Words = titles.Available(s.Catalog, ids)
-	me.Title = titles.Build(me.Words, player.EquippedPrefix, player.EquippedSuffix)
 	// Report only what is actually displayed, so the mod never shows a stale
-	// selection for a word that has since disappeared.
+	// selection for a word or style that has since disappeared.
+	me.Styles.Prefix = s.wornStyle(player.PrefixStyle, owned)
+	me.Styles.Suffix = s.wornStyle(player.SuffixStyle, owned)
+	me.Title = titles.Build(s.Catalog, me.Words,
+		titles.Slot{Word: player.EquippedPrefix, Style: me.Styles.Prefix},
+		titles.Slot{Word: player.EquippedSuffix, Style: me.Styles.Suffix})
 	if _, ok := me.Words.Prefix(player.EquippedPrefix); ok {
 		me.Equipped.Prefix = &player.EquippedPrefix
 	}
@@ -269,6 +305,36 @@ func (s *Server) me(ctx context.Context, uuid string) (*meResponse, error) {
 		me.Equipped.Suffix = &player.EquippedSuffix
 	}
 	return me, nil
+}
+
+// wornStyle decodes a stored style, dropping it if the catalog no longer
+// allows it or the player no longer owns every item in it.
+func (s *Server) wornStyle(stored string, owned map[string]bool) *catalog.Style {
+	if stored == "" {
+		return nil
+	}
+	var style catalog.Style
+	if err := json.Unmarshal([]byte(stored), &style); err != nil || s.Catalog.CheckStyle(&style) != nil {
+		return nil
+	}
+	for _, id := range style.Items() {
+		if !owned[id] {
+			return nil
+		}
+	}
+	return &style
+}
+
+// writeMe answers with the player's profile after a change, and updates the
+// public title to match.
+func (s *Server) writeMe(w http.ResponseWriter, r *http.Request, uuid string) {
+	me, err := s.me(r.Context(), uuid)
+	if err != nil {
+		s.internalError(w, err)
+		return
+	}
+	s.Titles.Set(uuid, me.Title)
+	writeJSON(w, http.StatusOK, me)
 }
 
 func (s *Server) putTitle(w http.ResponseWriter, r *http.Request, uuid string) {
@@ -299,8 +365,120 @@ func (s *Server) putTitle(w http.ResponseWriter, r *http.Request, uuid string) {
 		s.internalError(w, err)
 		return
 	}
-	s.Titles.Set(uuid, titles.Build(words, prefix, suffix))
-	s.getMe(w, r, uuid)
+	s.writeMe(w, r, uuid)
+}
+
+// putStyle sets how each slot is styled. A null slot goes back to the word's
+// native style; every item in a style must be owned.
+func (s *Server) putStyle(w http.ResponseWriter, r *http.Request, uuid string) {
+	var req struct {
+		Prefix *catalog.Style `json:"prefix"`
+		Suffix *catalog.Style `json:"suffix"`
+	}
+	if !s.decode(w, r, &req) {
+		return
+	}
+
+	me, err := s.me(r.Context(), uuid)
+	if err != nil {
+		s.internalError(w, err)
+		return
+	}
+	owned := map[string]bool{}
+	for _, id := range me.Owned {
+		owned[id] = true
+	}
+
+	var stored [2]string
+	for i, slot := range []struct {
+		name  string
+		style *catalog.Style
+	}{{"prefix", req.Prefix}, {"suffix", req.Suffix}} {
+		if slot.style == nil {
+			continue
+		}
+		if err := s.Catalog.CheckStyle(slot.style); err != nil {
+			writeError(w, http.StatusBadRequest, slot.name+" style: "+err.Error())
+			return
+		}
+		for _, id := range slot.style.Items() {
+			if !owned[id] {
+				writeError(w, http.StatusBadRequest, fmt.Sprintf("%s style: %q is not owned", slot.name, id))
+				return
+			}
+		}
+		b, err := json.Marshal(slot.style)
+		if err != nil {
+			s.internalError(w, err)
+			return
+		}
+		stored[i] = string(b)
+	}
+
+	if err := s.Store.SetStyles(r.Context(), uuid, stored[0], stored[1]); err != nil {
+		s.internalError(w, err)
+		return
+	}
+	s.writeMe(w, r, uuid)
+}
+
+// buy spends points on shop items, all or nothing, so trying on a whole style
+// and buying it is one step.
+func (s *Server) buy(w http.ResponseWriter, r *http.Request, uuid string) {
+	var req struct {
+		ItemIDs []string `json:"itemIds"`
+	}
+	if !s.decode(w, r, &req) {
+		return
+	}
+	if len(req.ItemIDs) == 0 {
+		writeError(w, http.StatusBadRequest, "nothing to buy")
+		return
+	}
+
+	var order []store.Purchase
+	seen := map[string]bool{}
+	for _, id := range req.ItemIDs {
+		item, ok := s.Catalog.ShopItem(id)
+		if !ok {
+			writeError(w, http.StatusNotFound, fmt.Sprintf("unknown shop item %q", id))
+			return
+		}
+		if !seen[id] {
+			seen[id] = true
+			order = append(order, store.Purchase{ItemID: id, Price: item.Price})
+		}
+	}
+
+	me, err := s.me(r.Context(), uuid)
+	if err != nil {
+		s.internalError(w, err)
+		return
+	}
+	err = s.Store.Buy(r.Context(), uuid, order, me.Points, s.Now())
+	switch {
+	case errors.Is(err, store.ErrAlreadyOwned):
+		writeError(w, http.StatusConflict, "already owned")
+		return
+	case errors.Is(err, store.ErrNotEnoughPoints):
+		writeError(w, http.StatusBadRequest, "not enough points")
+		return
+	case err != nil:
+		s.internalError(w, err)
+		return
+	}
+	s.Log.Info("shop purchase", "uuid", uuid, "items", req.ItemIDs)
+	s.writeMe(w, r, uuid)
+}
+
+// resetPurchases refunds every purchase and puts both slots back to native.
+// Styles are cosmetic, so trying things out should never be a trap.
+func (s *Server) resetPurchases(w http.ResponseWriter, r *http.Request, uuid string) {
+	if err := s.Store.ResetPurchases(r.Context(), uuid); err != nil {
+		s.internalError(w, err)
+		return
+	}
+	s.writeMe(w, r, uuid)
 }
 
 func (s *Server) claim(w http.ResponseWriter, r *http.Request, uuid string) {

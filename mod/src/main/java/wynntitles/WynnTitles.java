@@ -101,7 +101,10 @@ public class WynnTitles implements ClientModInitializer {
 
 		// Only contact the WynnTitles server on Wynncraft, not on every world or server.
 		// Wynntils creates its event bus in its own entrypoint, which may run after ours.
-		ClientLifecycleEvents.CLIENT_STARTED.register(client -> WynntilsMod.registerEventListener(this));
+		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+			WynntilsMod.registerEventListener(this);
+			WynntilsMod.registerEventListener(WynntilsDetectors.eventListener());
+		});
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			titles.tick();
