@@ -56,6 +56,8 @@ final class StylesPage {
 	private Box slots;
 	private Box footer;
 	private ScrollView ownedList;
+	private Box ownedContent;
+	private String adjustment;
 
 	StylesPage(Consumer<Me> onSaved) {
 		this.onSaved = onSaved;
@@ -95,7 +97,8 @@ final class StylesPage {
 		right.child(WynnUi.heading("Your styles").margins(Insets.left(2)));
 		// Wearing rebuilds the page; stay where the player was in the list.
 		double offset = ownedList == null ? 0 : ownedList.offset();
-		ownedList = WynnUi.well(Size.fill(), Size.expand(), owned()).scrollTo(offset);
+		ownedContent = Box.column(Size.fill(), Size.content());
+		ownedList = WynnUi.well(Size.fill(), Size.expand(), ownedContent).scrollTo(offset);
 		right.child(ownedList);
 		columns.child(right);
 		page.child(columns);
@@ -114,6 +117,8 @@ final class StylesPage {
 		slots.clearChildren();
 		slots.child(slotRow(Slot.PREFIX, prefixWord));
 		slots.child(slotRow(Slot.SUFFIX, suffixWord));
+		ownedContent.clearChildren();
+		ownedContent.child(owned());
 		refreshFooter();
 	}
 
@@ -162,10 +167,28 @@ final class StylesPage {
 				() -> setDraft(null)));
 		list.child(look);
 
-		StyleChips.addGroups(list, catalog, i -> me.owns(i.id()), item -> StyleChips.chip(item,
-				StyleChips.label(catalog, item), null, () -> wears(item),
-				StyleChips.tooltip(item.name(), StyleChips.describe(catalog, item), ChatFormatting.GRAY),
-				() -> toggle(item)));
+		StyleChips.addGroups(list, catalog, i -> me.owns(i.id()), item -> {
+			String problem = problem(item);
+			return problem != null ? StyleChips.disabled(item, problem, null) : StyleChips.chip(item,
+					StyleChips.label(catalog, item), null, () -> wears(item),
+					StyleChips.tooltip(item.name(), StyleChips.describe(catalog, item), ChatFormatting.GRAY),
+					() -> toggle(item));
+		});
+		ShopItem font = draft() == null ? null : catalog.shopItem(draft().font()).orElse(null);
+		if (font != null && font.banner()) {
+			list.child(WynnUi.heading("Letter color"));
+			Box colors = StyleChips.row();
+			colors.child(StyleChips.chip(WynnUi.label(WynnFonts.body("Auto contrast"), WynnUi.TEXT), null,
+					() -> draft().letterColor() == null, Component.literal("White or black for best contrast"),
+					() -> setDraft(new TitleStyle(draft().source(), draft().formats(), draft().font(), draft().color(), null))));
+			for (ShopItem color : catalog.shop()) if (ShopItem.COLOR.equals(color.kind())) {
+				colors.child(StyleChips.chip(StyleChips.label(catalog, color), null,
+						() -> color.color().equals(draft().letterColor()), Component.literal(color.name()),
+						() -> setDraft(new TitleStyle(draft().source(), draft().formats(), draft().font(), draft().color(), color.color()))));
+			}
+			list.child(colors);
+		}
+		if (adjustment != null) list.child(WynnUi.label(WynnFonts.body(adjustment), WynnUi.TEXT_DIM).maxWidth(235));
 		if (me.owned().isEmpty()) {
 			list.child(WynnUi.label(WynnFonts.body("Buy colors, palettes and formats on the Shop tab."), WynnUi.TEXT_DIM)
 					.maxWidth(220)
@@ -191,20 +214,43 @@ final class StylesPage {
 
 	private boolean wears(ShopItem item) {
 		TitleStyle draft = draft();
-		return draft != null && (item.isSource() ? item.id().equals(draft.source()) : draft.formats().contains(item.id()));
+		if (draft == null) return false;
+		if (ShopItem.FONT.equals(item.kind())) return item.id().equals(draft.font());
+		return item.isSource() ? item.id().equals(draft.source()) : draft.formats().contains(item.id());
 	}
 
-	/** A source replaces the current one and a format toggles; picking what is already worn takes it off. */
+
+	private String problem(ShopItem item) {
+		String missing = StyleChips.fontProblem(item, slot == Slot.PREFIX ? prefixWord : suffixWord);
+		if (missing != null) return missing;
+		ShopItem font = draft() == null ? null : catalog.shopItem(draft().font()).orElse(null);
+		if (font != null && !ShopItem.FONT.equals(item.kind()) && !font.allows(item))
+			return font.name() + (ShopItem.FORMAT.equals(item.kind()) ? ": formats unavailable" : ": solid colors only");
+		return null;
+	}
+
 	private void toggle(ShopItem item) {
-		TitleStyle draft = draft() == null ? new TitleStyle(null, List.of()) : draft();
-		if (item.isSource()) {
-			setDraft(new TitleStyle(item.id().equals(draft.source()) ? null : item.id(), draft.formats()));
-		} else {
-			List<String> formats = new ArrayList<>(draft.formats());
-			if (!formats.remove(item.id())) {
-				formats.add(item.id());
+		if (problem(item) != null) return;
+		TitleStyle d = draft() == null ? new TitleStyle(null, List.of()) : draft();
+		adjustment = null;
+		if (ShopItem.FONT.equals(item.kind())) {
+			if (item.id().equals(d.font())) {
+				setDraft(new TitleStyle(d.source(), d.formats(), null, null, null));
+				return;
 			}
-			setDraft(new TitleStyle(draft.source(), formats));
+			boolean dropsEffect = d.source() != null && !item.allows(catalog.shopItem(d.source()).orElseThrow());
+			boolean dropsFormats = !Boolean.TRUE.equals(item.formats()) && !d.formats().isEmpty();
+			if (dropsEffect || dropsFormats) {
+				adjustment = dropsEffect ? "On Wear: keep the first palette color; remove the effect" : "On Wear: remove formats";
+				adjustment += dropsEffect && dropsFormats ? " and formats." : ".";
+			}
+			setDraft(catalog.selectFont(d, item));
+		} else if (item.isSource()) {
+			setDraft(new TitleStyle(item.id().equals(d.source()) ? null : item.id(), d.formats(), d.font(), null, d.letterColor()));
+		} else {
+			List<String> formats = new ArrayList<>(d.formats());
+			if (!formats.remove(item.id())) formats.add(item.id());
+			setDraft(new TitleStyle(d.source(), formats, d.font(), d.color(), d.letterColor()));
 		}
 	}
 

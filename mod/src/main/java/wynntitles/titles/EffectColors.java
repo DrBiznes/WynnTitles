@@ -83,6 +83,11 @@ public final class EffectColors {
 		return PALETTES.containsKey(palette);
 	}
 
+	/** The first palette stop, independent of its animation phase. */
+	public static int firstColor(TitleEffect effect) {
+		return Ramp.of(effect).at(0);
+	}
+
 	/** The colors of a run's letters at {@code nowMs}. */
 	public static int[] colors(TitleEffect effect, int length, long nowMs) {
 		int[] out = new int[length];

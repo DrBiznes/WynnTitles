@@ -37,6 +37,8 @@ type Effect struct {
 
 type Run struct {
 	Text          string  `json:"text"`
+	Font          string  `json:"font,omitempty"`
+	LetterColor   string  `json:"letterColor,omitempty"`
 	Color         string  `json:"color,omitempty"`
 	Bold          bool    `json:"bold,omitempty"`
 	Italic        bool    `json:"italic,omitempty"`

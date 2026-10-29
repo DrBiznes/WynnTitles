@@ -12,6 +12,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import wynntitles.WynnTitles;
+import wynntitles.titles.TitleFonts;
 
 /**
  * The fonts of the Wynncraft resource pack, used by id the way Wynncraft's own
@@ -71,13 +72,63 @@ public final class WynnFonts {
 	 * {@link #pillsLoaded()} first: without the pack this is private-use boxes.
 	 */
 	public static MutableComponent pill(String text) {
-		StringBuilder pill = new StringBuilder(PILL_START).append(BACK_ONE);
-		for (char c : text.toUpperCase(Locale.ROOT).toCharArray()) {
-			pill.append(c >= 'A' && c <= 'Z' ? (char) ('\uE030' + c - 'A')
-					: c >= '0' && c <= '9' ? (char) ('\uE050' + c - '0')
-					: PILL_GAP).append(BACK_ONE);
-		}
-		return in(PILL, pill.append(PILL_END).toString());
+		return bannerBackground(PILL, text);
+	}
+
+	private static MutableComponent bannerBackground(Identifier font, String text) {
+		StringBuilder back = new StringBuilder(PILL_START).append(BACK_ONE);
+		text.codePoints().forEach(c -> {
+			int glyph = TitleFonts.glyph(c);
+			back.appendCodePoint(glyph < 0 || glyph == 0xE061 ? PILL_GAP : glyph + 0x30).append(BACK_ONE);
+		});
+		return in(font, back.append(PILL_END).toString());
+	}
+
+	public static boolean available(String id) {
+		if (!TitleFonts.known(id)) return false;
+		return available.contains(Identifier.parse(id)) && (!TitleFonts.banner(id) || available.contains(SPACE));
+	}
+
+	public static MutableComponent title(String id, String text) {
+		MutableComponent out = available(id) ? in(Identifier.parse(id), TitleFonts.text(id, text)) : Component.literal(text);
+		return "minecraft:language/wynncraft_outline".equals(id) ? out.withStyle(style -> style.withoutShadow()) : out;
+	}
+
+	/** Two complete layers with an exact rewind, so Font.width includes both
+	 * edges once. The foreground shares the background's glyph advances. */
+	public static MutableComponent banner(String id, String text, int background, Integer letters) {
+		if (!available(id) || TitleFonts.bannerCharacter(text) != 0) return Component.literal(text).withColor(background);
+		Identifier font = Identifier.parse(id);
+		// Each foreground letter advances as far as its background slice,
+		// whose extra pixel closes the seam with the next slice.
+		MutableComponent bg = bannerBackground(font, text).withColor(background);
+		int width = Mc.client().font.width(bg);
+		MutableComponent fg = in(font, "\uE060" + BACK_ONE).withColor(background);
+		text.codePoints().forEach(c -> {
+			int glyph = TitleFonts.glyph(c);
+			MutableComponent letter = in(font, new String(Character.toChars(glyph)))
+					.withColor(glyph == 0xE061 ? background : letters == null ? contrast(background) : letters);
+			int slice = Mc.client().font.width(in(font,
+					new String(Character.toChars(glyph == 0xE061 ? glyph : glyph + 0x30)) + BACK_ONE));
+			fg.append(letter).append(advance(slice - Mc.client().font.width(letter)));
+		});
+		fg.append(in(font, "\uE062").withColor(background));
+		return Component.empty().append(bg).append(advance(-width)).append(fg)
+				.withStyle(style -> style.withoutShadow().withBold(false).withItalic(false)
+						.withUnderlined(false).withStrikethrough(false).withObfuscated(false));
+	}
+
+	private static MutableComponent advance(int pixels) {
+		return in(SPACE, new String(Character.toChars(0xD0000 + pixels)));
+	}
+
+	public static int contrast(int color) {
+		double light = 0.2126 * channel((color >> 16) & 255) + 0.7152 * channel((color >> 8) & 255) + 0.0722 * channel(color & 255);
+		return light > 0.179 ? 0x000000 : 0xFFFFFF;
+	}
+	private static double channel(int n) {
+		double s = n / 255.0;
+		return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
 	}
 
 	private static MutableComponent in(Identifier font, String text) {
@@ -89,7 +140,9 @@ public final class WynnFonts {
 
 	private static void reload(ResourceManager manager) {
 		Set<Identifier> next = new HashSet<>();
-		for (Identifier font : Set.of(BODY, SMALL, PILL, SPACE)) {
+		Set<Identifier> fonts = new HashSet<>(Set.of(BODY, SMALL, PILL, SPACE));
+		TitleFonts.IDS.forEach(id -> fonts.add(Identifier.parse(id)));
+		for (Identifier font : fonts) {
 			if (manager.getResource(font.withPath(path -> "font/" + path + ".json")).isPresent()) {
 				next.add(font);
 			}

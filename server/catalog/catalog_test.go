@@ -220,3 +220,93 @@ func TestCheckStyleAndRestyle(t *testing.T) {
 		t.Fatalf("restyled = %+v, want %+v", got.Runs, want)
 	}
 }
+
+func TestFontRulesAndPricing(t *testing.T) {
+	c, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	points, cost, fonts := 0, 0, 0
+	for _, a := range c.Achievements {
+		points += a.Points
+	}
+	for _, item := range c.Shop {
+		cost += item.Price
+		if item.Kind != "font" {
+			continue
+		}
+		fonts++
+		style := &Style{Font: item.ID, Source: "color_red", Formats: []string{"bold"}}
+		if item.Banner() {
+			if c.CheckStyle(style) == nil {
+				t.Fatal("banner accepted bold")
+			}
+			style.Formats = nil
+			style.Source = "palette_ice"
+			if c.CheckStyle(style) == nil {
+				t.Fatal("banner accepted palette")
+			}
+			style.Source = "animated_ice"
+			if c.CheckStyle(style) == nil {
+				t.Fatal("banner accepted animation")
+			}
+			style.Source = "rainbow"
+			if c.CheckStyle(style) == nil {
+				t.Fatal("banner accepted rainbow")
+			}
+			style.Source = "color_red"
+			style.LetterColor = "yellow"
+		}
+		if err := c.CheckStyle(style); err != nil {
+			t.Fatal(err)
+		}
+		got := c.Restyle(Word{Text: "Greg", Runs: []Run{{Text: "Greg", Obfuscated: true}}}, style)
+		if got.Runs[0].Font != item.Font || got.Runs[0].Obfuscated {
+			t.Fatalf("font failed: %+v", got)
+		}
+	}
+	if fonts != 10 {
+		t.Fatalf("fonts = %d", fonts)
+	}
+	ratio := float64(points) / float64(cost)
+	if ratio < 0.58 || ratio > 0.62 {
+		t.Fatalf("earnable/shop = %.3f (%d/%d)", ratio, points, cost)
+	}
+	for _, style := range []Style{{Font: "bold"}, {Source: "font_pill"}, {Formats: []string{"font_pill"}}, {Font: "font_wynnic", LetterColor: "red"}, {Color: "red", Formats: []string{"bold"}}} {
+		if c.CheckStyle(&style) == nil {
+			t.Fatalf("accepted %+v", style)
+		}
+	}
+}
+
+func TestFontCatalogValidationAndCoverage(t *testing.T) {
+	c, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	font, _ := c.ShopItem("font_pill")
+	for _, mutate := range []func(*ShopItem){
+		func(i *ShopItem) { i.Font = "minecraft:missing" },
+		func(i *ShopItem) { i.Formats = nil },
+		func(i *ShopItem) { b := true; i.Formats = &b },
+		func(i *ShopItem) { i.Allows = nil },
+		func(i *ShopItem) { i.Allows = []string{"rainbow"} },
+		func(i *ShopItem) { i.Allows = []string{"color", "color"} },
+		func(i *ShopItem) { i.Color = "red" },
+	} {
+		bad := *font
+		mutate(&bad)
+		if validateShopItem(&bad) == nil {
+			t.Fatalf("accepted malformed font %+v", bad)
+		}
+	}
+	style := &Style{Font: "font_pill"}
+	if err := c.CheckWordStyle(Word{Text: "Wynn Hero 123"}, style); err != nil {
+		t.Fatal(err)
+	}
+	for _, text := range []string{"Queen's", "Café", "ß"} {
+		if c.CheckWordStyle(Word{Text: text}, style) == nil {
+			t.Fatalf("banner accepted %q", text)
+		}
+	}
+}

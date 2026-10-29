@@ -104,8 +104,8 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 
 			// Earn enough points to shop, then wear Greg in its native obfuscated
 			// style next to a bought one, so the styles tab has both to show.
-			for (String id : List.of("raid_tna", "raid_twp")) {
-				Catalog.Achievement raid = catalog.get(id).orElseThrow();
+			for (Catalog.Achievement raid : catalog.achievements().stream()
+					.filter(a -> List.of("raid_tna", "raid_twp").contains(a.id()) || a.points() >= 5 && a.category().equals("quest")).toList()) {
 				join(context.computeOnClient(client -> WynnTitles.account().withToken(token -> api.claim(
 						token, raid.id(), raid.trigger().type(), null, "gametest"))));
 			}
@@ -147,6 +147,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			context.takeScreenshot("wynntitles-unlock-toast");
 			screenshotChat(context, ownAchievement, "wynntitles-chat");
 
+			screenshotFonts(context, catalog, "fallbacks");
 			screenshotIconGallery(context, catalog, "fallbacks");
 			screenshotWithWynncraftPack(context, catalog, ownAchievement);
 		}
@@ -184,6 +185,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 						entry.id() + ": the loaded Wynncraft pack should resolve " + entry.icon().model());
 			}
 		});
+		screenshotFonts(context, catalog, "wynnpack");
 		screenshotIconGallery(context, catalog, "wynnpack");
 
 		context.setScreen(TitlesScreen::new);
@@ -207,6 +209,78 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		context.takeScreenshot("wynntitles-unlock-toast-wynnpack");
 		context.runOnClient(client -> check(WynnFonts.pillsLoaded(), "the Wynncraft pack should provide its chat pills"));
 		screenshotChat(context, achievement, "wynntitles-chat-wynnpack");
+	}
+
+	/** All ten fonts in chat, the shop, a contact sheet and real nametags. */
+	private static void screenshotFonts(ClientGameTestContext context, Catalog catalog, String variant) {
+		List<Catalog.ShopItem> fonts = catalog.shop().stream().filter(i -> Catalog.ShopItem.FONT.equals(i.kind())).toList();
+		int[] size = context.computeOnClient(client -> new int[] {client.getWindow().getWidth(), client.getWindow().getHeight()});
+		int scale = context.computeOnClient(client -> client.options.guiScale().get());
+		context.runOnClient(client -> client.options.guiScale().set(2));
+		context.getInput().resizeWindow(1920, 1080);
+		context.setScreen(() -> new FontGalleryScreen(catalog));
+		context.waitTicks(5);
+		screenshot(context, "wynntitles-fonts-" + variant);
+		context.setScreen(() -> null);
+		context.runOnClient(client -> client.options.guiScale().set(scale));
+		context.getInput().resizeWindow(size[0], size[1]);
+		context.runOnClient(client -> client.gui.getChat().clearMessages(true));
+		for (Catalog.ShopItem item : fonts) {
+			if (variant.equals("wynnpack")) context.runOnClient(client -> {
+				check(WynnFonts.available(item.font()), item.font() + " must load");
+				if ("font_pill".equals(item.id())) {
+					Component banner = WynnFonts.banner(item.font(), "Wynn Hero 123", 0xFFAA00, null);
+					check(client.font.width(banner) == client.font.width(WynnFonts.pill("Wynn Hero 123")),
+							"the foreground must not change the banner's advance");
+				}
+			});
+			var style = new TitleStyle("color_gold", List.of(), item.id(), null, null);
+			var title = wynntitles.titles.Title.of(catalog.restyle(new wynntitles.titles.TitleWord("Wynn Hero 123", null), style), null);
+			context.runOnClient(client -> {
+				WynnTitles.titles().put(offlineUuid(DUMMY_NAME), title);
+				client.gui.getChat().addMessage(Component.literal(item.name() + ": ").append(wynntitles.mc.TitleRenderer.render(title)));
+			});
+			context.waitTicks(3);
+			screenshot(context, "wynntitles-font-nametag-" + item.id() + "-" + variant);
+		}
+		context.getInput().pressKey(org.lwjgl.glfw.GLFW.GLFW_KEY_T);
+		context.waitTicks(5);
+		screenshot(context, "wynntitles-font-chat-" + variant);
+		context.setScreen(TitlesScreen::shop);
+		context.waitTicks(20);
+		scrollShopToEnd(context);
+		context.getInput().setCursorPos(0, 0);
+		screenshot(context, "wynntitles-font-shop-" + variant);
+		Me before = WynnTitles.account().me();
+		for (Catalog.Achievement a : catalog.achievements()) {
+			join(context.computeOnClient(client -> WynnTitles.account().withToken(token ->
+					new ApiClient(WynnTitlesConfig::resolvedServerUrl, "gametest").claim(token, a.id(), a.trigger().type(), null, "gametest"))));
+		}
+		List<String> purchase = catalog.shop().stream()
+				.filter(i -> Catalog.ShopItem.FONT.equals(i.kind()) || List.of("color_gold", "palette_ice", "animated_ice", "rainbow").contains(i.id()))
+				.filter(i -> !WynnTitles.account().me().owns(i.id())).map(Catalog.ShopItem::id).toList();
+		if (!purchase.isEmpty()) join(context.computeOnClient(client -> WynnTitles.account().buy(purchase)));
+		join(context.computeOnClient(client -> WynnTitles.account().setTitle("Greg", "Vanguard")));
+		join(context.computeOnClient(client -> WynnTitles.account().setStyle(
+				new TitleStyle("color_gold", List.of(), "font_pill", null, null), before.styles().suffix())));
+		context.setScreen(TitlesScreen::styles);
+		context.waitTicks(20);
+		context.getInput().setCursorPos(0, 0);
+		screenshot(context, "wynntitles-font-styles-disabled-" + variant);
+		scrollShopToEnd(context);
+		context.getInput().setCursorPos(0, 0);
+		screenshot(context, "wynntitles-font-letter-colors-" + variant);
+		join(context.computeOnClient(client -> WynnTitles.account().setStyle(null, null)));
+		join(context.computeOnClient(client -> WynnTitles.account().setTitle("Queen's", "Vanguard")));
+		context.setScreen(TitlesScreen::styles);
+		context.waitTicks(20);
+		scrollShopToEnd(context);
+		context.getInput().setCursorPos(0, 0);
+		screenshot(context, "wynntitles-font-unsupported-title-" + variant);
+		join(context.computeOnClient(client -> WynnTitles.account().setTitle(before.equipped().prefix(), before.equipped().suffix())));
+		join(context.computeOnClient(client -> WynnTitles.account().setStyle(before.styles().prefix(), before.styles().suffix())));
+
+		context.setScreen(() -> null);
 	}
 
 	/** Every icon at its actual menu size, including achievements below the first screenful. */

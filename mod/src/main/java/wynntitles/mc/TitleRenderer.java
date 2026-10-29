@@ -7,6 +7,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import wynntitles.titles.EffectColors;
 import wynntitles.titles.Title;
+import wynntitles.titles.TitleFonts;
 import wynntitles.titles.TitleRun;
 import wynntitles.titles.TitleWord;
 
@@ -37,15 +38,26 @@ public final class TitleRenderer {
 			if (run.text().isEmpty()) {
 				continue;
 			}
+			if (TitleFonts.banner(run.font())) {
+				out.append(WynnFonts.banner(run.font(), run.text(), EffectColors.colorValue(run.color() == null ? "white" : run.color()),
+						run.letterColor() == null ? null : EffectColors.colorValue(run.letterColor())));
+				continue;
+			}
+			if (run.font() != null && !WynnFonts.available(run.font())) {
+				int color = run.color() != null ? EffectColors.colorValue(run.color())
+						: run.effect() == null ? 0xFFFFFF : EffectColors.firstColor(run.effect());
+				out.append(Component.literal(run.text()).withColor(color));
+				continue;
+			}
 			if (run.effect() == null) {
-				out.append(Component.literal(run.text()).withStyle(style(run, null)));
+				out.append(WynnFonts.title(run.font(), run.text()).withStyle(style(run, null)));
 				continue;
 			}
 			int length = run.text().length();
 			int[] colors = EffectColors.colors(run.effect(), length, nowMs);
 			for (int i = 0; i < length; i++) {
 				int color = colors[i];
-				out.append(Component.literal(String.valueOf(run.text().charAt(i))).withStyle(style(run, color)));
+				out.append(WynnFonts.title(run.font(), String.valueOf(run.text().charAt(i))).withStyle(style(run, color)));
 			}
 		}
 		return out;

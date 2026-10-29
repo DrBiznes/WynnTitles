@@ -9,7 +9,14 @@ public record TitleRun(
 		boolean underlined,
 		boolean strikethrough,
 		boolean obfuscated,
-		TitleEffect effect) {
+		TitleEffect effect,
+		String font,
+		String letterColor) {
+	public TitleRun(String text, String color, boolean bold, boolean italic, boolean underlined,
+			boolean strikethrough, boolean obfuscated, TitleEffect effect) {
+		this(text, color, bold, italic, underlined, strikethrough, obfuscated, effect, null, null);
+	}
+
 	public TitleRun {
 		text = text == null ? "" : text;
 	}

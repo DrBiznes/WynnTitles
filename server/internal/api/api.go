@@ -373,6 +373,23 @@ func (s *Server) putTitle(w http.ResponseWriter, r *http.Request, uuid string) {
 		return
 	}
 
+	me, err := s.me(r.Context(), uuid)
+	if err != nil {
+		s.internalError(w, err)
+		return
+	}
+	p, _ := words.Prefix(prefix)
+	q, _ := words.Suffix(suffix)
+	for _, slot := range []struct {
+		word  catalog.Word
+		style *catalog.Style
+	}{{p, me.Styles.Prefix}, {q, me.Styles.Suffix}} {
+		if err := s.Catalog.CheckWordStyle(slot.word, slot.style); err != nil {
+			writeError(w, http.StatusBadRequest, err.Error()+"; change the font on the Styles tab first")
+			return
+		}
+	}
+
 	if err := s.Store.SetEquipped(r.Context(), uuid, prefix, suffix); err != nil {
 		s.internalError(w, err)
 		return
@@ -413,6 +430,16 @@ func (s *Server) putStyle(w http.ResponseWriter, r *http.Request, uuid string) {
 			continue
 		}
 		if err := s.Catalog.CheckStyle(slot.style); err != nil {
+			writeError(w, http.StatusBadRequest, slot.name+" style: "+err.Error())
+			return
+		}
+		var word catalog.Word
+		if i == 0 {
+			word, _ = me.Words.Prefix(deref(me.Equipped.Prefix))
+		} else {
+			word, _ = me.Words.Suffix(deref(me.Equipped.Suffix))
+		}
+		if err := s.Catalog.CheckWordStyle(word, slot.style); err != nil {
 			writeError(w, http.StatusBadRequest, slot.name+" style: "+err.Error())
 			return
 		}

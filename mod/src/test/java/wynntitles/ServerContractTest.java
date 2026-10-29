@@ -95,8 +95,14 @@ class ServerContractTest {
 		assertEquals(first.points() + greg.points(), me.balance());
 		assertEquals(greg.rewards().prefix().runs(), me.title().runs());
 
+		// Pricing follows all 164 achievements; earn the full test budget.
+		for (Catalog.Achievement a : catalog.achievements()) {
+			account.withToken(t -> api.claim(t, a.id(), a.trigger().type(), evidence, "test")).get();
+		}
+		int earned = catalog.achievements().stream().mapToInt(Catalog.Achievement::points).sum();
+
 		me = account.buy(List.of("color_red", "bold")).get();
-		assertEquals(first.points() + greg.points() - 5, me.balance());
+		assertEquals(earned - catalog.shopItem("color_red").orElseThrow().price() - catalog.shopItem("bold").orElseThrow().price(), me.balance());
 		assertTrue(me.owns("color_red") && me.owns("bold"));
 		TitleStyle style = new TitleStyle("color_red", List.of("bold"));
 		me = account.setStyle(style, null).get();
@@ -109,7 +115,7 @@ class ServerContractTest {
 		me = account.resetPurchases().get();
 		assertTrue(me.owned().isEmpty());
 		assertNull(me.styles().prefix());
-		assertEquals(first.points() + greg.points(), me.balance());
+		assertEquals(earned, me.balance());
 
 		// An animated palette carries its animation through the server to the nametag.
 		Catalog.Achievement palace = catalog.get("raid_twp").orElseThrow();
@@ -121,7 +127,34 @@ class ServerContractTest {
 		assertEquals(catalog.restyle(greg.rewards().prefix(), wave).runs(), me.title().runs());
 		assertEquals(animated.animation(), me.title().runs().get(0).effect().animation());
 		me = account.resetPurchases().get();
-		assertEquals(first.points() + greg.points() + palace.points(), me.balance());
+		assertEquals(earned, me.balance());
+
+		// Every font survives purchase, persistence, public lookup and preview
+		// exactly. A bought font replaces native obfuscation just like a color.
+		account.buy(catalog.shop().stream().filter(i -> Catalog.ShopItem.FONT.equals(i.kind()))
+				.map(Catalog.ShopItem::id).toList()).get();
+		account.buy(List.of("color_red", "bold", "palette_ice")).get();
+		for (Catalog.ShopItem font : catalog.shop()) {
+			if (!Catalog.ShopItem.FONT.equals(font.kind())) continue;
+			TitleStyle fontStyle = new TitleStyle("color_red", font.banner() ? List.of() : List.of("bold"),
+					font.id(), null, font.banner() ? "yellow" : null);
+			me = account.setStyle(fontStyle, null).get();
+			assertEquals(fontStyle, me.styles().prefix());
+			assertEquals(catalog.restyle(greg.rewards().prefix(), fontStyle).runs(), me.title().runs());
+			assertEquals(font.font(), me.title().runs().get(0).font());
+			assertEquals(me.title(), api.titles(List.of(serverUuid)).get().get(serverUuid));
+			if (font.banner()) {
+				org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> account.setStyle(
+						new TitleStyle("palette_ice", List.of(), font.id(), null, null), null).get());
+				org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> account.setStyle(
+						new TitleStyle("color_red", List.of("bold"), font.id(), null, null), null).get());
+				TitleStyle fallback = new TitleStyle(null, List.of(), font.id(), "#C4F1FF", null);
+				me = account.setStyle(fallback, null).get();
+				assertEquals(catalog.restyle(greg.rewards().prefix(), fallback).runs(), me.title().runs());
+			}
+		}
+		me = account.resetPurchases().get();
+		assertEquals(earned, me.balance());
 
 		// A second Account reuses the cached token instead of logging in again.
 		Account restarted = new Account(api, new FakeSession(uuid, username) {

@@ -24,6 +24,7 @@ import wynntitles.mc.screen.ui.Painter;
 import wynntitles.mc.screen.ui.Size;
 import wynntitles.titles.EffectColors;
 import wynntitles.titles.TitleAnimation;
+import wynntitles.titles.TitleFonts;
 import wynntitles.titles.TitleStyle;
 import wynntitles.titles.TitleWord;
 
@@ -61,6 +62,7 @@ final class StyleChips {
 		static Tier of(String kind) {
 			return switch (kind) {
 				case ShopItem.PALETTE -> SILVER;
+				case ShopItem.FONT -> GOLD;
 				case ShopItem.ANIMATED_PALETTE -> GOLD;
 				case ShopItem.RAINBOW -> PRISMATIC;
 				default -> STONE;
@@ -84,7 +86,8 @@ final class StyleChips {
 			new String[] {ShopItem.PALETTE, "Palettes"},
 			new String[] {ShopItem.ANIMATED_PALETTE, "Animated palettes"},
 			new String[] {ShopItem.RAINBOW, "Rainbow"},
-			new String[] {ShopItem.FORMAT, "Formats"});
+			new String[] {ShopItem.FORMAT, "Formats"},
+			new String[] {ShopItem.FONT, "Fonts"});
 
 	private StyleChips() {}
 
@@ -158,6 +161,7 @@ final class StyleChips {
 	/** What the item does, in a few words: "Ocean palette, rippling letter by letter". */
 	static String describe(Catalog catalog, ShopItem item) {
 		return switch (item.kind()) {
+			case ShopItem.FONT -> item.banner() ? "Solid banner and contrasting letters; no formats" : "Wynncraft font, with colors and formats";
 			case ShopItem.COLOR -> "Colors the whole word " + item.name().toLowerCase(Locale.ROOT);
 			case ShopItem.PALETTE -> PALETTE_BLURBS.getOrDefault(item.palette(), "A gradient across the word");
 			case ShopItem.ANIMATED_PALETTE -> {
@@ -197,7 +201,26 @@ final class StyleChips {
 
 	/** A style made of just this item. */
 	static TitleStyle alone(ShopItem item) {
+		if (ShopItem.FONT.equals(item.kind())) return new TitleStyle(null, List.of(), item.id(), null, null);
 		return item.isSource() ? new TitleStyle(item.id(), List.of()) : new TitleStyle(null, List.of(item.id()));
+	}
+
+	/** Missing packs and unsupported characters are explained before selection. */
+	static String fontProblem(ShopItem item, TitleWord... words) {
+		if (!ShopItem.FONT.equals(item.kind())) return null;
+		if (!WynnFonts.available(item.font())) return "Needs the Wynncraft resource pack";
+		if (item.banner()) for (TitleWord word : words) {
+			if (word == null) continue;
+			int c = TitleFonts.bannerCharacter(word.text());
+			if (c != 0) return item.name() + ": no banner glyph for “" + new String(Character.toChars(c)) + "”";
+		}
+		return null;
+	}
+
+	static Box disabled(ShopItem item, String why, Element badge) {
+		Box chip = chip(Tier.STONE, WynnUi.label(WynnFonts.body(item.name()), WynnUi.TEXT_DIM), badge,
+				() -> false, tooltip(item.name(), why, ChatFormatting.GRAY), null);
+		return chip;
 	}
 
 	/** A tile with a label and an optional badge (the owned tick, say), gold-rimmed while selected. */

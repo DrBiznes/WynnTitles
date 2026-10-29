@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import wynntitles.titles.EffectColors;
 import wynntitles.titles.TitleAnimation;
 import wynntitles.titles.TitleEffect;
+import wynntitles.titles.TitleFonts;
 import wynntitles.titles.TitleRun;
 import wynntitles.titles.TitleStyle;
 import wynntitles.titles.TitleWord;
@@ -41,7 +42,13 @@ public record Catalog(String version, List<Achievement> achievements, List<ShopI
 		if (word == null || style == null || style.isEmpty()) {
 			return word;
 		}
-		String color = null;
+		ShopItem font = shopItem(style.font()).orElse(null);
+		if (font != null && ((!Boolean.TRUE.equals(font.formats()) && !style.formats().isEmpty())
+				|| (style.source() != null && shopItem(style.source()).map(i -> !font.allows(i)).orElse(true))
+				|| (font.banner() && TitleFonts.bannerCharacter(word.text()) != 0))) {
+			return word;
+		}
+		String color = style.color();
 		TitleEffect effect = null;
 		ShopItem source = style.source() == null ? null : shopItem(style.source()).orElse(null);
 		if (source != null) {
@@ -66,7 +73,22 @@ public record Catalog(String version, List<Achievement> achievements, List<ShopI
 			}
 		}
 		return new TitleWord(word.text(),
-				List.of(new TitleRun(word.text(), color, bold, italic, underlined, strikethrough, false, effect)));
+				List.of(new TitleRun(word.text(), color, bold, italic, underlined, strikethrough, false, effect,
+						font == null ? null : font.font(), style.letterColor())));
+	}
+
+	/** Switching fonts keeps only supported pieces. A dropped effect becomes
+	 * its first palette stop, making the preview identical to what is saved. */
+	public TitleStyle selectFont(TitleStyle current, ShopItem font) {
+		TitleStyle d = current == null ? new TitleStyle(null, List.of()) : current;
+		String source = d.source(), color = d.color();
+		if (source != null && !font.allows(shopItem(source).orElseThrow())) {
+			TitleRun run = restyle(new TitleWord("Preview", null), d).runs().get(0);
+			color = String.format("#%06X", EffectColors.firstColor(run.effect()));
+			source = null;
+		}
+		return new TitleStyle(source, Boolean.TRUE.equals(font.formats()) ? d.formats() : List.of(),
+				font.id(), color, font.banner() ? d.letterColor() : null);
 	}
 
 	public record Achievement(
@@ -119,25 +141,41 @@ public record Catalog(String version, List<Achievement> achievements, List<ShopI
 
 	/**
 	 * A style piece bought with achievement points. Kind is a color source
-	 * (color, palette, animatedPalette, rainbow) or a format; an unknown kind
+	 * (color, palette, animatedPalette, rainbow), a format or a font; an unknown kind
 	 * comes from a newer catalog and is shown as needing an update. An animated
 	 * palette also names its animation.
 	 */
 	public record ShopItem(
-			String id, String kind, String name, int price, String color, String palette, String animation, String format) {
+			String id, String kind, String name, int price, String color, String palette, String animation, String format,
+			String font, List<String> allows, Boolean formats) {
+
+		public ShopItem {
+			allows = allows == null ? List.of() : List.copyOf(allows);
+		}
+
+		public boolean banner() {
+			return TitleFonts.banner(font);
+		}
+
+		public boolean allows(ShopItem item) {
+			return FORMAT.equals(item.kind()) ? Boolean.TRUE.equals(formats) : allows.contains(item.kind());
+		}
+
 		public static final String COLOR = "color";
 		public static final String PALETTE = "palette";
 		public static final String ANIMATED_PALETTE = "animatedPalette";
 		public static final String RAINBOW = "rainbow";
+		public static final String FONT = "font";
 		public static final String FORMAT = "format";
 
 		public boolean isSource() {
-			return !FORMAT.equals(kind);
+			return List.of(COLOR, PALETTE, ANIMATED_PALETTE, RAINBOW).contains(kind);
 		}
 
 		/** False for kinds added to the shop after this mod version shipped. */
 		public boolean supported() {
 			return switch (kind) {
+				case FONT -> TitleFonts.known(font);
 				case COLOR, RAINBOW -> true;
 				// A newer catalog may add palettes or animations this mod cannot draw yet.
 				case PALETTE -> EffectColors.knowsPalette(palette);

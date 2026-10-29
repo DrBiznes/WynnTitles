@@ -104,6 +104,8 @@ final class ShopPage {
 
 	private Box chip(ShopItem item) {
 		boolean owned = me.owns(item.id());
+		String problem = StyleChips.fontProblem(item, prefixWord, suffixWord);
+		if (problem != null) return StyleChips.disabled(item, problem, owned ? StyleChips.ownedMark() : null);
 		// The price is in the tooltip and on the buy button, so the chips stay short.
 		Element badge = owned ? StyleChips.ownedMark() : null;
 		Component tooltip = StyleChips.tooltip(item.name(), StyleChips.describe(catalog, item), ChatFormatting.GRAY)

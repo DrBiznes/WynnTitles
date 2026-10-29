@@ -338,7 +338,15 @@ func TestShopStylesAndReset(t *testing.T) {
 	if code := h.do("PUT", "/v1/me/style", token, style, nil); code != 400 {
 		t.Fatalf("wearing unowned items: got %d, want 400", code)
 	}
-	if code := buy("color_red", "bold"); code != 200 || me.Balance != greg.Points-5 || len(me.Owned) != 2 {
+	// Earn enough for the newly priced pieces after checking insufficient funds.
+	earned := 0
+	for _, a := range h.cat.Achievements {
+		h.do("POST", "/v1/claims", token, map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type}, nil)
+		earned += a.Points
+	}
+	red, _ := h.cat.ShopItem("color_red")
+	bold, _ := h.cat.ShopItem("bold")
+	if code := buy("color_red", "bold"); code != 200 || me.Balance != earned-red.Price-bold.Price || len(me.Owned) != 2 {
 		t.Fatalf("buy: code %d, balance %d, owned %v", code, me.Balance, me.Owned)
 	}
 	if code := buy("bold"); code != 409 {
@@ -370,7 +378,7 @@ func TestShopStylesAndReset(t *testing.T) {
 
 	// Resetting refunds everything and goes back to native.
 	h.do("POST", "/v1/shop/reset", token, nil, fresh())
-	if me.Balance != greg.Points || len(me.Owned) != 0 || me.Styles.Prefix != nil || !me.Title.Runs[0].Obfuscated {
+	if me.Balance != earned || len(me.Owned) != 0 || me.Styles.Prefix != nil || !me.Title.Runs[0].Obfuscated {
 		t.Fatalf("after reset: balance %d, owned %v, style %+v, title %+v", me.Balance, me.Owned, me.Styles.Prefix, me.Title)
 	}
 	if got := lookup(); got == nil || !got.Runs[0].Obfuscated {
