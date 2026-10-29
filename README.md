@@ -1,6 +1,6 @@
 # WynnTitles
 
-Earn title words from Wynncraft achievements and wear them above your name. Everything happens in game: there is no website and no account to create.
+Earn title words from Wynncraft achievements and wear them above your name. Players use everything in game, with no separate account to create. An optional private moderation dashboard runs on its own listener.
 
 ```
 mod/      Fabric client mod (Wynntils addon, Cloth Config options)
@@ -36,6 +36,15 @@ cd mod && ./gradlew runClient
 ```
 
 The dev client points at `http://localhost:8080`; release builds default to `https://wynntitles.jamino.me`. Join a singleplayer world, then press `` ` `` or run `/titles` to open the title screen. `/titles status`, `/titles login` and `/titles reload` help with troubleshooting.
+
+## Hosting and moderation
+
+See [the complete Docker, Cloudflare and dashboard setup](deploy/README.md).
+The Go binary includes an optional server-rendered moderation console on `WT_ADMIN_ADDR`.
+It never mounts dashboard routes on the public API. The console supports player search,
+reported claim evidence, confirmed revoke/restore actions, and an append-only audit history.
+Developer grants of catalog achievements and free shop styles are limited to `WT_DEV_UUID`.
+Minecraft authentication and the mod's API response shapes are unchanged.
 
 ## Tests
 

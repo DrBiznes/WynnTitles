@@ -63,6 +63,17 @@ var migrations = []string{
 	-- native style.
 	ALTER TABLE players ADD COLUMN prefix_style TEXT;
 	ALTER TABLE players ADD COLUMN suffix_style TEXT;`,
+
+	`CREATE TABLE moderation_log (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		actor TEXT NOT NULL,
+		uuid TEXT NOT NULL REFERENCES players(uuid),
+		action TEXT NOT NULL,
+		reason TEXT NOT NULL,
+		details TEXT NOT NULL,
+		created_at INTEGER NOT NULL
+	);
+	CREATE INDEX moderation_by_player ON moderation_log(uuid, id);`,
 }
 
 type Store struct {
@@ -93,6 +104,7 @@ type Unlock struct {
 	ModVersion    string
 	ClaimedAt     time.Time
 	Revoked       bool
+	RevokeReason  string
 }
 
 var (
@@ -259,7 +271,7 @@ func (s *Store) DeleteExpiredSessions(ctx context.Context, now time.Time) (int64
 func (s *Store) Unlocks(ctx context.Context, uuid string) ([]Unlock, error) {
 	rows, err := s.db.QueryContext(ctx, `
 		SELECT uuid, achievement_id, trigger_type, COALESCE(evidence, ''), COALESCE(mod_version, ''),
-		       claimed_at, revoked_at IS NOT NULL
+		       claimed_at, revoked_at IS NOT NULL, COALESCE(revoke_reason, '')
 		FROM unlocks WHERE uuid = ? ORDER BY claimed_at`, uuid)
 	if err != nil {
 		return nil, err
@@ -271,7 +283,7 @@ func (s *Store) Unlocks(ctx context.Context, uuid string) ([]Unlock, error) {
 		var u Unlock
 		var claimedAt int64
 		if err := rows.Scan(&u.UUID, &u.AchievementID, &u.TriggerType, &u.Evidence, &u.ModVersion,
-			&claimedAt, &u.Revoked); err != nil {
+			&claimedAt, &u.Revoked, &u.RevokeReason); err != nil {
 			return nil, err
 		}
 		u.ClaimedAt = time.UnixMilli(claimedAt)

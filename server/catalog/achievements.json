@@ -31,8 +31,8 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/gui/content_book/story_quest_active",
-      "fallback": "minecraft:writable_book"
+      "model": "wynn/skin/hat/queen_crown",
+      "fallback": "minecraft:golden_helmet"
     },
     "trigger": {
       "type": "quest",
@@ -55,7 +55,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/gui/content_book/story_quest_tracked",
+      "model": "wynn/weapon/warrior/spear_basic_wood",
       "fallback": "minecraft:iron_sword"
     },
     "trigger": {
@@ -166,7 +166,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/gui/content_book/quest_active",
+      "model": "wynn/gui/store/pet/minecart",
       "fallback": "minecraft:minecart"
     },
     "trigger": {
@@ -187,8 +187,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/ingredient/brown_mushroom",
-      "fallback": "minecraft:brown_mushroom"
+      "model": "wynn/ingredient/astral_alloy",
+      "fallback": "minecraft:end_stone"
     },
     "trigger": {
       "type": "quest",
@@ -211,7 +211,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/character_select/hunted",
+      "model": "wynn/weapon/assassin/dagger_thunder_c",
       "fallback": "minecraft:crossbow"
     },
     "trigger": {
@@ -232,7 +232,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/prop/undead_remains_1",
+      "model": "wynn/housing/furniture/statue_hero",
       "fallback": "minecraft:skeleton_skull"
     },
     "trigger": {
@@ -271,8 +271,8 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/prop/soul_lantern",
-      "fallback": "minecraft:wither_skeleton_skull"
+      "model": "wynn/armor/helmet/pale_iron_helmet",
+      "fallback": "minecraft:iron_helmet"
     },
     "trigger": {
       "type": "quest",
@@ -357,7 +357,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "fallback": "minecraft:honeycomb"
+      "model": "wynn/weapon/warrior/spear_multi_c",
+      "fallback": "minecraft:purple_concrete"
     },
     "trigger": {
       "type": "quest",
@@ -380,8 +381,8 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/tool/iron_pickaxe",
-      "fallback": "minecraft:iron_pickaxe"
+      "model": "wynn/ingredient/dogun_alert_sigil",
+      "fallback": "minecraft:magma_cream"
     },
     "trigger": {
       "type": "quest",
@@ -404,8 +405,8 @@
     "tier": "bronze",
     "points": 1,
     "icon": {
-      "model": "wynn/prop/clay_amphora",
-      "fallback": "minecraft:brush"
+      "model": "wynn/gui/store/effect/amadel_crystals",
+      "fallback": "minecraft:amethyst_shard"
     },
     "trigger": {
       "type": "quest",
@@ -451,7 +452,7 @@
     "points": 3,
     "icon": {
       "model": "wynn/player/content_book",
-      "fallback": "minecraft:book"
+      "fallback": "minecraft:writable_book"
     },
     "trigger": {
       "type": "statistic",
@@ -536,7 +537,7 @@
     "points": 3,
     "icon": {
       "model": "wynn/weapon/archer/bow_basic_gold",
-      "fallback": "minecraft:bow"
+      "fallback": "minecraft:crossbow"
     },
     "trigger": {
       "type": "combatLevel",
@@ -561,7 +562,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/weapon/archer/bow_fire_c",
-      "fallback": "minecraft:bow"
+      "fallback": "minecraft:spectral_arrow"
     },
     "trigger": {
       "type": "combatLevel",
@@ -586,7 +587,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/weapon/archer/bow_multi_c",
-      "fallback": "minecraft:bow"
+      "fallback": "minecraft:target"
     },
     "trigger": {
       "type": "combatLevel",
@@ -664,7 +665,7 @@
     "points": 3,
     "icon": {
       "model": "wynn/weapon/warrior/spear_basic_gold",
-      "fallback": "minecraft:trident"
+      "fallback": "minecraft:iron_axe"
     },
     "trigger": {
       "type": "combatLevel",
@@ -689,7 +690,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/weapon/warrior/spear_fire_c",
-      "fallback": "minecraft:trident"
+      "fallback": "minecraft:diamond_axe"
     },
     "trigger": {
       "type": "combatLevel",
@@ -714,7 +715,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/weapon/warrior/spear_multi_c",
-      "fallback": "minecraft:trident"
+      "fallback": "minecraft:netherite_axe"
     },
     "trigger": {
       "type": "combatLevel",
@@ -758,7 +759,7 @@
     "tier": "bronze",
     "points": 1,
     "icon": {
-      "model": "wynn/weapon/mage/wand_basic_gold",
+      "model": "wynn/weapon/mage/wand_basic_wood",
       "fallback": "minecraft:stick"
     },
     "trigger": {
@@ -783,8 +784,8 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/weapon/mage/wand_basic_diamond",
-      "fallback": "minecraft:stick"
+      "model": "wynn/weapon/mage/wand_basic_gold",
+      "fallback": "minecraft:blaze_rod"
     },
     "trigger": {
       "type": "combatLevel",
@@ -809,7 +810,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/weapon/mage/wand_fire_c",
-      "fallback": "minecraft:stick"
+      "fallback": "minecraft:end_rod"
     },
     "trigger": {
       "type": "combatLevel",
@@ -834,7 +835,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/weapon/mage/wand_multi_c",
-      "fallback": "minecraft:stick"
+      "fallback": "minecraft:nether_star"
     },
     "trigger": {
       "type": "combatLevel",
@@ -882,7 +883,7 @@
     "points": 1,
     "icon": {
       "model": "wynn/weapon/assassin/dagger_basic_wood",
-      "fallback": "minecraft:iron_sword"
+      "fallback": "minecraft:wooden_sword"
     },
     "trigger": {
       "type": "combatLevel",
@@ -932,7 +933,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/weapon/assassin/dagger_fire_c",
-      "fallback": "minecraft:iron_sword"
+      "fallback": "minecraft:diamond_sword"
     },
     "trigger": {
       "type": "combatLevel",
@@ -957,7 +958,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/weapon/assassin/dagger_multi_c",
-      "fallback": "minecraft:iron_sword"
+      "fallback": "minecraft:netherite_sword"
     },
     "trigger": {
       "type": "combatLevel",
@@ -1010,7 +1011,7 @@
     "points": 1,
     "icon": {
       "model": "wynn/weapon/shaman/relik_basic_wooden",
-      "fallback": "minecraft:blaze_rod"
+      "fallback": "minecraft:torch"
     },
     "trigger": {
       "type": "combatLevel",
@@ -1035,7 +1036,7 @@
     "points": 3,
     "icon": {
       "model": "wynn/weapon/shaman/relik_basic_gold",
-      "fallback": "minecraft:blaze_rod"
+      "fallback": "minecraft:soul_torch"
     },
     "trigger": {
       "type": "combatLevel",
@@ -1060,7 +1061,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/weapon/shaman/relik_fire_c",
-      "fallback": "minecraft:blaze_rod"
+      "fallback": "minecraft:amethyst_shard"
     },
     "trigger": {
       "type": "combatLevel",
@@ -1085,7 +1086,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/weapon/shaman/relik_multi_c",
-      "fallback": "minecraft:blaze_rod"
+      "fallback": "minecraft:totem_of_undying"
     },
     "trigger": {
       "type": "combatLevel",
@@ -1135,8 +1136,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/loot/mythic",
-      "fallback": "minecraft:nether_star"
+      "model": "wynn/gui/character_info/combat_info",
+      "fallback": "minecraft:dragon_egg"
     },
     "trigger": {
       "type": "combatLevelAnyClass",
@@ -1205,8 +1206,8 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/gui/character_select/reskin_class",
-      "fallback": "minecraft:armor_stand"
+      "model": "wynn/gui/character_info/ability_tree",
+      "fallback": "minecraft:iron_chestplate"
     },
     "trigger": {
       "type": "characterRoster",
@@ -1226,8 +1227,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/character_select/select_reskin",
-      "fallback": "minecraft:armor_stand"
+      "model": "wynn/gui/character_info/skill_crystal",
+      "fallback": "minecraft:diamond_chestplate"
     },
     "trigger": {
       "type": "characterRoster",
@@ -1269,7 +1270,7 @@
     "points": 1,
     "icon": {
       "model": "wynn/economy/mining/gem_copper",
-      "fallback": "minecraft:iron_pickaxe"
+      "fallback": "minecraft:copper_ingot"
     },
     "trigger": {
       "type": "totalProfessionLevel",
@@ -1290,7 +1291,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/economy/mining/gem_diamond",
-      "fallback": "minecraft:diamond_pickaxe"
+      "fallback": "minecraft:diamond"
     },
     "trigger": {
       "type": "totalProfessionLevel",
@@ -1314,7 +1315,7 @@
     "points": 3,
     "icon": {
       "model": "wynn/economy/mining/gem_iron",
-      "fallback": "minecraft:stone_pickaxe"
+      "fallback": "minecraft:iron_ingot"
     },
     "trigger": {
       "type": "totalProfessionLevel",
@@ -1338,7 +1339,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/economy/mining/gem_titanium",
-      "fallback": "minecraft:golden_pickaxe"
+      "fallback": "minecraft:netherite_ingot"
     },
     "trigger": {
       "type": "totalProfessionLevel",
@@ -1361,8 +1362,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/housing/profession/trophy/base",
-      "fallback": "minecraft:netherite_pickaxe"
+      "model": "wynn/gui/character_info/profession_info",
+      "fallback": "minecraft:smithing_table"
     },
     "trigger": {
       "type": "totalProfessionLevel",
@@ -1421,8 +1422,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/tool/dernic_axe",
-      "fallback": "minecraft:iron_axe"
+      "model": "wynn/tool/titanium_axe",
+      "fallback": "minecraft:netherite_axe"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1465,8 +1466,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/tool/dernic_pickaxe",
-      "fallback": "minecraft:iron_pickaxe"
+      "model": "wynn/tool/titanium_pickaxe",
+      "fallback": "minecraft:netherite_pickaxe"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1488,7 +1489,7 @@
     "points": 3,
     "icon": {
       "model": "wynn/housing/profession/farming",
-      "fallback": "minecraft:wheat"
+      "fallback": "minecraft:iron_hoe"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1509,8 +1510,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/economy/farming/grain_dernic",
-      "fallback": "minecraft:wheat"
+      "model": "wynn/tool/titanium_scythe",
+      "fallback": "minecraft:golden_hoe"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1553,8 +1554,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/tool/dernic_rod",
-      "fallback": "minecraft:fishing_rod"
+      "model": "wynn/tool/titanium_rod",
+      "fallback": "minecraft:tropical_fish"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1597,8 +1598,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/potion/healing_full",
-      "fallback": "minecraft:brewing_stand"
+      "model": "wynn/potion/wisdom_full",
+      "fallback": "minecraft:dragon_breath"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1641,8 +1642,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/economy/mining/ingot_titanium",
-      "fallback": "minecraft:iron_chestplate"
+      "model": "wynn/armor/chestplate/titanium_chestplate",
+      "fallback": "minecraft:netherite_chestplate"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1686,7 +1687,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/economy/meals/spicy",
-      "fallback": "minecraft:bread"
+      "fallback": "minecraft:golden_carrot"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1730,7 +1731,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/economy/mining/gem_cinnabar",
-      "fallback": "minecraft:diamond"
+      "fallback": "minecraft:emerald"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1774,7 +1775,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/economy/woodcutting/paper_redwood",
-      "fallback": "minecraft:paper"
+      "fallback": "minecraft:writable_book"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1817,8 +1818,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/economy/farming/string_dernic",
-      "fallback": "minecraft:string"
+      "model": "wynn/economy/farming/string_heather",
+      "fallback": "minecraft:leather"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1862,7 +1863,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/economy/mining/ingot_cinnabar",
-      "fallback": "minecraft:iron_sword"
+      "fallback": "minecraft:netherite_sword"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1906,7 +1907,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/economy/woodcutting/plank_redwood",
-      "fallback": "minecraft:bow"
+      "fallback": "minecraft:crossbow"
     },
     "trigger": {
       "type": "professionLevel",
@@ -1927,8 +1928,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/tool/dernic_scythe",
-      "fallback": "minecraft:diamond_hoe"
+      "model": "wynn/tool/titanium_scythe",
+      "fallback": "minecraft:netherite_hoe"
     },
     "trigger": {
       "type": "professionLevelAll",
@@ -1957,7 +1958,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/crafting/main",
+      "model": "wynn/gui/character_info/profession_info",
       "fallback": "minecraft:smithing_table"
     },
     "trigger": {
@@ -1991,8 +1992,8 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/economy/woodcutting/paper_acacia",
-      "fallback": "minecraft:filled_map"
+      "model": "wynn/ingredient/troll_hair",
+      "fallback": "minecraft:bricks"
     },
     "trigger": {
       "type": "location",
@@ -2016,7 +2017,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/skin/relik/halfmoon_crescent",
-      "fallback": "minecraft:ender_eye"
+      "fallback": "minecraft:end_stone"
     },
     "trigger": {
       "type": "location",
@@ -2113,6 +2114,7 @@
     "tier": "bronze",
     "points": 1,
     "icon": {
+      "model": "wynn/gui/content_book/time_trial_active",
       "fallback": "minecraft:clock"
     },
     "trigger": {
@@ -2288,7 +2290,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/gui/content_book/world_event_complete",
-      "fallback": "minecraft:lightning_rod"
+      "fallback": "minecraft:totem_of_undying"
     },
     "trigger": {
       "type": "statistic",
@@ -2313,7 +2315,7 @@
     "points": 3,
     "icon": {
       "model": "wynn/pouch/emerald_full",
-      "fallback": "minecraft:emerald_block"
+      "fallback": "minecraft:emerald"
     },
     "trigger": {
       "type": "inventoryItem",
@@ -2337,8 +2339,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/loot/legendary",
-      "fallback": "minecraft:gold_nugget"
+      "model": "wynn/ingredient/golden_coin",
+      "fallback": "minecraft:diamond"
     },
     "trigger": {
       "type": "inventoryItem",
@@ -2380,7 +2382,7 @@
     "points": 1,
     "icon": {
       "model": "wynn/pouch/emerald_half",
-      "fallback": "minecraft:emerald"
+      "fallback": "minecraft:emerald_block"
     },
     "trigger": {
       "type": "inventoryItem",
@@ -2402,7 +2404,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/gui/bank/liquid_storage",
-      "fallback": "minecraft:emerald_block"
+      "fallback": "minecraft:experience_bottle"
     },
     "trigger": {
       "type": "inventoryItem",
@@ -2443,8 +2445,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/loot/mythic",
-      "fallback": "minecraft:bow"
+      "model": "wynn/weapon/archer/bow_earth_c",
+      "fallback": "minecraft:crossbow"
     },
     "trigger": {
       "type": "inventoryItem",
@@ -2468,8 +2470,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/loot/mythic",
-      "fallback": "minecraft:iron_bars"
+      "model": "wynn/weapon/warrior/spear_earth_a",
+      "fallback": "minecraft:mace"
     },
     "trigger": {
       "type": "inventoryItem",
@@ -2536,7 +2538,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "fallback": "minecraft:spider_eye"
+      "fallback": "minecraft:ender_eye"
     },
     "trigger": {
       "type": "inventoryItem",
@@ -2711,7 +2713,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/loot/fabled",
+      "model": "wynn/gui/store/consumable/token/shiny_adder",
       "fallback": "minecraft:glow_ink_sac"
     },
     "trigger": {
@@ -2750,8 +2752,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/loot/set",
-      "fallback": "minecraft:chainmail_chestplate"
+      "model": "wynn/armor/helmet/diamond_helmet",
+      "fallback": "minecraft:diamond_helmet"
     },
     "trigger": {
       "type": "itemSet",
@@ -2781,7 +2783,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "fallback": "minecraft:beehive"
+      "model": "wynn/armor/chestplate/diamond_chestplate",
+      "fallback": "minecraft:diamond_chestplate"
     },
     "trigger": {
       "type": "itemSet",
@@ -2885,7 +2888,7 @@
     "tier": "bronze",
     "points": 1,
     "icon": {
-      "model": "wynn/outer_void/drop/luxury_timepiece",
+      "model": "wynn/gui/lootrun/inspect/general/time_elapsed",
       "fallback": "minecraft:clock"
     },
     "trigger": {
@@ -2907,7 +2910,7 @@
     "points": 3,
     "icon": {
       "model": "wynn/outer_void/drop/luxury_timepiece",
-      "fallback": "minecraft:clock"
+      "fallback": "minecraft:recovery_compass"
     },
     "trigger": {
       "type": "playtime",
@@ -2927,8 +2930,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/outer_void/drop/luxury_timepiece",
-      "fallback": "minecraft:clock"
+      "model": "wynn/gui/character_select/character_backups",
+      "fallback": "minecraft:respawn_anchor"
     },
     "trigger": {
       "type": "playtime",
@@ -2966,6 +2969,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
+      "model": "wynn/prop/present_green",
       "fallback": "minecraft:cake"
     },
     "trigger": {
@@ -2986,6 +2990,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
+      "model": "wynn/prop/present_red",
       "fallback": "minecraft:ancient_debris"
     },
     "trigger": {
@@ -3009,7 +3014,8 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "fallback": "minecraft:gold_ingot"
+      "model": "wynn/ingredient/medallion",
+      "fallback": "minecraft:gold_nugget"
     },
     "trigger": {
       "type": "leaderboard",
@@ -3029,7 +3035,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "fallback": "minecraft:golden_helmet"
+      "model": "wynn/ingredient/honoured_commanders_medal",
+      "fallback": "minecraft:gold_ingot"
     },
     "trigger": {
       "type": "leaderboard",
@@ -3065,7 +3072,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/gui/lootrun/daily",
+      "model": "wynn/mastery_tome/lootrun",
       "fallback": "minecraft:beacon"
     },
     "trigger": {
@@ -3479,7 +3486,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/gui/raid/sigil_2",
+      "model": "wynn/mastery_tome/armour",
       "fallback": "minecraft:iron_sword"
     },
     "trigger": {
@@ -3501,7 +3508,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/raid/sigil_3",
+      "model": "wynn/mastery_tome/weapon",
       "fallback": "minecraft:diamond_sword"
     },
     "trigger": {
@@ -3906,7 +3913,7 @@
     "points": 3,
     "icon": {
       "model": "wynn/gui/content_book/dungeon_tracked",
-      "fallback": "minecraft:iron_door"
+      "fallback": "minecraft:iron_bars"
     },
     "trigger": {
       "type": "statistic",
@@ -3928,7 +3935,7 @@
     "points": 5,
     "icon": {
       "model": "wynn/dungeon/key",
-      "fallback": "minecraft:iron_door"
+      "fallback": "minecraft:trial_key"
     },
     "trigger": {
       "type": "statistic",
@@ -3974,7 +3981,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/mastery_tome/guild",
+      "model": "wynn/ingredient/bloodstained_steel",
       "fallback": "minecraft:iron_sword"
     },
     "trigger": {
@@ -3996,7 +4003,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/mastery_tome/guild",
+      "model": "wynn/skin/hat/crown_of_chains",
       "fallback": "minecraft:netherite_sword"
     },
     "trigger": {
@@ -4037,6 +4044,7 @@
     "tier": "bronze",
     "points": 1,
     "icon": {
+      "model": "wynn/gui/store/list/guild",
       "fallback": "minecraft:white_banner"
     },
     "trigger": {
@@ -4057,6 +4065,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
+      "model": "wynn/gui/store/consumable/token/guild_boost",
       "fallback": "minecraft:blue_banner"
     },
     "trigger": {
@@ -4077,6 +4086,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
+      "model": "wynn/skin/hat/fancy_crown",
       "fallback": "minecraft:golden_helmet"
     },
     "trigger": {
@@ -4100,7 +4110,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/gui/character_select/hardcore",
+      "model": "wynn/ingredient/bat_heart",
       "fallback": "minecraft:redstone"
     },
     "trigger": {
@@ -4124,8 +4134,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/character_select/hardcore",
-      "fallback": "minecraft:redstone_block"
+      "model": "wynn/ingredient/undead_heart",
+      "fallback": "minecraft:totem_of_undying"
     },
     "trigger": {
       "type": "gamemodeLevel",
@@ -4167,7 +4177,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
-      "model": "wynn/gui/character_select/ironman",
+      "model": "wynn/economy/mining/ingot_iron",
       "fallback": "minecraft:iron_ingot"
     },
     "trigger": {
@@ -4191,8 +4201,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/character_select/ironman",
-      "fallback": "minecraft:iron_block"
+      "model": "wynn/locked_chest",
+      "fallback": "minecraft:ender_chest"
     },
     "trigger": {
       "type": "gamemodeLevel",
@@ -4218,7 +4228,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/character_select/craftsman",
+      "model": "wynn/housing/profession/weaponsmithing",
       "fallback": "minecraft:crafting_table"
     },
     "trigger": {
@@ -4245,7 +4255,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/character_select/hunted",
+      "model": "wynn/weapon/assassin/dagger_thunder_c",
       "fallback": "minecraft:target"
     },
     "trigger": {
@@ -4272,7 +4282,7 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/gui/character_select/select_gamemodes",
+      "model": "wynn/skin/hat/jagged_crown",
       "fallback": "minecraft:wither_rose"
     },
     "trigger": {
@@ -4318,8 +4328,8 @@
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/prop/garden_gnome",
-      "fallback": "minecraft:red_mushroom"
+      "model": "wynn/ingredient/brown_mushroom",
+      "fallback": "minecraft:brown_mushroom"
     },
     "trigger": {
       "type": "itemAtLocation",
@@ -4345,6 +4355,7 @@
     "tier": "silver",
     "points": 3,
     "icon": {
+      "model": "wynn/ingredient/skeleton_key",
       "fallback": "minecraft:tripwire_hook"
     },
     "trigger": {

@@ -16,3 +16,6 @@ mod/run/
 mod/logs/
 mod/out/
 mod/bin/
+
+# local deployment secrets
+deploy/.env

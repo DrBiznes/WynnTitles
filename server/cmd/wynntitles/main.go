@@ -4,6 +4,11 @@
 //
 //	WT_ADDR         listen address (default ":8080")
 //	WT_DB           SQLite database path (default "data/wynntitles.db")
+//	WT_ADMIN_ADDR   separate dashboard listen address (unset disables it)
+//	WT_ADMIN_USERNAME dashboard login name
+//	WT_ADMIN_PASSWORD dashboard password (24+ characters), or WT_ADMIN_PASSWORD_FILE
+//	WT_ADMIN_ALLOWED_CIDRS comma-separated source networks (default loopback)
+//	WT_DEV_UUID     only account allowed developer grants (unset disables grants)
 //	WT_SESSION_TTL  how long a login lasts (default "720h")
 //	WT_STATS_TTL    how long achievement rarity is cached (default "1m")
 //	WT_MOJANG_URL   Mojang session server (default "https://sessionserver.mojang.com")
@@ -14,10 +19,13 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -29,6 +37,22 @@ import (
 )
 
 func main() {
+	if len(os.Args) == 2 && os.Args[1] == "healthcheck" {
+		client := &http.Client{Timeout: 3 * time.Second}
+		_, port, err := net.SplitHostPort(env("WT_ADDR", ":8080"))
+		if err != nil {
+			os.Exit(1)
+		}
+		response, err := client.Get("http://127.0.0.1:" + port + "/healthz")
+		if err != nil {
+			os.Exit(1)
+		}
+		response.Body.Close()
+		if response.StatusCode != http.StatusOK {
+			os.Exit(1)
+		}
+		return
+	}
 	log := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	if err := run(log); err != nil {
 		log.Error("server stopped", "err", err)
@@ -86,33 +110,79 @@ func run(log *slog.Logger) error {
 
 	go pruneSessions(ctx, db, log)
 
-	httpServer := &http.Server{
-		Addr:              env("WT_ADDR", ":8080"),
-		Handler:           srv.Handler(),
-		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout:       10 * time.Second,
-		WriteTimeout:      10 * time.Second,
+	servers := []*http.Server{newHTTPServer(env("WT_ADDR", ":8080"), srv.Handler())}
+	if addr := os.Getenv("WT_ADMIN_ADDR"); addr != "" {
+		config, err := adminConfig()
+		if err != nil {
+			return err
+		}
+		handler, err := srv.AdminHandler(config)
+		if err != nil {
+			return err
+		}
+		servers = append(servers, newHTTPServer(addr, handler))
 	}
-
-	errc := make(chan error, 1)
-	go func() {
-		log.Info("listening", "addr", httpServer.Addr, "achievements", len(cat.Achievements),
-			"catalog", cat.Version, "titles", srv.Titles.Len())
-		errc <- httpServer.ListenAndServe()
+	// Bind every listener before serving. A private-port conflict fails startup
+	// cleanly instead of leaving a partially configured process running.
+	listeners := make([]net.Listener, 0, len(servers))
+	defer func() {
+		for _, listener := range listeners {
+			listener.Close()
+		}
 	}()
-
+	for _, server := range servers {
+		listener, err := net.Listen("tcp", server.Addr)
+		if err != nil {
+			return err
+		}
+		listeners = append(listeners, listener)
+	}
+	errc := make(chan error, len(servers))
+	for i, server := range servers {
+		log.Info("listening", "addr", server.Addr, "dashboard", i == 1)
+		go func() { errc <- server.Serve(listeners[i]) }()
+	}
+	var serveErr error
 	select {
-	case err := <-errc:
-		return err
+	case serveErr = <-errc:
 	case <-ctx.Done():
 	}
-
+	if errors.Is(serveErr, http.ErrServerClosed) {
+		serveErr = nil
+	}
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if err := httpServer.Shutdown(shutdownCtx); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		return err
+	// Start both shutdowns together so neither listener accepts new writes while
+	// the other drains. Wait for both before closing the shared database.
+	shutdowns := make(chan error, len(servers))
+	for _, server := range servers {
+		go func() { shutdowns <- server.Shutdown(shutdownCtx) }()
 	}
-	return nil
+	for range servers {
+		if err := <-shutdowns; err != nil {
+			serveErr = errors.Join(serveErr, err)
+		}
+	}
+	return serveErr
+}
+
+func newHTTPServer(addr string, handler http.Handler) *http.Server {
+	return &http.Server{Addr: addr, Handler: handler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, WriteTimeout: 10 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 16 << 10}
+}
+
+func adminConfig() (api.AdminConfig, error) {
+	password := os.Getenv("WT_ADMIN_PASSWORD")
+	if file := os.Getenv("WT_ADMIN_PASSWORD_FILE"); file != "" {
+		if password != "" {
+			return api.AdminConfig{}, fmt.Errorf("set only one of WT_ADMIN_PASSWORD or WT_ADMIN_PASSWORD_FILE")
+		}
+		data, err := os.ReadFile(file)
+		if err != nil {
+			return api.AdminConfig{}, fmt.Errorf("read dashboard password: %w", err)
+		}
+		password = strings.TrimRight(string(data), "\r\n")
+	}
+	return api.AdminConfig{Username: os.Getenv("WT_ADMIN_USERNAME"), Password: password, DeveloperUUID: os.Getenv("WT_DEV_UUID"), AllowedCIDRs: strings.FieldsFunc(os.Getenv("WT_ADMIN_ALLOWED_CIDRS"), func(r rune) bool { return r == ',' })}, nil
 }
 
 func pruneSessions(ctx context.Context, db *store.Store, log *slog.Logger) {

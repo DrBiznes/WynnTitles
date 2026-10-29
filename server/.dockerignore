@@ -1,0 +1,10 @@
+*
+!go.mod
+!go.sum
+!catalog/
+!catalog/**
+!internal/
+!internal/**
+!cmd/
+!cmd/**
+!Dockerfile

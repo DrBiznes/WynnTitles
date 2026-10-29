@@ -147,7 +147,8 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			context.takeScreenshot("wynntitles-unlock-toast");
 			screenshotChat(context, ownAchievement, "wynntitles-chat");
 
-			screenshotWithWynncraftPack(context, ownAchievement);
+			screenshotIconGallery(context, catalog, "fallbacks");
+			screenshotWithWynncraftPack(context, catalog, ownAchievement);
 		}
 	}
 
@@ -157,7 +158,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 	 * the pack's fonts and item models the way players see them. The pack stays
 	 * in the run folder, outside the repository.
 	 */
-	private static void screenshotWithWynncraftPack(ClientGameTestContext context, Catalog.Achievement achievement) {
+	private static void screenshotWithWynncraftPack(ClientGameTestContext context, Catalog catalog, Catalog.Achievement achievement) {
 		String pack = System.getProperty("wynntitles.wynnPack");
 		if (pack == null || pack.isBlank()) {
 			return;
@@ -178,7 +179,12 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		context.waitFor(client -> reload.isDone() && client.getOverlay() == null, TIMEOUT_TICKS);
 		context.runOnClient(client -> {
 			check(WynnFonts.loaded(), "the Wynncraft pack should provide its fonts");
+			for (Catalog.Achievement entry : catalog.achievements()) {
+				check(entry.icon().model() == null || Icons.resolved(entry.icon()),
+						entry.id() + ": the loaded Wynncraft pack should resolve " + entry.icon().model());
+			}
 		});
+		screenshotIconGallery(context, catalog, "wynnpack");
 
 		context.setScreen(TitlesScreen::new);
 		context.waitTicks(20);
@@ -201,6 +207,34 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		context.takeScreenshot("wynntitles-unlock-toast-wynnpack");
 		context.runOnClient(client -> check(WynnFonts.pillsLoaded(), "the Wynncraft pack should provide its chat pills"));
 		screenshotChat(context, achievement, "wynntitles-chat-wynnpack");
+	}
+
+	/** Every icon at its actual menu size, including achievements below the first screenful. */
+	private static void screenshotIconGallery(ClientGameTestContext context, Catalog catalog, String variant) {
+		int[] size = context.computeOnClient(client -> new int[] {
+				client.getWindow().getWidth(), client.getWindow().getHeight()});
+		int guiScale = context.computeOnClient(client -> client.options.guiScale().get());
+		context.runOnClient(client -> client.options.guiScale().set(2));
+		context.getInput().resizeWindow(1920, 1080);
+		context.runOnClient(client -> {
+			for (Catalog.Achievement entry : catalog.achievements()) {
+				Catalog.Icon fallback = new Catalog.Icon(null, entry.icon().fallback());
+				check(Icons.stack(fallback).is(net.minecraft.core.registries.BuiltInRegistries.ITEM
+						.getValue(net.minecraft.resources.Identifier.parse(entry.icon().fallback()))),
+						entry.id() + ": invalid vanilla fallback " + entry.icon().fallback());
+			}
+		});
+		for (int offset = 0; offset < catalog.achievements().size(); offset += IconGalleryScreen.PAGE_SIZE) {
+			int page = offset / IconGalleryScreen.PAGE_SIZE + 1;
+			List<Catalog.Achievement> entries = catalog.achievements().subList(offset,
+					Math.min(offset + IconGalleryScreen.PAGE_SIZE, catalog.achievements().size()));
+			context.setScreen(() -> new IconGalleryScreen(entries, variant, page));
+			context.waitTicks(3);
+			screenshot(context, "wynntitles-icons-" + variant + "-" + page);
+		}
+		context.setScreen(() -> null);
+		context.runOnClient(client -> client.options.guiScale().set(guiScale));
+		context.getInput().resizeWindow(size[0], size[1]);
 	}
 
 	/**
@@ -299,7 +333,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			check(bow.is(Items.PAPER) && data != null && data.floats().equals(List.of(4100f)),
 					"archer bow should be paper with custom model data 4100, got " + bow + " " + data);
 
-			Catalog.Icon missing = icon(catalog, "wynn/weapon/warrior/spear_basic_wood");
+			Catalog.Icon missing = catalog.get("warrior_lvl_1").orElseThrow().icon();
 			check(!Icons.resolved(missing) && Icons.stack(missing).is(Items.TRIDENT),
 					"a model the pack lacks should fall back to " + missing.fallback());
 		});

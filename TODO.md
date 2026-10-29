@@ -2,12 +2,12 @@
 
 ## 1. Redo achievement icons
 
-All 35 achievements need a fresh pass on `icon.model` and `icon.fallback` in `server/catalog/achievements.json`. Right now 20 of them are class-level tiers sharing five fallbacks (bow, trident, stick, iron sword, blaze rod, four each).
+Reviewed all 164 current achievements against the wiki, cached Wynntils item data and the Oct. 28, 2026 Wynncraft pack. Updated 91 icon entries in `server/catalog/achievements.json`; see [the icon review](docs/achievement-icons.md) for sources, symbolic choices and alternatives.
 
-- [ ] Pick a distinct Wynncraft item model per achievement so tiers look different at a glance
-- [ ] Give each one a vanilla fallback that still makes sense without the Wynncraft pack
-- [ ] Run the `wynnPack` test against a cached pack from a Wynncraft profile's `downloads/` folder
-- [ ] Check the icons in the smoke-test screenshots
+- [x] Pick relevant, selectable Wynncraft item models and distinguish class/profession tiers. Keep each raid's emblem across its tiers, as requested; Borange Fluff, Eyes Yet Open and Dynamite intentionally use vanilla items
+- [x] Give each one a vanilla fallback that still makes sense without the Wynncraft pack
+- [x] Run the `wynnPack` test against a cached pack from a Wynncraft profile's `downloads/` folder
+- [x] Check the icons in the smoke-test screenshots, including contact sheets for every achievement with and without the real pack
 
 Point at models only. Never copy textures out of the Wynncraft pack.
 

@@ -43,6 +43,9 @@ type Server struct {
 	statsMu sync.Mutex
 	stats   *statsResponse
 	statsAt time.Time
+	// Serialize account mutations with moderation so an older in-flight title
+	// update cannot put a revoked reward back into the public cache.
+	mutationMu sync.Mutex
 }
 
 func (s *Server) Handler() http.Handler {
@@ -137,6 +140,12 @@ func (s *Server) achievementStats(ctx context.Context) (*statsResponse, error) {
 	}
 	s.stats, s.statsAt = stats, now
 	return stats, nil
+}
+
+func (s *Server) invalidateStats() {
+	s.statsMu.Lock()
+	s.stats = nil
+	s.statsMu.Unlock()
 }
 
 func (s *Server) challenge(w http.ResponseWriter, r *http.Request) {
@@ -346,6 +355,9 @@ func (s *Server) putTitle(w http.ResponseWriter, r *http.Request, uuid string) {
 		return
 	}
 
+	s.mutationMu.Lock()
+	defer s.mutationMu.Unlock()
+
 	words, err := s.availableWords(r.Context(), uuid)
 	if err != nil {
 		s.internalError(w, err)
@@ -378,6 +390,9 @@ func (s *Server) putStyle(w http.ResponseWriter, r *http.Request, uuid string) {
 	if !s.decode(w, r, &req) {
 		return
 	}
+
+	s.mutationMu.Lock()
+	defer s.mutationMu.Unlock()
 
 	me, err := s.me(r.Context(), uuid)
 	if err != nil {
@@ -431,6 +446,9 @@ func (s *Server) buy(w http.ResponseWriter, r *http.Request, uuid string) {
 	if !s.decode(w, r, &req) {
 		return
 	}
+
+	s.mutationMu.Lock()
+	defer s.mutationMu.Unlock()
 	if len(req.ItemIDs) == 0 {
 		writeError(w, http.StatusBadRequest, "nothing to buy")
 		return
@@ -474,6 +492,8 @@ func (s *Server) buy(w http.ResponseWriter, r *http.Request, uuid string) {
 // resetPurchases refunds every purchase and puts both slots back to native.
 // Styles are cosmetic, so trying things out should never be a trap.
 func (s *Server) resetPurchases(w http.ResponseWriter, r *http.Request, uuid string) {
+	s.mutationMu.Lock()
+	defer s.mutationMu.Unlock()
 	if err := s.Store.ResetPurchases(r.Context(), uuid); err != nil {
 		s.internalError(w, err)
 		return
@@ -491,6 +511,9 @@ func (s *Server) claim(w http.ResponseWriter, r *http.Request, uuid string) {
 	if !s.decode(w, r, &req) {
 		return
 	}
+
+	s.mutationMu.Lock()
+	defer s.mutationMu.Unlock()
 
 	a, ok := s.Catalog.Get(req.AchievementID)
 	if !ok {

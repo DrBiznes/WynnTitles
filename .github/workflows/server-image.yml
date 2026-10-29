@@ -1,0 +1,86 @@
+name: Server image
+
+on:
+  pull_request:
+    paths:
+      - 'server/**'
+      - 'deploy/**'
+      - '.github/workflows/server-image.yml'
+  push:
+    branches: [main]
+    tags: ['server-v*']
+    paths:
+      - 'server/**'
+      - 'deploy/**'
+      - '.github/workflows/server-image.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+      - name: Test server
+        working-directory: server
+        run: |
+          go vet ./...
+          go test -race ./...
+      - name: Build Linux amd64 image
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          image="ghcr.io/${REPOSITORY_OWNER,,}/wynntitles-server"
+          docker build --pull --file server/Dockerfile --tag "$image:sha-$GITHUB_SHA" server
+      - name: Verify container listeners and persistence
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          image="ghcr.io/${REPOSITORY_OWNER,,}/wynntitles-server:sha-$GITHUB_SHA"
+          docker volume create wynntitles-smoke
+          password=$(openssl rand -hex 32)
+          docker run -d --name wt-smoke --read-only --cap-drop ALL --security-opt no-new-privileges \
+            -p 127.0.0.1:18080:8080 -p 127.0.0.1:18091:8081 \
+            -e WT_ADMIN_ADDR=:8081 -e WT_ADMIN_USERNAME=dev -e WT_ADMIN_PASSWORD="$password" \
+            -e WT_ADMIN_ALLOWED_CIDRS=0.0.0.0/0 \
+            -v wynntitles-smoke:/data "$image"
+          trap 'docker logs wt-smoke; docker rm -f wt-smoke; docker volume rm wynntitles-smoke' EXIT
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/healthz; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:18080/healthz
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18080/player/test)" = 404
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18091/)" = 401
+          curl -fsS --user "dev:$password" http://127.0.0.1:18091/ >/dev/null
+          docker exec wt-smoke /app/wynntitles healthcheck
+          docker restart wt-smoke
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/healthz; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:18080/healthz
+      - name: Publish image
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          image="ghcr.io/${REPOSITORY_OWNER,,}/wynntitles-server"
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker push "$image:sha-$GITHUB_SHA"
+          if [[ "$GITHUB_REF" == refs/tags/server-v* ]]; then
+            version="${GITHUB_REF#refs/tags/server-v}"
+            docker tag "$image:sha-$GITHUB_SHA" "$image:$version"
+            docker push "$image:$version"
+          fi
+          echo "Published $image:sha-$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
