@@ -1,14 +1,13 @@
 package wynntitles.mc.screen;
 
-import io.wispforest.owo.ui.base.BaseUIComponent;
-import io.wispforest.owo.ui.core.OwoUIGraphics;
-import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import wynntitles.mc.Mc;
+import wynntitles.mc.screen.ui.Element;
 
 /** Text with a one-pixel outline all round, as on Wynncraft's ribbons and buttons. */
-public class OutlinedText extends BaseUIComponent {
+public class OutlinedText extends Element {
 	private final Component text;
 	private final int color;
 	private final int outline;
@@ -17,21 +16,20 @@ public class OutlinedText extends BaseUIComponent {
 		this.text = text;
 		this.color = color;
 		this.outline = outline;
-		this.sizing(Sizing.content(), Sizing.content());
 	}
 
 	@Override
-	protected int determineHorizontalContentSize(Sizing sizing) {
+	protected int contentWidth() {
 		return font().width(text) + 2;
 	}
 
 	@Override
-	protected int determineVerticalContentSize(Sizing sizing) {
+	protected int contentHeight() {
 		return font().lineHeight + 1;
 	}
 
 	@Override
-	public void draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
+	public void draw(GuiGraphics graphics, int mouseX, int mouseY) {
 		// Colours are ARGB since 1.21.6; without an alpha byte the text is invisible.
 		for (int dx = -1; dx <= 1; dx++) {
 			for (int dy = -1; dy <= 1; dy++) {

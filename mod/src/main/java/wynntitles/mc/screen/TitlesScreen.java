@@ -1,23 +1,14 @@
 package wynntitles.mc.screen;
 
-import io.wispforest.owo.ui.base.BaseOwoScreen;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.core.CursorStyle;
-import io.wispforest.owo.ui.core.Easing;
-import io.wispforest.owo.ui.core.HorizontalAlignment;
-import io.wispforest.owo.ui.core.Insets;
-import io.wispforest.owo.ui.core.OwoUIAdapter;
-import io.wispforest.owo.ui.core.Positioning;
-import io.wispforest.owo.ui.core.Sizing;
-import io.wispforest.owo.ui.core.Surface;
-import io.wispforest.owo.ui.core.VerticalAlignment;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 import wynntitles.WynnTitles;
 import wynntitles.api.ApiException;
 import wynntitles.api.ApiTypes.Me;
@@ -25,6 +16,13 @@ import wynntitles.catalog.Catalog;
 import wynntitles.mc.Mc;
 import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.WynnFonts;
+import wynntitles.mc.screen.ui.Align;
+import wynntitles.mc.screen.ui.Box;
+import wynntitles.mc.screen.ui.Element;
+import wynntitles.mc.screen.ui.Insets;
+import wynntitles.mc.screen.ui.Size;
+import wynntitles.mc.screen.ui.Tween;
+import wynntitles.mc.screen.ui.UiScreen;
 import wynntitles.titles.Title;
 import wynntitles.titles.TitleStyle;
 import wynntitles.titles.TitleWord;
@@ -33,9 +31,9 @@ import wynntitles.titles.TitleWord;
  * The in-game home of WynnTitles, laid out like Wynncraft's raid start screen:
  * a ribbon with the title, a stone tab bar to switch between picking a title,
  * styling it, buying styles and browsing achievements, the page, and its
- * actions along the bottom.
+ * actions along the bottom. A new page slides in from the side of its tab.
  */
-public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
+public class TitlesScreen extends UiScreen {
 	// The panel is one picture (PANEL_W/H in draw-ui-sprites.py), sized to fit a
 	// 427x240 GUI (854x480 at GUI scale 2). The content stays inside the frame,
 	// clear of the pillars.
@@ -45,11 +43,10 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	private static final int BODY_WIDTH = PANEL_WIDTH - 2 * SIDE_INSET;
 	// Leaves the footer midway between the page and the pinstripe above the ledge.
 	private static final int BODY_HEIGHT = 141;
-	/** The tab bar centres the eye between two equal halves, whatever the tabs' widths. */
-	private static final int EYE_WIDTH = 14;
-	private static final int TAB_GAP = 10;
-	private static final int TAB_SIDE = (BODY_WIDTH - EYE_WIDTH - 2 * TAB_GAP) / 2;
 	private static final int COLUMN_WIDTH = (BODY_WIDTH - 8) / 2;
+	/** How far a page slides in from, in pixels. */
+	private static final int SLIDE = 18;
+
 	private enum Tab {
 		TITLES("Titles"),
 		STYLES("Styles"),
@@ -73,13 +70,17 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	private String selectedSuffix;
 	private boolean saving;
 
-	private FlowLayout header;
-	private FlowLayout tabBar;
-	private FlowLayout body;
-	private FlowLayout footer;
+	private Box header;
+	private Box body;
+	private Box footer;
+	/** Rising into place on open, like a Wynncraft menu. */
+	private final Tween rise = new Tween(220).restart();
+	private final Tween slide = new Tween(180);
+	/** Which side the last page slid in from: 1 the right, -1 the left. */
+	private int slideFrom;
 
 	public TitlesScreen() {
-		super(Component.literal("WynnTitles"));
+		super(Component.literal("WynnTitles"), PANEL_WIDTH, PANEL_HEIGHT);
 	}
 
 	/** Opens straight to the achievements tab. */
@@ -111,38 +112,25 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	}
 
 	@Override
-	protected OwoUIAdapter<FlowLayout> createAdapter() {
-		return OwoUIAdapter.create(this, UIContainers::verticalFlow);
-	}
-
-	@Override
-	protected void build(FlowLayout root) {
-		root.surface(Surface.VANILLA_TRANSLUCENT);
-
-		FlowLayout panel = UIContainers.verticalFlow(Sizing.fixed(PANEL_WIDTH), Sizing.fixed(PANEL_HEIGHT));
+	protected Element build() {
+		Box panel = Box.column(Size.fixed(PANEL_WIDTH), Size.fixed(PANEL_HEIGHT));
 		panel.gap(4);
-		panel.surface(WynnUi.surface(WynnUi.PANEL))
+		panel.background(WynnUi.surface(WynnUi.PANEL))
 				.padding(Insets.of(0, 0, SIDE_INSET, SIDE_INSET))
-				.horizontalAlignment(HorizontalAlignment.CENTER);
+				.alignX(Align.CENTER);
 		// The ribbon sits across the top edge of the field.
-		header = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(20));
-		tabBar = UIContainers.horizontalFlow(Sizing.fill(), Sizing.fixed(18));
-		tabBar.gap(TAB_GAP);
-		tabBar.surface(WynnUi.surface(WynnUi.BAR))
-				.horizontalAlignment(HorizontalAlignment.CENTER)
-				.verticalAlignment(VerticalAlignment.CENTER);
-		body = UIContainers.verticalFlow(Sizing.fill(), Sizing.fixed(BODY_HEIGHT));
+		header = Box.row(Size.content(), Size.fixed(20));
+		// What you wear on one side of the eye, how you earn and spend points on the other.
+		TabBar tabBar = new TabBar(Arrays.stream(Tab.values()).map(t -> t.label).toList(), 2,
+				() -> tab.ordinal(), i -> switchTab(Tab.values()[i]));
+		// The page and its actions are clipped, so they can slide in under the frame.
+		body = Box.column(Size.fill(), Size.fixed(BODY_HEIGHT));
 		body.gap(5);
-		body.horizontalAlignment(HorizontalAlignment.CENTER).verticalAlignment(VerticalAlignment.TOP);
-		footer = UIContainers.horizontalFlow(Sizing.fill(), Sizing.fixed(WynnUi.BUTTON_HEIGHT));
+		body.alignX(Align.CENTER).alignY(Align.START).clip(true);
+		footer = Box.row(Size.fill(), Size.fixed(WynnUi.BUTTON_HEIGHT));
 		footer.gap(8);
-		footer.horizontalAlignment(HorizontalAlignment.CENTER).verticalAlignment(VerticalAlignment.CENTER);
+		footer.alignX(Align.CENTER).alignY(Align.CENTER).clip(true);
 		panel.child(header).child(tabBar).child(body).child(footer);
-
-		// Rise into place, like a Wynncraft menu opening.
-		panel.positioning(Positioning.relative(50, 58));
-		panel.positioning().animate(220, Easing.CUBIC, Positioning.relative(50, 50)).forwards();
-		root.child(panel);
 
 		me = WynnTitles.account().me();
 		resetSelection();
@@ -168,21 +156,57 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 			}
 			rebuild();
 		}));
+		return panel;
+	}
+
+	@Override
+	protected float drop() {
+		return 0.08f * (1 - rise.value());
+	}
+
+	@Override
+	protected void animate() {
+		int shift = slide.running() ? Math.round(slideFrom * SLIDE * (1 - slide.value())) : 0;
+		body.shift(shift);
+		footer.shift(shift);
 	}
 
 	private void switchTab(Tab next) {
 		if (tab != next) {
+			if (tab == Tab.TITLES) {
+				// Picks are only kept by equipping them; elsewhere the preview shows what you wear.
+				dropTitlePicks();
+			}
+			slideFrom = next.ordinal() > tab.ordinal() ? 1 : -1;
+			slide.restart();
 			tab = next;
 			WynnUi.playPageTurn();
 			rebuild();
 		}
 	}
 
+	/** Number keys 1 to 4 open the tabs in order. */
+	@Override
+	public boolean keyPressed(KeyEvent event) {
+		int index = event.key() - GLFW.GLFW_KEY_1;
+		if (index >= 0 && index < Tab.values().length) {
+			switchTab(Tab.values()[index]);
+			return true;
+		}
+		return super.keyPressed(event);
+	}
+
 	private void resetSelection() {
+		if (me != null) {
+			dropTitlePicks();
+			styles.reset(me);
+		}
+	}
+
+	private void dropTitlePicks() {
 		if (me != null) {
 			selectedPrefix = me.equipped().prefix();
 			selectedSuffix = me.equipped().suffix();
-			styles.reset(me);
 		}
 	}
 
@@ -196,23 +220,18 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	private void rebuild() {
 		header.clearChildren();
 		header.child(WynnUi.ribbon(tab.label));
-		tabBar.clearChildren();
-		// What you wear on one side of the eye, how you earn and spend points on the other.
-		tabBar.child(tabSide(HorizontalAlignment.RIGHT, Tab.TITLES, Tab.STYLES));
-		tabBar.child(UIContainers.horizontalFlow(Sizing.fixed(EYE_WIDTH), Sizing.fixed(8)).surface(WynnUi.surface(WynnUi.EYE)));
-		tabBar.child(tabSide(HorizontalAlignment.LEFT, Tab.SHOP, Tab.ACHIEVEMENTS));
 		body.clearChildren();
 		footer.clearChildren();
 
 		Catalog catalog = WynnTitles.catalogs().catalog();
 		if (me == null || (tab != Tab.TITLES && catalog == null)) {
-			body.verticalAlignment(VerticalAlignment.CENTER);
+			body.alignY(Align.CENTER);
 			body.child(me == null && error != null
 					? WynnUi.label(WynnFonts.body(error), WynnUi.ERROR).maxWidth(PANEL_WIDTH - 40)
 					: WynnUi.label(WynnFonts.body(me == null ? "Logging in..." : "Loading achievements..."), WynnUi.TEXT_DIM));
 			return;
 		}
-		body.verticalAlignment(VerticalAlignment.TOP);
+		body.alignY(Align.START);
 		if (tab == Tab.TITLES) {
 			buildTitles();
 		} else if (tab == Tab.STYLES) {
@@ -232,43 +251,13 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		}
 	}
 
-	private FlowLayout tabSide(HorizontalAlignment toward, Tab... tabs) {
-		FlowLayout side = UIContainers.horizontalFlow(Sizing.fixed(TAB_SIDE), Sizing.fixed(14));
-		side.gap(TAB_GAP);
-		side.horizontalAlignment(toward).verticalAlignment(VerticalAlignment.CENTER);
-		for (Tab t : tabs) {
-			side.child(tabButton(t));
-		}
-		return side;
-	}
-
-	private FlowLayout tabButton(Tab t) {
-		// The name in a frame carved into the bar, so it reads as a button; the
-		// open tab's frame is inset with a gold rim.
-		boolean selected = t == tab;
-		boolean[] hovered = {false};
-		FlowLayout button = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(14));
-		button.padding(Insets.of(3, 0, 7, 6)).verticalAlignment(VerticalAlignment.TOP);
-		button.surface((graphics, c) -> WynnUi.surface(selected ? WynnUi.TAB_SELECTED
-				: hovered[0] ? WynnUi.TAB_HOVER : WynnUi.TAB).draw(graphics, c));
-		button.child(WynnUi.label(WynnFonts.small(t.label), selected ? WynnUi.GOLD : WynnUi.TEXT));
-		button.cursorStyle(CursorStyle.HAND);
-		button.mouseEnter().subscribe(() -> hovered[0] = true);
-		button.mouseLeave().subscribe(() -> hovered[0] = false);
-		button.mouseDown().subscribe((click, doubled) -> {
-			switchTab(t);
-			return true;
-		});
-		return button;
-	}
-
 	// ── Titles ─────────────────────────────────────────────────────────────
 
 	private void buildTitles() {
-		// How the title will look over your head: the title, then your name.
-		body.child(StyleChips.nameplate(this::preview, me.username()));
+		// How the title will look over your head.
+		body.child(StyleChips.nameplate(this::preview));
 
-		FlowLayout columns = UIContainers.horizontalFlow(Sizing.fill(), Sizing.expand());
+		Box columns = Box.row(Size.fill(), Size.expand());
 		columns.gap(8);
 		columns.child(wordColumn("Prefix", me.words().prefixes(), () -> selectedPrefix, w -> selectedPrefix = w));
 		columns.child(wordColumn("Suffix", me.words().suffixes(), () -> selectedSuffix, w -> selectedSuffix = w));
@@ -305,49 +294,40 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 	}
 
 	/** Lists words in their native styles; only the preview shows the slot's shop style. */
-	private FlowLayout wordColumn(String heading, List<TitleWord> words,
+	private Box wordColumn(String heading, List<TitleWord> words,
 			Supplier<String> selected, Consumer<String> select) {
-		FlowLayout column = UIContainers.verticalFlow(Sizing.fixed(COLUMN_WIDTH), Sizing.fill());
+		Box column = Box.column(Size.fixed(COLUMN_WIDTH), Size.fill());
 		column.gap(3);
 		column.child(WynnUi.heading(heading).margins(Insets.left(2)));
 
-		FlowLayout rows = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
-		rows.child(wordRow(null, selected, select));
-		for (TitleWord word : words) {
-			rows.child(wordRow(word, selected, select));
+		Box rows = Box.column(Size.fill(), Size.content());
+		rows.child(wordRow(null, 0, selected, select));
+		for (int i = 0; i < words.size(); i++) {
+			rows.child(wordRow(words.get(i), i + 1, selected, select));
 		}
-		column.child(WynnUi.well(Sizing.fill(), Sizing.expand(), rows));
+		column.child(WynnUi.well(Size.fill(), Size.expand(), rows));
 		return column;
 	}
 
-	/** Rows restyle themselves as the selection changes, so picking one keeps the list's scroll. */
-	private FlowLayout wordRow(TitleWord word, Supplier<String> selected, Consumer<String> select) {
+	/**
+	 * Rows restyle themselves as the selection changes, so picking one keeps the
+	 * list's scroll. Every other row is a shade lighter, so long lists are easy to follow.
+	 */
+	private Box wordRow(TitleWord word, int index, Supplier<String> selected, Consumer<String> select) {
 		String text = word == null ? null : word.text();
-		FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(), Sizing.fixed(13));
-		row.padding(Insets.of(2, 0, 5, 0)).verticalAlignment(VerticalAlignment.CENTER);
+		Box row = Box.row(Size.fill(), Size.fixed(13));
+		row.padding(Insets.of(2, 0, 5, 0)).alignY(Align.CENTER);
 		row.child(word == null
 				? WynnUi.label(WynnFonts.body("None"), WynnUi.TEXT_DIM)
 				: new TitleText(() -> TitleRenderer.render(word), 1f, WynnUi.TEXT));
-
-		boolean[] hovered = {false};
-		row.surface((graphics, c) -> {
-			if (Objects.equals(selected.get(), text)) {
-				WynnUi.surface(WynnUi.ROW_SELECTED).draw(graphics, c);
-			} else if (hovered[0]) {
-				WynnUi.surface(WynnUi.ROW_HOVER).draw(graphics, c);
-			}
-		});
-		row.cursorStyle(CursorStyle.HAND);
-		row.mouseEnter().subscribe(() -> hovered[0] = true);
-		row.mouseLeave().subscribe(() -> hovered[0] = false);
-		row.mouseDown().subscribe((click, doubled) -> {
-			if (!Objects.equals(selected.get(), text)) {
-				select.accept(text);
-				WynnUi.playClick();
-				titlesFooter();
-			}
-			return true;
-		});
+		StyleChips.clickable(row, index % 2 == 1 ? WynnUi.STRIPE : null, () -> Objects.equals(selected.get(), text),
+				WynnUi.ROW_SELECTED, WynnUi.ROW_HOVER, () -> {
+					if (!Objects.equals(selected.get(), text)) {
+						select.accept(text);
+						WynnUi.playClick();
+						titlesFooter();
+					}
+				});
 		return row;
 	}
 

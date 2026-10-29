@@ -1,18 +1,15 @@
 package wynntitles.mc.screen;
 
-import io.wispforest.owo.ui.base.BaseUIComponent;
-import io.wispforest.owo.ui.core.OwoUIGraphics;
-import io.wispforest.owo.ui.core.Sizing;
 import java.util.function.Supplier;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import wynntitles.mc.Mc;
+import wynntitles.mc.screen.ui.Element;
+import wynntitles.mc.screen.ui.Size;
 
-/**
- * Draws a Component that is rebuilt every frame, so animated title effects
- * move. owo's LabelComponent re-lays out on every text change, which this avoids.
- */
-public class TitleText extends BaseUIComponent {
+/** Draws a Component that is rebuilt every frame, so animated title effects move. */
+public class TitleText extends Element {
 	private final Supplier<Component> text;
 	private final float scale;
 	private final int color;
@@ -22,32 +19,28 @@ public class TitleText extends BaseUIComponent {
 		this.text = text;
 		this.scale = scale;
 		this.color = color;
-		this.sizing(Sizing.content(), Sizing.content());
+		sizing(Size.content(), Size.content());
 	}
 
-	/**
-	 * Fills the parent's width and centres the text in it every frame. A
-	 * content-sized one keeps the width it was laid out with, so it drifts off
-	 * centre when the text changes length.
-	 */
+	/** Fills the parent's width and centres the text in it. */
 	public TitleText centered() {
 		this.centered = true;
-		this.sizing(Sizing.fill(), Sizing.content());
+		sizing(Size.fill(), Size.content());
 		return this;
 	}
 
 	@Override
-	protected int determineHorizontalContentSize(Sizing sizing) {
+	protected int contentWidth() {
 		return Math.round(font().width(text.get()) * scale);
 	}
 
 	@Override
-	protected int determineVerticalContentSize(Sizing sizing) {
+	protected int contentHeight() {
 		return Math.round(font().lineHeight * scale);
 	}
 
 	@Override
-	public void draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
+	public void draw(GuiGraphics graphics, int mouseX, int mouseY) {
 		Component current = text.get();
 		int offset = centered ? Math.round((width - font().width(current) * scale) / 2) : 0;
 		graphics.pose().pushMatrix();

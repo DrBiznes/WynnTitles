@@ -19,7 +19,6 @@
 		"java": ">=${java_version}",
 		"fabric-api": "*",
 		"wynntils": ">=4.2.0",
-		"owo": ">=0.13.0",
 		"cloth-config": "*"
 	},
 	"suggests": {

@@ -87,7 +87,11 @@ public record Catalog(String version, List<Achievement> achievements, List<ShopI
 	 */
 	public record Icon(String model, String fallback) {}
 
-	/** Unused fields are null or 0 depending on the trigger type. */
+	/**
+	 * Unused fields are null or 0 depending on the trigger type. ItemSets is met
+	 * when every item of any one set is held or worn; x, z and radius are a
+	 * circle on the map.
+	 */
 	public record Trigger(
 			String type,
 			String questName,
@@ -97,7 +101,19 @@ public record Catalog(String version, List<Achievement> achievements, List<ShopI
 			String itemName,
 			int amount,
 			String statistic,
-			String raidName) {}
+			String raidName,
+			String dungeonName,
+			List<String> dungeonNames,
+			String professionName,
+			List<String> professionNames,
+			List<String> territoryNames,
+			List<String> gamemodes,
+			String guildRank,
+			String rarity,
+			List<List<String>> itemSets,
+			int x,
+			int z,
+			int radius) {}
 
 	public record Rewards(TitleWord prefix, TitleWord suffix) {}
 

@@ -1,15 +1,5 @@
 package wynntitles.mc.screen;
 
-import io.wispforest.owo.ui.base.BaseUIComponent;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.core.CursorStyle;
-import io.wispforest.owo.ui.core.HorizontalAlignment;
-import io.wispforest.owo.ui.core.Insets;
-import io.wispforest.owo.ui.core.OwoUIGraphics;
-import io.wispforest.owo.ui.core.Sizing;
-import io.wispforest.owo.ui.core.Surface;
-import io.wispforest.owo.ui.core.VerticalAlignment;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
+import net.minecraft.client.gui.GuiGraphics;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import net.minecraft.resources.Identifier;
@@ -29,6 +20,12 @@ import wynntitles.api.ApiTypes.Unlock;
 import wynntitles.catalog.Catalog;
 import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.WynnFonts;
+import wynntitles.mc.screen.ui.Align;
+import wynntitles.mc.screen.ui.Box;
+import wynntitles.mc.screen.ui.Element;
+import wynntitles.mc.screen.ui.Insets;
+import wynntitles.mc.screen.ui.Painter;
+import wynntitles.mc.screen.ui.Size;
 import wynntitles.titles.Title;
 
 /**
@@ -86,8 +83,8 @@ final class AchievementsPage {
 	private Map<String, Long> unlockedAt = Map.of();
 	private Catalog catalog;
 	private AchievementStats stats;
-	private FlowLayout sidebar;
-	private FlowLayout list;
+	private Box sidebar;
+	private Box list;
 	private int textWidth;
 
 	AchievementsPage(Predicate<Catalog.Achievement> canDetect) {
@@ -95,7 +92,7 @@ final class AchievementsPage {
 	}
 
 	/** Stats are null while they load, or when the server could not send them. */
-	FlowLayout build(Catalog catalog, Me me, AchievementStats stats, int width, int height) {
+	Box build(Catalog catalog, Me me, AchievementStats stats, int width, int height) {
 		this.catalog = catalog;
 		this.stats = stats;
 		// Labels wrap to an exact width, so work out what a row has left for text.
@@ -107,27 +104,27 @@ final class AchievementsPage {
 			category = null;
 		}
 
-		FlowLayout page = UIContainers.horizontalFlow(Sizing.fixed(width), Sizing.fixed(height));
+		Box page = Box.row(Size.fixed(width), Size.fixed(height));
 		page.gap(GAP);
-		sidebar = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
+		sidebar = Box.column(Size.fill(), Size.content());
 		sidebar.gap(1);
-		page.child(WynnUi.well(Sizing.fixed(SIDEBAR_WIDTH), Sizing.fill(), sidebar));
-		list = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
+		page.child(WynnUi.well(Size.fixed(SIDEBAR_WIDTH), Size.fill(), sidebar));
+		list = Box.column(Size.fill(), Size.content());
 		list.gap(1);
-		page.child(WynnUi.well(Sizing.expand(), Sizing.fill(), list));
+		page.child(WynnUi.well(Size.expand(), Size.fill(), list));
 		fill();
 		return page;
 	}
 
 	/** Progress toward every achievement, for the panel's footer. */
-	FlowLayout footer(Me me) {
+	Box footer(Me me) {
 		int total = catalog.achievements().size();
 		long done = catalog.achievements().stream().filter(a -> unlockedAt.containsKey(a.id())).count();
-		FlowLayout footer = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+		Box footer = Box.row(Size.content(), Size.content());
 		footer.gap(6);
-		footer.verticalAlignment(VerticalAlignment.CENTER);
+		footer.alignY(Align.CENTER);
 		footer.child(WynnUi.heading("Progress"));
-		footer.child(new ProgressBar(total == 0 ? 0 : (float) done / total).sizing(Sizing.fixed(120), Sizing.fixed(8)));
+		footer.child(new ProgressBar(total == 0 ? 0 : (float) done / total).sizing(Size.fixed(120), Size.fixed(8)));
 		footer.child(WynnUi.label(WynnFonts.body(done + " / " + total), WynnUi.TEXT));
 		footer.child(WynnUi.label(WynnFonts.small(me.points() + (me.points() == 1 ? " point" : " points")), WynnUi.GOLD));
 		return footer;
@@ -158,53 +155,51 @@ final class AchievementsPage {
 		}
 	}
 
-	private FlowLayout categoryEntry(String id, String name, List<Catalog.Achievement> achievements) {
+	private Box categoryEntry(String id, String name, List<Catalog.Achievement> achievements) {
 		boolean selected = Objects.equals(id, category);
 		long done = achievements.stream().filter(a -> unlockedAt.containsKey(a.id())).count();
 
-		FlowLayout entry = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
+		Box entry = Box.column(Size.fill(), Size.content());
 		entry.gap(2);
 		entry.padding(Insets.of(3, 3, 5, 3));
 		entry.child(WynnUi.label(WynnFonts.body(name), selected ? WynnUi.GOLD : WynnUi.TEXT));
-		FlowLayout progress = UIContainers.horizontalFlow(Sizing.fill(), Sizing.content());
+		Box progress = Box.row(Size.fill(), Size.content());
 		progress.gap(3);
-		progress.verticalAlignment(VerticalAlignment.CENTER);
+		progress.alignY(Align.CENTER);
 		progress.child(new ProgressBar(achievements.isEmpty() ? 0 : (float) done / achievements.size())
-				.sizing(Sizing.expand(), Sizing.fixed(5)));
+				.sizing(Size.expand(), Size.fixed(5)));
 		progress.child(WynnUi.label(WynnFonts.small(done + "/" + achievements.size()), WynnUi.TEXT_DIM));
 		entry.child(progress);
 
 		highlight(entry, () -> selected);
-		entry.cursorStyle(CursorStyle.HAND);
-		entry.mouseDown().subscribe((click, doubled) -> {
+		entry.onClick(() -> {
 			if (!selected) {
 				category = id;
 				WynnUi.playClick();
 				fill();
 			}
-			return true;
 		});
 		return entry;
 	}
 
-	private FlowLayout row(Catalog.Achievement achievement) {
+	private Box row(Catalog.Achievement achievement) {
 		Long claimedAt = unlockedAt.get(achievement.id());
 		boolean unlocked = claimedAt != null;
 		boolean needsUpdate = !unlocked && !canDetect.test(achievement);
 
-		FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(), Sizing.content());
+		Box row = Box.row(Size.fill(), Size.content());
 		row.gap(ROW_GAP);
-		row.padding(Insets.of(ROW_PADDING)).verticalAlignment(VerticalAlignment.CENTER);
+		row.padding(Insets.of(ROW_PADDING)).alignY(Align.CENTER);
 
-		FlowLayout icon = UIContainers.verticalFlow(Sizing.fixed(ICON_WIDTH), Sizing.content());
+		Box icon = Box.column(Size.fixed(ICON_WIDTH), Size.content());
 		icon.gap(1);
-		icon.horizontalAlignment(HorizontalAlignment.CENTER);
+		icon.alignX(Align.CENTER);
 		icon.child(new AchievementIcon(achievement, unlocked));
 		icon.child(WynnUi.label(WynnFonts.small(achievement.points() + (achievement.points() == 1 ? " pt" : " pts")),
 				tierColor(achievement.tier())));
 		row.child(icon);
 
-		FlowLayout text = UIContainers.verticalFlow(Sizing.fixed(textWidth), Sizing.content());
+		Box text = Box.column(Size.fixed(textWidth), Size.content());
 		text.gap(2);
 		text.child(WynnUi.label(WynnFonts.body(achievement.name()), unlocked ? WynnUi.GOLD : WynnUi.TEXT).maxWidth(textWidth));
 		text.child(WynnUi.label(WynnFonts.body(achievement.description()), WynnUi.TEXT_DIM).maxWidth(textWidth));
@@ -223,10 +218,10 @@ final class AchievementsPage {
 	}
 
 	/** The rarity column: share of players, the Wynncraft tier that maps to, and the unlock date. */
-	private FlowLayout rarity(Catalog.Achievement achievement, Long claimedAt) {
-		FlowLayout column = UIContainers.verticalFlow(Sizing.fixed(RARITY_WIDTH), Sizing.content());
+	private Box rarity(Catalog.Achievement achievement, Long claimedAt) {
+		Box column = Box.column(Size.fixed(RARITY_WIDTH), Size.content());
 		column.gap(2);
-		column.horizontalAlignment(HorizontalAlignment.RIGHT);
+		column.alignX(Align.END);
 		if (stats != null) {
 			double percent = stats.percent(achievement.id());
 			Rarity rarity = Rarity.of(percent);
@@ -245,19 +240,16 @@ final class AchievementsPage {
 	}
 
 	/** Gold while selected, a soft glow while hovered. */
-	private static void highlight(FlowLayout layout, BooleanSupplier selected) {
-		boolean[] hovered = {false};
-		Surface selectedSurface = WynnUi.surface(WynnUi.ROW_SELECTED);
-		Surface hoverSurface = WynnUi.surface(WynnUi.ROW_HOVER);
-		layout.surface((graphics, c) -> {
+	private static void highlight(Box layout, BooleanSupplier selected) {
+		Painter selectedSurface = WynnUi.surface(WynnUi.ROW_SELECTED);
+		Painter hoverSurface = WynnUi.surface(WynnUi.ROW_HOVER);
+		layout.background((graphics, c) -> {
 			if (selected.getAsBoolean()) {
-				selectedSurface.draw(graphics, c);
-			} else if (hovered[0]) {
-				hoverSurface.draw(graphics, c);
+				selectedSurface.paint(graphics, c);
+			} else if (c.hovered()) {
+				hoverSurface.paint(graphics, c);
 			}
 		});
-		layout.mouseEnter().subscribe(() -> hovered[0] = true);
-		layout.mouseLeave().subscribe(() -> hovered[0] = false);
 	}
 
 	/** One decimal below 10%, so rare achievements do not all read as 0%. */
@@ -287,7 +279,7 @@ final class AchievementsPage {
 	}
 
 	/** A gold bar in a dark trough. */
-	private static final class ProgressBar extends BaseUIComponent {
+	private static final class ProgressBar extends Element {
 		private static final Identifier TROUGH = WynnUi.sprite("progress");
 		private static final Identifier FILL = WynnUi.sprite("progress_fill");
 		private final float progress;
@@ -297,7 +289,7 @@ final class AchievementsPage {
 		}
 
 		@Override
-		public void draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
+		public void draw(GuiGraphics graphics, int mouseX, int mouseY) {
 			WynnUi.blit(graphics, TROUGH, x, y, width, height);
 			int fill = Math.round((width - 2) * progress);
 			if (fill > 0) {

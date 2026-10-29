@@ -1,20 +1,19 @@
 package wynntitles.mc.screen;
 
-import io.wispforest.owo.ui.base.BaseUIComponent;
-import io.wispforest.owo.ui.core.OwoUIGraphics;
-import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import wynntitles.WynnTitles;
 import wynntitles.catalog.Catalog;
 import wynntitles.mc.Icons;
+import wynntitles.mc.screen.ui.Element;
+import wynntitles.mc.screen.ui.Size;
 
 /**
  * An achievement's item inside its hexagonal tier frame, dimmed while locked.
  * The frames come from scripts/draw-icon-frames.py; keep the sizes in step.
  */
-public class AchievementIcon extends BaseUIComponent {
+public class AchievementIcon extends Element {
 	public static final int WIDTH = 28;
 	public static final int HEIGHT = 32;
 	private static final int ITEM_X = 6;
@@ -27,11 +26,11 @@ public class AchievementIcon extends BaseUIComponent {
 	public AchievementIcon(Catalog.Achievement achievement, boolean unlocked) {
 		this.achievement = achievement;
 		this.unlocked = unlocked;
-		this.sizing(Sizing.fixed(WIDTH), Sizing.fixed(HEIGHT));
+		sizing(Size.fixed(WIDTH), Size.fixed(HEIGHT));
 	}
 
 	@Override
-	public void draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
+	public void draw(GuiGraphics graphics, int mouseX, int mouseY) {
 		draw(graphics, achievement, unlocked, x, y);
 	}
 

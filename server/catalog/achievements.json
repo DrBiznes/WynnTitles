@@ -24,6 +24,485 @@
     }
   },
   {
+    "id": "quest_queens_recruit",
+    "category": "quest",
+    "name": "Queen's Recruit",
+    "description": "Complete Queen's Recruit, the first quest in Fruma.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content_book/story_quest_active",
+      "fallback": "minecraft:writable_book"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Queen's Recruit"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Queen's"
+      },
+      "suffix": {
+        "text": "Vanguard"
+      }
+    }
+  },
+  {
+    "id": "quest_journey_further",
+    "category": "quest",
+    "name": "A Journey Further",
+    "description": "Complete A Journey Further, where Aledar asks you to strike him down.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content_book/story_quest_tracked",
+      "fallback": "minecraft:iron_sword"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "A Journey Further"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Sacrificial"
+      },
+      "suffix": {
+        "text": "Friendslayer"
+      }
+    }
+  },
+  {
+    "id": "quest_tunnel_trouble",
+    "category": "quest",
+    "name": "Sacred Animals",
+    "description": "Complete Tunnel Trouble and free the sacred cows.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/prop/hay_bale",
+      "fallback": "minecraft:hay_block"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Tunnel Trouble"
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Bovemist"
+      }
+    }
+  },
+  {
+    "id": "quest_cowfusion",
+    "category": "quest",
+    "name": "Cowfusion",
+    "description": "Complete Cowfusion and get turned back from a cow.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/ingredient/corrupted_beef",
+      "fallback": "minecraft:beef"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Cowfusion"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Cowfused"
+      }
+    }
+  },
+  {
+    "id": "quest_cluck_cluck",
+    "category": "quest",
+    "name": "A Hideous Crime",
+    "description": "Complete Cluck Cluck by taking care of Cluckles. Permanently.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/ingredient/plucked_feather",
+      "fallback": "minecraft:feather"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Cluck Cluck"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Fowl"
+      },
+      "suffix": {
+        "text": "Cluckslayer"
+      }
+    }
+  },
+  {
+    "id": "quest_stable_story",
+    "category": "quest",
+    "name": "Stable Story",
+    "description": "Complete Stable Story and earn your first horse.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/mount/horse_saddle",
+      "fallback": "minecraft:saddle"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Stable Story"
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Cavalryman"
+      }
+    }
+  },
+  {
+    "id": "quest_off_the_rails",
+    "category": "quest",
+    "name": "Off the Rails",
+    "description": "Complete Off the Rails in Timasca.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content_book/quest_active",
+      "fallback": "minecraft:minecart"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Off the Rails"
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Railfan"
+      }
+    }
+  },
+  {
+    "id": "quest_secret",
+    "category": "quest",
+    "name": "???",
+    "description": "Complete the secret quest ??? and find Mehme alone in the White Meteor.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/ingredient/brown_mushroom",
+      "fallback": "minecraft:brown_mushroom"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "???"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Mehme's"
+      },
+      "suffix": {
+        "text": "???"
+      }
+    }
+  },
+  {
+    "id": "quest_hunters_calling",
+    "category": "quest",
+    "name": "A Hunter's Calling",
+    "description": "Complete the secret quest A Hunter's Calling and unlock Hunted mode.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/character_select/hunted",
+      "fallback": "minecraft:crossbow"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "A Hunter's Calling"
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Quarry"
+      }
+    }
+  },
+  {
+    "id": "quest_reincarnation",
+    "category": "quest",
+    "name": "Reincarnation",
+    "description": "Complete Reincarnation and defeat Bob's Reincarnation at his tomb.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/prop/undead_remains_1",
+      "fallback": "minecraft:skeleton_skull"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Reincarnation"
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Bobslayer",
+        "runs": [
+          {
+            "text": "Bob",
+            "color": "gold",
+            "bold": true
+          },
+          {
+            "text": "slayer",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#ffaa00",
+                "#aa0000"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "quest_tower_of_ascension",
+    "category": "quest",
+    "name": "Tower of Ascension",
+    "description": "Clear every floor of the Tower of Ascension and defeat Death.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/prop/soul_lantern",
+      "fallback": "minecraft:wither_skeleton_skull"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Tower of Ascension"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Ankou's"
+      },
+      "suffix": {
+        "text": "Death-Defier"
+      }
+    }
+  },
+  {
+    "id": "quest_overture",
+    "category": "quest",
+    "name": "Overture to Despair",
+    "description": "Complete Overture to Despair, the start of Fruma's endgame.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/prop/soul_flame",
+      "fallback": "minecraft:soul_lantern"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Overture to Despair"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Despairing"
+      }
+    }
+  },
+  {
+    "id": "quest_apotheosis",
+    "category": "quest",
+    "name": "Apotheosis",
+    "description": "Complete Apotheosis, the final quest of the main story.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/prop/burning_flame",
+      "fallback": "minecraft:totem_of_undying"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Apotheosis"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Deified",
+        "runs": [
+          {
+            "text": "Deified",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#ffffff",
+                "#ffff55",
+                "#ffaa00"
+              ],
+              "animated": true,
+              "cycleMs": 4400,
+              "animation": "shimmer"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Demigod"
+      }
+    }
+  },
+  {
+    "id": "quest_qira_hive",
+    "category": "quest",
+    "name": "The Qira Hive",
+    "description": "Complete The Qira Hive and clear all five divisions.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "fallback": "minecraft:honeycomb"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "The Qira Hive"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Hive-Touched"
+      },
+      "suffix": {
+        "text": "Hivebreaker"
+      }
+    }
+  },
+  {
+    "id": "quest_dwarves_doguns",
+    "category": "quest",
+    "name": "Dwarves and Doguns",
+    "description": "Complete all four parts of Dwarves and Doguns.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/tool/iron_pickaxe",
+      "fallback": "minecraft:iron_pickaxe"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "Dwarves and Doguns Part IV"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Dogun-Allied"
+      },
+      "suffix": {
+        "text": "Dwarf-Friend"
+      }
+    }
+  },
+  {
+    "id": "quest_wynnexcavation",
+    "category": "quest",
+    "name": "WynnExcavation",
+    "description": "Complete all four WynnExcavation sites.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/prop/clay_amphora",
+      "fallback": "minecraft:brush"
+    },
+    "trigger": {
+      "type": "quest",
+      "questName": "WynnExcavation Site D"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Excavating"
+      },
+      "suffix": {
+        "text": "Digger"
+      }
+    }
+  },
+  {
+    "id": "stat_quests_50",
+    "category": "quest",
+    "name": "Adventurer",
+    "description": "Complete 50 quests or mini-quests across your characters.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/player/closed_book",
+      "fallback": "minecraft:book"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "completedQuests",
+      "amount": 50
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Adventurer"
+      }
+    }
+  },
+  {
+    "id": "stat_quests_300",
+    "category": "quest",
+    "name": "Storied",
+    "description": "Complete 300 quests or mini-quests across your characters.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/player/content_book",
+      "fallback": "minecraft:book"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "completedQuests",
+      "amount": 300
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Storied"
+      }
+    }
+  },
+  {
+    "id": "stat_quests_1000",
+    "category": "quest",
+    "name": "Loremaster",
+    "description": "Complete 1,000 quests or mini-quests across your characters.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content_book/complete",
+      "fallback": "minecraft:enchanted_book"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "completedQuests",
+      "amount": 1000
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Questing",
+        "runs": [
+          {
+            "text": "Questing",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "royal",
+              "animated": true,
+              "cycleMs": 4300,
+              "animation": "wave"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Loremaster"
+      }
+    }
+  },
+  {
     "id": "archer_lvl_1",
     "category": "class_level",
     "name": "Archer 1",
@@ -698,6 +1177,90 @@
     }
   },
   {
+    "id": "roster_1",
+    "category": "class_level",
+    "name": "Many Faces",
+    "description": "Have a character of every class.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/gui/character_select/create",
+      "fallback": "minecraft:armor_stand"
+    },
+    "trigger": {
+      "type": "characterRoster",
+      "level": 1
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Many-Faced"
+      }
+    }
+  },
+  {
+    "id": "roster_50",
+    "category": "class_level",
+    "name": "Versatile",
+    "description": "Have a level 50 character of every class.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/character_select/reskin_class",
+      "fallback": "minecraft:armor_stand"
+    },
+    "trigger": {
+      "type": "characterRoster",
+      "level": 50
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Versatile"
+      }
+    }
+  },
+  {
+    "id": "roster_100",
+    "category": "class_level",
+    "name": "Pentarch",
+    "description": "Have a level 100 character of every class.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/character_select/select_reskin",
+      "fallback": "minecraft:armor_stand"
+    },
+    "trigger": {
+      "type": "characterRoster",
+      "level": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Five-Sworn",
+        "runs": [
+          {
+            "text": "Five-Sworn",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#ff5555",
+                "#ffaa00",
+                "#55ff55",
+                "#55ffff",
+                "#aa00aa"
+              ],
+              "animated": true,
+              "cycleMs": 5000
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Pentarch"
+      }
+    }
+  },
+  {
     "id": "prof_total_50",
     "category": "profession",
     "name": "Jack of All Trades (Novice)",
@@ -739,6 +1302,684 @@
       },
       "suffix": {
         "text": "Draft"
+      }
+    }
+  },
+  {
+    "id": "prof_total_250",
+    "category": "profession",
+    "name": "Diligent Journeyman",
+    "description": "Reach a total profession level of 250 on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/economy/mining/gem_iron",
+      "fallback": "minecraft:stone_pickaxe"
+    },
+    "trigger": {
+      "type": "totalProfessionLevel",
+      "level": 250
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Diligent"
+      },
+      "suffix": {
+        "text": "Journeyman"
+      }
+    }
+  },
+  {
+    "id": "prof_total_1000",
+    "category": "profession",
+    "name": "Renaissance",
+    "description": "Reach a total profession level of 1,000 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/economy/mining/gem_titanium",
+      "fallback": "minecraft:golden_pickaxe"
+    },
+    "trigger": {
+      "type": "totalProfessionLevel",
+      "level": 1000
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Renaissance"
+      },
+      "suffix": {
+        "text": "Polymath"
+      }
+    }
+  },
+  {
+    "id": "prof_total_1584",
+    "category": "profession",
+    "name": "Perfectionist",
+    "description": "Max every profession at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/housing/profession/trophy/base",
+      "fallback": "minecraft:netherite_pickaxe"
+    },
+    "trigger": {
+      "type": "totalProfessionLevel",
+      "level": 1584
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Perfectionist",
+        "runs": [
+          {
+            "text": "Perfectionist",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#ffaa00",
+                "#ffff55",
+                "#ffffff"
+              ],
+              "animated": true,
+              "cycleMs": 4500,
+              "animation": "shimmer"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "prof_woodcutting_100",
+    "category": "profession",
+    "name": "Woodcutting 100",
+    "description": "Reach level 100 in Woodcutting on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/woodcutting",
+      "fallback": "minecraft:iron_axe"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Woodcutting",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Lumberjack"
+      }
+    }
+  },
+  {
+    "id": "prof_woodcutting_132",
+    "category": "profession",
+    "name": "Woodcutting 132",
+    "description": "Max Woodcutting at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/tool/dernic_axe",
+      "fallback": "minecraft:iron_axe"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Woodcutting",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Timbered"
+      }
+    }
+  },
+  {
+    "id": "prof_mining_100",
+    "category": "profession",
+    "name": "Mining 100",
+    "description": "Reach level 100 in Mining on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/mining",
+      "fallback": "minecraft:iron_pickaxe"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Mining",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Prospector"
+      }
+    }
+  },
+  {
+    "id": "prof_mining_132",
+    "category": "profession",
+    "name": "Mining 132",
+    "description": "Max Mining at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/tool/dernic_pickaxe",
+      "fallback": "minecraft:iron_pickaxe"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Mining",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Deep-Delved"
+      }
+    }
+  },
+  {
+    "id": "prof_farming_100",
+    "category": "profession",
+    "name": "Farming 100",
+    "description": "Reach level 100 in Farming on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/farming",
+      "fallback": "minecraft:wheat"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Farming",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Harvester"
+      }
+    }
+  },
+  {
+    "id": "prof_farming_132",
+    "category": "profession",
+    "name": "Farming 132",
+    "description": "Max Farming at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/economy/farming/grain_dernic",
+      "fallback": "minecraft:wheat"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Farming",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Harvest-Blessed"
+      }
+    }
+  },
+  {
+    "id": "prof_fishing_100",
+    "category": "profession",
+    "name": "Fishing 100",
+    "description": "Reach level 100 in Fishing on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/fishing",
+      "fallback": "minecraft:fishing_rod"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Fishing",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Angler"
+      }
+    }
+  },
+  {
+    "id": "prof_fishing_132",
+    "category": "profession",
+    "name": "Fishing 132",
+    "description": "Max Fishing at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/tool/dernic_rod",
+      "fallback": "minecraft:fishing_rod"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Fishing",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Tidal"
+      }
+    }
+  },
+  {
+    "id": "prof_alchemism_100",
+    "category": "profession",
+    "name": "Alchemism 100",
+    "description": "Reach level 100 in Alchemism on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/alchemism",
+      "fallback": "minecraft:brewing_stand"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Alchemism",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Alchemist"
+      }
+    }
+  },
+  {
+    "id": "prof_alchemism_132",
+    "category": "profession",
+    "name": "Alchemism 132",
+    "description": "Max Alchemism at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/potion/healing_full",
+      "fallback": "minecraft:brewing_stand"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Alchemism",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Transmuting"
+      }
+    }
+  },
+  {
+    "id": "prof_armouring_100",
+    "category": "profession",
+    "name": "Armouring 100",
+    "description": "Reach level 100 in Armouring on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/armouring",
+      "fallback": "minecraft:iron_chestplate"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Armouring",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Armourer"
+      }
+    }
+  },
+  {
+    "id": "prof_armouring_132",
+    "category": "profession",
+    "name": "Armouring 132",
+    "description": "Max Armouring at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/economy/mining/ingot_titanium",
+      "fallback": "minecraft:iron_chestplate"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Armouring",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Plate-Forged"
+      }
+    }
+  },
+  {
+    "id": "prof_cooking_100",
+    "category": "profession",
+    "name": "Cooking 100",
+    "description": "Reach level 100 in Cooking on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/cooking",
+      "fallback": "minecraft:bread"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Cooking",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Gourmand"
+      }
+    }
+  },
+  {
+    "id": "prof_cooking_132",
+    "category": "profession",
+    "name": "Cooking 132",
+    "description": "Max Cooking at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/economy/meals/spicy",
+      "fallback": "minecraft:bread"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Cooking",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Savoury"
+      }
+    }
+  },
+  {
+    "id": "prof_jeweling_100",
+    "category": "profession",
+    "name": "Jeweling 100",
+    "description": "Reach level 100 in Jeweling on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/jeweling",
+      "fallback": "minecraft:diamond"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Jeweling",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Lapidary"
+      }
+    }
+  },
+  {
+    "id": "prof_jeweling_132",
+    "category": "profession",
+    "name": "Jeweling 132",
+    "description": "Max Jeweling at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/economy/mining/gem_cinnabar",
+      "fallback": "minecraft:diamond"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Jeweling",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Gem-Cut"
+      }
+    }
+  },
+  {
+    "id": "prof_scribing_100",
+    "category": "profession",
+    "name": "Scribing 100",
+    "description": "Reach level 100 in Scribing on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/scribing",
+      "fallback": "minecraft:paper"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Scribing",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Lorekeeper"
+      }
+    }
+  },
+  {
+    "id": "prof_scribing_132",
+    "category": "profession",
+    "name": "Scribing 132",
+    "description": "Max Scribing at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/economy/woodcutting/paper_redwood",
+      "fallback": "minecraft:paper"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Scribing",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Ink-Stained"
+      }
+    }
+  },
+  {
+    "id": "prof_tailoring_100",
+    "category": "profession",
+    "name": "Tailoring 100",
+    "description": "Reach level 100 in Tailoring on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/tailoring",
+      "fallback": "minecraft:string"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Tailoring",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Weaver"
+      }
+    }
+  },
+  {
+    "id": "prof_tailoring_132",
+    "category": "profession",
+    "name": "Tailoring 132",
+    "description": "Max Tailoring at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/economy/farming/string_dernic",
+      "fallback": "minecraft:string"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Tailoring",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Silk-Spun"
+      }
+    }
+  },
+  {
+    "id": "prof_weaponsmithing_100",
+    "category": "profession",
+    "name": "Weaponsmithing 100",
+    "description": "Reach level 100 in Weaponsmithing on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/weaponsmithing",
+      "fallback": "minecraft:iron_sword"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Weaponsmithing",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Bladesmith"
+      }
+    }
+  },
+  {
+    "id": "prof_weaponsmithing_132",
+    "category": "profession",
+    "name": "Weaponsmithing 132",
+    "description": "Max Weaponsmithing at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/economy/mining/ingot_cinnabar",
+      "fallback": "minecraft:iron_sword"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Weaponsmithing",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Anvil-Forged"
+      }
+    }
+  },
+  {
+    "id": "prof_woodworking_100",
+    "category": "profession",
+    "name": "Woodworking 100",
+    "description": "Reach level 100 in Woodworking on one character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/woodworking",
+      "fallback": "minecraft:bow"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Woodworking",
+      "level": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Bowyer"
+      }
+    }
+  },
+  {
+    "id": "prof_woodworking_132",
+    "category": "profession",
+    "name": "Woodworking 132",
+    "description": "Max Woodworking at level 132 on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/economy/woodcutting/plank_redwood",
+      "fallback": "minecraft:bow"
+    },
+    "trigger": {
+      "type": "professionLevel",
+      "professionName": "Woodworking",
+      "level": 132
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Fletched"
+      }
+    }
+  },
+  {
+    "id": "prof_gathering_125",
+    "category": "profession",
+    "name": "Bountiful Gatherer",
+    "description": "Reach level 125 in all four gathering professions on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/tool/dernic_scythe",
+      "fallback": "minecraft:diamond_hoe"
+    },
+    "trigger": {
+      "type": "professionLevelAll",
+      "professionNames": [
+        "Woodcutting",
+        "Mining",
+        "Farming",
+        "Fishing"
+      ],
+      "level": 125
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Bountiful"
+      },
+      "suffix": {
+        "text": "Gatherer"
+      }
+    }
+  },
+  {
+    "id": "prof_crafting_117",
+    "category": "profession",
+    "name": "Master Tradesman",
+    "description": "Reach level 117 in all eight crafting professions on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/crafting/main",
+      "fallback": "minecraft:smithing_table"
+    },
+    "trigger": {
+      "type": "professionLevelAll",
+      "professionNames": [
+        "Alchemism",
+        "Armouring",
+        "Cooking",
+        "Jeweling",
+        "Scribing",
+        "Tailoring",
+        "Weaponsmithing",
+        "Woodworking"
+      ],
+      "level": 117
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Craft-Honed"
+      },
+      "suffix": {
+        "text": "Tradesman"
       }
     }
   },
@@ -800,6 +2041,266 @@
             }
           }
         ]
+      }
+    }
+  },
+  {
+    "id": "loc_void",
+    "category": "exploration",
+    "name": "Into the Void",
+    "description": "Find The Lonely Abyss, far out in The Void.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/outer_void/drop/tangible_intangibility",
+      "fallback": "minecraft:ender_pearl"
+    },
+    "trigger": {
+      "type": "coordinates",
+      "x": 13777,
+      "z": -4042,
+      "radius": 64
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Void-Touched",
+        "runs": [
+          {
+            "text": "Void-Touched",
+            "effect": {
+              "type": "gradient",
+              "palette": "void",
+              "animated": true,
+              "cycleMs": 5200
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Voidwalker"
+      }
+    }
+  },
+  {
+    "id": "loc_little_wood",
+    "category": "exploration",
+    "name": "Old Man Martyn's Cabin",
+    "description": "Visit Little Wood.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/economy/woodcutting/plank_oak",
+      "fallback": "minecraft:oak_sapling"
+    },
+    "trigger": {
+      "type": "location",
+      "territoryName": "Little Wood"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Little"
+      },
+      "suffix": {
+        "text": "Woodsman"
+      }
+    }
+  },
+  {
+    "id": "loc_time_valley",
+    "category": "exploration",
+    "name": "Gone to Travel",
+    "description": "Visit Time Valley, where Old Man Martyn's cabin sign waits.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "fallback": "minecraft:clock"
+    },
+    "trigger": {
+      "type": "location",
+      "territoryName": "Time Valley"
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Wanderer"
+      }
+    }
+  },
+  {
+    "id": "loc_wynn_towns",
+    "category": "exploration",
+    "name": "Good Neighbour",
+    "description": "Visit every town from Ragni to Relos.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/signage/default",
+      "fallback": "minecraft:map"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "Ragni",
+        "Elkurn",
+        "Nivla Woods",
+        "Detlas",
+        "Maltic",
+        "Ternaves",
+        "Nemract",
+        "Selchar",
+        "Almuj",
+        "Bremminglar",
+        "Rymek",
+        "Nesaak",
+        "Lusuco",
+        "Iboju Village",
+        "Troms",
+        "Lutho",
+        "Espren",
+        "Timasca",
+        "Aldwell",
+        "Hyloch",
+        "Corkus City",
+        "Relos"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Well-Travelled"
+      },
+      "suffix": {
+        "text": "Neighbour"
+      }
+    }
+  },
+  {
+    "id": "loc_gavel_settlements",
+    "category": "exploration",
+    "name": "Mapmaker of Gavel",
+    "description": "Visit every settlement in Gavel.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/signage/seaskipper",
+      "fallback": "minecraft:compass"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "Llevigar",
+        "Olux",
+        "Gelibord",
+        "Cinfras",
+        "Thesead",
+        "Eltom",
+        "Rodoroc",
+        "Kandon-Beda",
+        "Ahmsord",
+        "Lexdale",
+        "Efilim",
+        "Thanos",
+        "Bantisu Air Temple"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Worldly"
+      },
+      "suffix": {
+        "text": "Cartographer"
+      }
+    }
+  },
+  {
+    "id": "stat_caves_25",
+    "category": "exploration",
+    "name": "Spelunker",
+    "description": "Clear 25 caves across your characters.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/gui/content_book/cave_active",
+      "fallback": "minecraft:torch"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "caves",
+      "amount": 25
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Spelunker"
+      }
+    }
+  },
+  {
+    "id": "stat_caves_250",
+    "category": "exploration",
+    "name": "Cave-Warden",
+    "description": "Clear 250 caves across your characters.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content_book/cave_tracked",
+      "fallback": "minecraft:lantern"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "caves",
+      "amount": 250
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Deepdelving"
+      },
+      "suffix": {
+        "text": "Cave-Warden"
+      }
+    }
+  },
+  {
+    "id": "stat_world_events_100",
+    "category": "exploration",
+    "name": "Stormchaser",
+    "description": "Complete 100 world events.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content_book/world_event_active",
+      "fallback": "minecraft:bell"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "worldEvents",
+      "amount": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Stormchaser"
+      }
+    }
+  },
+  {
+    "id": "stat_world_events_500",
+    "category": "exploration",
+    "name": "Restless Defender",
+    "description": "Complete 500 world events.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content_book/world_event_complete",
+      "fallback": "minecraft:lightning_rod"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "worldEvents",
+      "amount": 500
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Restless"
+      },
+      "suffix": {
+        "text": "Defender"
       }
     }
   },
@@ -871,6 +2372,462 @@
     }
   },
   {
+    "id": "item_eb_64",
+    "category": "collection",
+    "name": "Block Party",
+    "description": "Carry 64 Emerald Blocks, the price of one Liquid Emerald.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/pouch/emerald_half",
+      "fallback": "minecraft:emerald"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Emerald Block",
+      "amount": 64
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Banker"
+      }
+    }
+  },
+  {
+    "id": "item_le_640",
+    "category": "collection",
+    "name": "Ten Stacks",
+    "description": "Carry ten stacks of Liquid Emeralds at once.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/bank/liquid_storage",
+      "fallback": "minecraft:emerald_block"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Liquid Emerald",
+      "amount": 640
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Gilded",
+        "runs": [
+          {
+            "text": "Gilded",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#ffaa00",
+                "#55ff55",
+                "#ffff55"
+              ],
+              "animated": true,
+              "cycleMs": 4000,
+              "animation": "shimmer"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Magnate"
+      }
+    }
+  },
+  {
+    "id": "item_grandmother",
+    "category": "collection",
+    "name": "Grandmother",
+    "description": "Carry the mythic bow Grandmother.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/loot/mythic",
+      "fallback": "minecraft:bow"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Grandmother",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Grandmother's"
+      },
+      "suffix": {
+        "text": "Heirloom"
+      }
+    }
+  },
+  {
+    "id": "item_alkatraz",
+    "category": "collection",
+    "name": "Alkatraz",
+    "description": "Carry the mythic spear Alkatraz.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/loot/mythic",
+      "fallback": "minecraft:iron_bars"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Alkatraz",
+      "amount": 1
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Escapee"
+      }
+    }
+  },
+  {
+    "id": "item_archaic_writing",
+    "category": "collection",
+    "name": "Archaic Writing",
+    "description": "Carry Archaic Writing, a rare Outer Void find that was once a mythic.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/outer_void/drop/archaic_writing",
+      "fallback": "minecraft:paper"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Archaic Writing",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Gavellian"
+      },
+      "suffix": {
+        "text": "Scribe"
+      }
+    }
+  },
+  {
+    "id": "item_borange_fluff",
+    "category": "collection",
+    "name": "Borange",
+    "description": "Carry Borange Fluff from the Orange Wybel altar.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:orange_wool"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Borange Fluff",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Borange"
+      }
+    }
+  },
+  {
+    "id": "item_eyes_yet_open",
+    "category": "collection",
+    "name": "Eyes Yet Open",
+    "description": "Carry the ingredient Eyes Yet Open.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:spider_eye"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Eyes Yet Open",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Unblinking"
+      }
+    }
+  },
+  {
+    "id": "item_mega_fern",
+    "category": "collection",
+    "name": "Mega Fern",
+    "description": "Carry a Mega Fern from the Bushpig Matriarch.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/ingredient/mega_fern",
+      "fallback": "minecraft:fern"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Mega Fern",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Fernly"
+      }
+    }
+  },
+  {
+    "id": "item_blazing_fireball",
+    "category": "collection",
+    "name": "Blazing Fireball",
+    "description": "Carry a Blazing Fireball from the Fire Zombie.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/ingredient/blazing_fireball",
+      "fallback": "minecraft:fire_charge"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Blazing Fireball",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Blazing"
+      }
+    }
+  },
+  {
+    "id": "item_witherhead_rib",
+    "category": "collection",
+    "name": "Rib Collector",
+    "description": "Carry 10 Witherhead's Ribs from the Decrepit Sewers.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/dungeon/token/decrepit_sewers",
+      "fallback": "minecraft:bone"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Witherhead's Rib",
+      "amount": 10
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Rib-Rattled"
+      }
+    }
+  },
+  {
+    "id": "item_redbeard_hair",
+    "category": "collection",
+    "name": "Redbeard's Beard",
+    "description": "Carry 10 Redbeard's Hair from Galleon's Graveyard.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/dungeon/token/galleon_graveyard",
+      "fallback": "minecraft:string"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Redbeard's Hair",
+      "amount": 10
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Plundering"
+      },
+      "suffix": {
+        "text": "Buccaneer"
+      }
+    }
+  },
+  {
+    "id": "item_eye_pupil",
+    "category": "collection",
+    "name": "Pupil Hoarder",
+    "description": "Carry 10 of The Eye's Pupils from Eldritch Outlook.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/dungeon/token/eldritch_outlook",
+      "fallback": "minecraft:ender_eye"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "The Eye's Pupil",
+      "amount": 10
+    },
+    "rewards": {
+      "prefix": {
+        "text": "All-Seeing"
+      }
+    }
+  },
+  {
+    "id": "item_mythic_hoard",
+    "category": "collection",
+    "name": "Mythic Hoard",
+    "description": "Carry three mythic items at once.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/loot/cache",
+      "fallback": "minecraft:ender_chest"
+    },
+    "trigger": {
+      "type": "itemRarityCount",
+      "rarity": "mythic",
+      "amount": 3
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Mythic",
+        "runs": [
+          {
+            "text": "Mythic",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#aa00aa",
+                "#ff55ff"
+              ],
+              "animated": true,
+              "cycleMs": 3800,
+              "animation": "pulse"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Hoarder"
+      }
+    }
+  },
+  {
+    "id": "item_shiny",
+    "category": "collection",
+    "name": "Shiny!",
+    "description": "Carry a shiny item.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/loot/fabled",
+      "fallback": "minecraft:glow_ink_sac"
+    },
+    "trigger": {
+      "type": "shinyItem",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Shining",
+        "runs": [
+          {
+            "text": "Shining",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#ffffff",
+                "#ffff55"
+              ],
+              "animated": true,
+              "cycleMs": 3600,
+              "animation": "sparkle"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Prodigy"
+      }
+    }
+  },
+  {
+    "id": "item_morph",
+    "category": "collection",
+    "name": "Morphling",
+    "description": "Carry or wear all four Morph armour pieces.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/loot/set",
+      "fallback": "minecraft:chainmail_chestplate"
+    },
+    "trigger": {
+      "type": "itemSet",
+      "itemSets": [
+        [
+          "Morph-Stardust",
+          "Morph-Steel",
+          "Morph-Iron",
+          "Morph-Gold"
+        ]
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Shapeshifting"
+      },
+      "suffix": {
+        "text": "Morphling"
+      }
+    }
+  },
+  {
+    "id": "item_hive_mind",
+    "category": "collection",
+    "name": "Hive Mind",
+    "description": "Carry or wear the four armour pieces from any one Hive merchant.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "fallback": "minecraft:beehive"
+    },
+    "trigger": {
+      "type": "itemSet",
+      "itemSets": [
+        [
+          "Sparkling Visor",
+          "Insulated Plate Mail",
+          "Static-charged Leggings",
+          "Thunderous Step"
+        ],
+        [
+          "Pride of the Aerie",
+          "Gale's Freedom",
+          "Turbine Greaves",
+          "Flashstep"
+        ],
+        [
+          "Ambertoise Shell",
+          "Beetle Aegis",
+          "Elder Oak Roots",
+          "Humbark Moccasins"
+        ],
+        [
+          "Whitecap Crown",
+          "Stillwater Blue",
+          "Trench Scourer",
+          "Silt of the Seafloor"
+        ],
+        [
+          "Sparkweaver",
+          "Soulflare",
+          "Cinderchain",
+          "Mantlewalkers"
+        ]
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Hive-Minded"
+      },
+      "suffix": {
+        "text": "Drone"
+      }
+    }
+  },
+  {
     "id": "stat_mobs_10k",
     "category": "statistics",
     "name": "Monster Hunter",
@@ -917,6 +2874,208 @@
       },
       "suffix": {
         "text": "Secrets"
+      }
+    }
+  },
+  {
+    "id": "stat_playtime_100",
+    "category": "statistics",
+    "name": "Committed",
+    "description": "Play Wynncraft for 100 hours.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/outer_void/drop/luxury_timepiece",
+      "fallback": "minecraft:clock"
+    },
+    "trigger": {
+      "type": "playtime",
+      "amount": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Committed"
+      }
+    }
+  },
+  {
+    "id": "stat_playtime_500",
+    "category": "statistics",
+    "name": "Long Haul",
+    "description": "Play Wynncraft for 500 hours.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/outer_void/drop/luxury_timepiece",
+      "fallback": "minecraft:clock"
+    },
+    "trigger": {
+      "type": "playtime",
+      "amount": 500
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Wayfarer"
+      }
+    }
+  },
+  {
+    "id": "stat_playtime_1500",
+    "category": "statistics",
+    "name": "Timeless",
+    "description": "Play Wynncraft for 1,500 hours.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/outer_void/drop/luxury_timepiece",
+      "fallback": "minecraft:clock"
+    },
+    "trigger": {
+      "type": "playtime",
+      "amount": 1500
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Timeless",
+        "runs": [
+          {
+            "text": "Timeless",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#55ffff",
+                "#5555ff",
+                "#ffffff"
+              ],
+              "animated": true,
+              "cycleMs": 6000
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Eternal"
+      }
+    }
+  },
+  {
+    "id": "stat_account_5",
+    "category": "statistics",
+    "name": "Elder",
+    "description": "Have first joined Wynncraft at least five years ago.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:cake"
+    },
+    "trigger": {
+      "type": "accountAge",
+      "amount": 5
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Elder"
+      }
+    }
+  },
+  {
+    "id": "stat_account_10",
+    "category": "statistics",
+    "name": "Ancient Veteran",
+    "description": "Have first joined Wynncraft at least ten years ago.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "fallback": "minecraft:ancient_debris"
+    },
+    "trigger": {
+      "type": "accountAge",
+      "amount": 10
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Ancient"
+      },
+      "suffix": {
+        "text": "Veteran"
+      }
+    }
+  },
+  {
+    "id": "stat_leaderboard_1000",
+    "category": "statistics",
+    "name": "Ranked",
+    "description": "Place in the top 1,000 of any Wynncraft leaderboard.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:gold_ingot"
+    },
+    "trigger": {
+      "type": "leaderboard",
+      "amount": 1000
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Ranked"
+      }
+    }
+  },
+  {
+    "id": "stat_leaderboard_100",
+    "category": "statistics",
+    "name": "Chart-Topper",
+    "description": "Place in the top 100 of any Wynncraft leaderboard.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "fallback": "minecraft:golden_helmet"
+    },
+    "trigger": {
+      "type": "leaderboard",
+      "amount": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Chart-Topping",
+        "runs": [
+          {
+            "text": "Chart-Topping",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "palette": "sunset",
+              "animated": true,
+              "cycleMs": 4200,
+              "animation": "shimmer"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Apex"
+      }
+    }
+  },
+  {
+    "id": "stat_lootrun_camps",
+    "category": "statistics",
+    "name": "Trail-Worn",
+    "description": "Finish a lootrun at all seven lootrun camps.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/lootrun/daily",
+      "fallback": "minecraft:beacon"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "lootruns",
+      "amount": 7
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Trail-Worn"
       }
     }
   },
@@ -1069,6 +3228,1191 @@
             }
           }
         ]
+      }
+    }
+  },
+  {
+    "id": "raid_notg_10",
+    "category": "raid",
+    "name": "Wormfeeder",
+    "description": "Complete Nest of the Grootslangs 10 times.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content/nest_of_the_grootslangs",
+      "fallback": "minecraft:slime_ball"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "Nest of the Grootslangs",
+      "amount": 10
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Wormfeeder"
+      }
+    }
+  },
+  {
+    "id": "raid_notg_50",
+    "category": "raid",
+    "name": "Wyrmbane",
+    "description": "Complete Nest of the Grootslangs 50 times.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content/nest_of_the_grootslangs",
+      "fallback": "minecraft:slime_ball"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "Nest of the Grootslangs",
+      "amount": 50
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Wyrmbane"
+      }
+    }
+  },
+  {
+    "id": "raid_nol_10",
+    "category": "raid",
+    "name": "Parasite Purger",
+    "description": "Complete Orphion's Nexus of Light 10 times.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content/nexus_of_light",
+      "fallback": "minecraft:glowstone_dust"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "Orphion's Nexus of Light",
+      "amount": 10
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Parasite-Purger"
+      }
+    }
+  },
+  {
+    "id": "raid_nol_50",
+    "category": "raid",
+    "name": "Unfading",
+    "description": "Complete Orphion's Nexus of Light 50 times.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content/nexus_of_light",
+      "fallback": "minecraft:glowstone_dust"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "Orphion's Nexus of Light",
+      "amount": 50
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Unfading"
+      }
+    }
+  },
+  {
+    "id": "raid_tcc_10",
+    "category": "raid",
+    "name": "Shard-Breaker",
+    "description": "Complete The Canyon Colossus 10 times.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content/canyon_colossus",
+      "fallback": "minecraft:chiseled_stone_bricks"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "The Canyon Colossus",
+      "amount": 10
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Shard-Breaker"
+      }
+    }
+  },
+  {
+    "id": "raid_tcc_50",
+    "category": "raid",
+    "name": "Gavel's Protector",
+    "description": "Complete The Canyon Colossus 50 times.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content/canyon_colossus",
+      "fallback": "minecraft:chiseled_stone_bricks"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "The Canyon Colossus",
+      "amount": 50
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Gavel's"
+      },
+      "suffix": {
+        "text": "Protector"
+      }
+    }
+  },
+  {
+    "id": "raid_tna_10",
+    "category": "raid",
+    "name": "Anomaly",
+    "description": "Complete The Nameless Anomaly 10 times.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content/nameless_anomaly",
+      "fallback": "minecraft:echo_shard"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "The Nameless Anomaly",
+      "amount": 10
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Anomaly"
+      }
+    }
+  },
+  {
+    "id": "raid_tna_50",
+    "category": "raid",
+    "name": "Nameless No More",
+    "description": "Complete The Nameless Anomaly 50 times.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content/nameless_anomaly",
+      "fallback": "minecraft:echo_shard"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "The Nameless Anomaly",
+      "amount": 50
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Nameless",
+        "runs": [
+          {
+            "text": "Nameless",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#aa00aa",
+                "#555555",
+                "#5555ff"
+              ],
+              "animated": true,
+              "cycleMs": 5200,
+              "animation": "flicker"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "raid_twp_10",
+    "category": "raid",
+    "name": "Anathema's End",
+    "description": "Complete The Wartorn Palace 10 times.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content_book/raid_active",
+      "fallback": "minecraft:golden_sword"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "The Wartorn Palace",
+      "amount": 10
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Anathema's"
+      }
+    }
+  },
+  {
+    "id": "raid_twp_50",
+    "category": "raid",
+    "name": "Scourge of the Palace",
+    "description": "Complete The Wartorn Palace 50 times.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content_book/raid_active",
+      "fallback": "minecraft:golden_sword"
+    },
+    "trigger": {
+      "type": "raid",
+      "raidName": "The Wartorn Palace",
+      "amount": 50
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Scourge"
+      }
+    }
+  },
+  {
+    "id": "stat_raids_25",
+    "category": "raid",
+    "name": "Seasoned Raider",
+    "description": "Complete 25 raids of any kind.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/raid/sigil_2",
+      "fallback": "minecraft:iron_sword"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "raidsCompleted",
+      "amount": 25
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Seasoned"
+      }
+    }
+  },
+  {
+    "id": "stat_raids_100",
+    "category": "raid",
+    "name": "Raid Syndicate",
+    "description": "Complete 100 raids of any kind.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/raid/sigil_3",
+      "fallback": "minecraft:diamond_sword"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "raidsCompleted",
+      "amount": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Syndicate"
+      },
+      "suffix": {
+        "text": "Raidmaster"
+      }
+    }
+  },
+  {
+    "id": "dungeon_decrepit_sewers",
+    "category": "dungeon",
+    "name": "Sewer Rat",
+    "description": "Complete Decrepit Sewers.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/dungeon/fragment/decrepit_sewers",
+      "fallback": "minecraft:rotten_flesh"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Decrepit Sewers",
+      "amount": 1
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Sewer-Rat"
+      }
+    }
+  },
+  {
+    "id": "dungeon_infested_pit",
+    "category": "dungeon",
+    "name": "Arachnophobe",
+    "description": "Complete Infested Pit.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/dungeon/fragment/infested_pit",
+      "fallback": "minecraft:cobweb"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Infested Pit",
+      "amount": 1
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Webcutter"
+      }
+    }
+  },
+  {
+    "id": "dungeon_underworld_crypt",
+    "category": "dungeon",
+    "name": "Ferryman's Toll",
+    "description": "Complete Underworld Crypt.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/dungeon/fragment/underworld_crypt",
+      "fallback": "minecraft:oak_boat"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Underworld Crypt",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Charon's"
+      },
+      "suffix": {
+        "text": "Ferryman"
+      }
+    }
+  },
+  {
+    "id": "dungeon_timelost_sanctum",
+    "category": "dungeon",
+    "name": "Timelost",
+    "description": "Complete Timelost Sanctum.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/dungeon/fragment/timelost_sanctum",
+      "fallback": "minecraft:clock"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Timelost Sanctum",
+      "amount": 1
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Timewalker"
+      }
+    }
+  },
+  {
+    "id": "dungeon_sand_swept_tomb",
+    "category": "dungeon",
+    "name": "Sand-Swept",
+    "description": "Complete Sand-Swept Tomb.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/dungeon/fragment/sand_swept_tomb",
+      "fallback": "minecraft:sand"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Sand-Swept Tomb",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Sand-Swept"
+      }
+    }
+  },
+  {
+    "id": "dungeon_ice_barrows",
+    "category": "dungeon",
+    "name": "Frostbitten",
+    "description": "Complete Ice Barrows.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/dungeon/fragment/ice_barrows",
+      "fallback": "minecraft:packed_ice"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Ice Barrows",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Frostbitten"
+      }
+    }
+  },
+  {
+    "id": "dungeon_undergrowth_ruins",
+    "category": "dungeon",
+    "name": "Overgrown",
+    "description": "Complete Undergrowth Ruins.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/dungeon/fragment/undergrowth_ruins",
+      "fallback": "minecraft:vine"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Undergrowth Ruins",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Overgrown"
+      }
+    }
+  },
+  {
+    "id": "dungeon_galleon_graveyard",
+    "category": "dungeon",
+    "name": "Le Big Fishe",
+    "description": "Complete Galleon's Graveyard.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/dungeon/fragment/galleon_graveyard",
+      "fallback": "minecraft:pufferfish"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Galleon's Graveyard",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Le Big"
+      },
+      "suffix": {
+        "text": "Fishe"
+      }
+    }
+  },
+  {
+    "id": "dungeon_fallen_factory",
+    "category": "dungeon",
+    "name": "Cogbreaker",
+    "description": "Complete Fallen Factory.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/dungeon/fragment/fallen_factory",
+      "fallback": "minecraft:piston"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Fallen Factory",
+      "amount": 1
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Cogbreaker"
+      }
+    }
+  },
+  {
+    "id": "dungeon_eldritch_outlook",
+    "category": "dungeon",
+    "name": "Eye to Eye",
+    "description": "Complete Eldritch Outlook.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/dungeon/fragment/eldritch_outlook",
+      "fallback": "minecraft:ender_eye"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Eldritch Outlook",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Eldritch"
+      }
+    }
+  },
+  {
+    "id": "dungeon_galleon_graveyard_10",
+    "category": "dungeon",
+    "name": "Mutiny!",
+    "description": "Complete Galleon's Graveyard 10 times.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/dungeon/token/galleon_graveyard",
+      "fallback": "minecraft:pufferfish"
+    },
+    "trigger": {
+      "type": "dungeon",
+      "dungeonName": "Galleon's Graveyard",
+      "amount": 10
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Mutineer"
+      }
+    }
+  },
+  {
+    "id": "dungeon_corrupted_all",
+    "category": "dungeon",
+    "name": "Corruption Cleansed",
+    "description": "Complete all eight Corrupted dungeons.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/dungeon/key_broken",
+      "fallback": "minecraft:crying_obsidian"
+    },
+    "trigger": {
+      "type": "dungeonSet",
+      "dungeonNames": [
+        "Corrupted Decrepit Sewers",
+        "Corrupted Infested Pit",
+        "Corrupted Lost Sanctuary",
+        "Corrupted Underworld Crypt",
+        "Corrupted Sand-Swept Tomb",
+        "Corrupted Ice Barrows",
+        "Corrupted Undergrowth Ruins",
+        "Corrupted Galleon's Graveyard"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Corrupted",
+        "runs": [
+          {
+            "text": "Corrupted",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#550055",
+                "#aa00aa",
+                "#ff55ff"
+              ],
+              "animated": true,
+              "cycleMs": 4600,
+              "animation": "flicker"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Cleanser"
+      }
+    }
+  },
+  {
+    "id": "dungeon_all",
+    "category": "dungeon",
+    "name": "Keymaster",
+    "description": "Complete every dungeon, Corrupted ones included.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/signage/dungeon",
+      "fallback": "minecraft:tripwire_hook"
+    },
+    "trigger": {
+      "type": "dungeonSet",
+      "dungeonNames": [
+        "Decrepit Sewers",
+        "Infested Pit",
+        "Underworld Crypt",
+        "Timelost Sanctum",
+        "Sand-Swept Tomb",
+        "Ice Barrows",
+        "Undergrowth Ruins",
+        "Galleon's Graveyard",
+        "Fallen Factory",
+        "Eldritch Outlook",
+        "Corrupted Decrepit Sewers",
+        "Corrupted Infested Pit",
+        "Corrupted Lost Sanctuary",
+        "Corrupted Underworld Crypt",
+        "Corrupted Sand-Swept Tomb",
+        "Corrupted Ice Barrows",
+        "Corrupted Undergrowth Ruins",
+        "Corrupted Galleon's Graveyard"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Unbarred",
+        "runs": [
+          {
+            "text": "Unbarred",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#ffaa00",
+                "#ffff55",
+                "#aa00aa"
+              ],
+              "animated": true,
+              "cycleMs": 4800
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Keymaster"
+      }
+    }
+  },
+  {
+    "id": "stat_dungeons_10",
+    "category": "dungeon",
+    "name": "Delver",
+    "description": "Complete 10 dungeons of any kind.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/gui/content_book/dungeon_active",
+      "fallback": "minecraft:iron_door"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "dungeonsCompleted",
+      "amount": 10
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Delver"
+      }
+    }
+  },
+  {
+    "id": "stat_dungeons_100",
+    "category": "dungeon",
+    "name": "Dungeoneer",
+    "description": "Complete 100 dungeons of any kind.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/content_book/dungeon_tracked",
+      "fallback": "minecraft:iron_door"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "dungeonsCompleted",
+      "amount": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Dungeoneer"
+      }
+    }
+  },
+  {
+    "id": "stat_dungeons_500",
+    "category": "dungeon",
+    "name": "Crypt-Born",
+    "description": "Complete 500 dungeons of any kind.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/dungeon/key",
+      "fallback": "minecraft:iron_door"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "dungeonsCompleted",
+      "amount": 500
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Crypt-Born"
+      },
+      "suffix": {
+        "text": "Depthwalker"
+      }
+    }
+  },
+  {
+    "id": "stat_wars_1",
+    "category": "guild",
+    "name": "Blooded",
+    "description": "Fight in a guild war.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/mastery_tome/guild",
+      "fallback": "minecraft:wooden_sword"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "wars",
+      "amount": 1
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Blooded"
+      }
+    }
+  },
+  {
+    "id": "stat_wars_100",
+    "category": "guild",
+    "name": "Warmonger",
+    "description": "Fight in 100 guild wars.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/mastery_tome/guild",
+      "fallback": "minecraft:iron_sword"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "wars",
+      "amount": 100
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Warmonger"
+      }
+    }
+  },
+  {
+    "id": "stat_wars_1000",
+    "category": "guild",
+    "name": "Warlord",
+    "description": "Fight in 1,000 guild wars.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/mastery_tome/guild",
+      "fallback": "minecraft:netherite_sword"
+    },
+    "trigger": {
+      "type": "statistic",
+      "statistic": "wars",
+      "amount": 1000
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Ironclad",
+        "runs": [
+          {
+            "text": "Ironclad",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#aa0000",
+                "#ffaa00"
+              ],
+              "animated": true,
+              "cycleMs": 3400,
+              "animation": "pulse"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Warlord"
+      }
+    }
+  },
+  {
+    "id": "guild_member",
+    "category": "guild",
+    "name": "Guildmate",
+    "description": "Join a guild.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "fallback": "minecraft:white_banner"
+    },
+    "trigger": {
+      "type": "guild",
+      "guildRank": "recruit"
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Guildmate"
+      }
+    }
+  },
+  {
+    "id": "guild_chief",
+    "category": "guild",
+    "name": "Banner-Bearer",
+    "description": "Be a Chief of your guild.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:blue_banner"
+    },
+    "trigger": {
+      "type": "guild",
+      "guildRank": "chief"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Banner-Bearing"
+      }
+    }
+  },
+  {
+    "id": "guild_owner",
+    "category": "guild",
+    "name": "Guildmaster",
+    "description": "Own a guild.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "fallback": "minecraft:golden_helmet"
+    },
+    "trigger": {
+      "type": "guild",
+      "guildRank": "owner"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Crowned"
+      },
+      "suffix": {
+        "text": "Guildmaster"
+      }
+    }
+  },
+  {
+    "id": "gm_hardcore_50",
+    "category": "gamemode",
+    "name": "Hardened",
+    "description": "Reach level 50 on a living Hardcore character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/character_select/hardcore",
+      "fallback": "minecraft:redstone"
+    },
+    "trigger": {
+      "type": "gamemodeLevel",
+      "gamemodes": [
+        "hardcore"
+      ],
+      "level": 50
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Hardened"
+      }
+    }
+  },
+  {
+    "id": "gm_hardcore_100",
+    "category": "gamemode",
+    "name": "Deathless",
+    "description": "Reach level 100 on a living Hardcore character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/character_select/hardcore",
+      "fallback": "minecraft:redstone_block"
+    },
+    "trigger": {
+      "type": "gamemodeLevel",
+      "gamemodes": [
+        "hardcore"
+      ],
+      "level": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Deathless",
+        "runs": [
+          {
+            "text": "Deathless",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#aa0000",
+                "#ffffff"
+              ],
+              "animated": true,
+              "cycleMs": 3200,
+              "animation": "pulse"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Unscathed"
+      }
+    }
+  },
+  {
+    "id": "gm_ironman_50",
+    "category": "gamemode",
+    "name": "Self-Reliant",
+    "description": "Reach level 50 on an Ironman character.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/gui/character_select/ironman",
+      "fallback": "minecraft:iron_ingot"
+    },
+    "trigger": {
+      "type": "gamemodeLevel",
+      "gamemodes": [
+        "ironman"
+      ],
+      "level": 50
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Self-Reliant"
+      }
+    }
+  },
+  {
+    "id": "gm_ultimate_ironman_100",
+    "category": "gamemode",
+    "name": "Hermit",
+    "description": "Reach level 100 on an Ultimate Ironman character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/character_select/ironman",
+      "fallback": "minecraft:iron_block"
+    },
+    "trigger": {
+      "type": "gamemodeLevel",
+      "gamemodes": [
+        "ultimate_ironman"
+      ],
+      "level": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Solitary"
+      },
+      "suffix": {
+        "text": "Hermit"
+      }
+    }
+  },
+  {
+    "id": "gm_craftsman_100",
+    "category": "gamemode",
+    "name": "Hand-Forged",
+    "description": "Reach level 100 on a Craftsman character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/character_select/craftsman",
+      "fallback": "minecraft:crafting_table"
+    },
+    "trigger": {
+      "type": "gamemodeLevel",
+      "gamemodes": [
+        "craftsman"
+      ],
+      "level": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Hand-Forged"
+      },
+      "suffix": {
+        "text": "Artisan"
+      }
+    }
+  },
+  {
+    "id": "gm_hunted_100",
+    "category": "gamemode",
+    "name": "Hunted",
+    "description": "Reach level 100 on a Hunted character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/character_select/hunted",
+      "fallback": "minecraft:target"
+    },
+    "trigger": {
+      "type": "gamemodeLevel",
+      "gamemodes": [
+        "hunted"
+      ],
+      "level": 100
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Hunted"
+      },
+      "suffix": {
+        "text": "Prey"
+      }
+    }
+  },
+  {
+    "id": "gm_huich_80",
+    "category": "gamemode",
+    "name": "HUICH",
+    "description": "Reach level 80 on a living Hunted, Ultimate Ironman, Craftsman and Hardcore character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/character_select/select_gamemodes",
+      "fallback": "minecraft:wither_rose"
+    },
+    "trigger": {
+      "type": "gamemodeLevel",
+      "gamemodes": [
+        "hunted",
+        "ultimate_ironman",
+        "craftsman",
+        "hardcore"
+      ],
+      "level": 80
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Unyielding",
+        "runs": [
+          {
+            "text": "Unyielding",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#aa0000",
+                "#555555"
+              ],
+              "animated": true,
+              "cycleMs": 3000,
+              "animation": "flicker"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Masochist"
+      }
+    }
+  },
+  {
+    "id": "secret_rocket_mushroom",
+    "category": "secret",
+    "name": "Little Rocket Mushroom",
+    "description": "Carry a Talking Mushroom all the way to Mehme's home. He hates mushrooms.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/prop/garden_gnome",
+      "fallback": "minecraft:red_mushroom"
+    },
+    "trigger": {
+      "type": "itemAtLocation",
+      "itemName": "Talking Mushroom",
+      "x": -7112,
+      "z": -12825,
+      "radius": 16
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Unwelcome"
+      },
+      "suffix": {
+        "text": "Mycophile"
+      }
+    }
+  },
+  {
+    "id": "secret_overdue",
+    "category": "secret",
+    "name": "Overdue",
+    "description": "Bring a Dusty Key to Llevigar's Secret Library. Bob never returned his book.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:tripwire_hook"
+    },
+    "trigger": {
+      "type": "itemAtLocation",
+      "itemName": "Dusty Key",
+      "x": -1854,
+      "z": -4503,
+      "radius": 8
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Overdue"
+      },
+      "suffix": {
+        "text": "Borrower"
+      }
+    }
+  },
+  {
+    "id": "secret_tears_for_bob",
+    "category": "secret",
+    "name": "Tears for Bob",
+    "description": "Bring Bob's Tear to Ragni's Secret Library.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/ingredient/bobs_tear",
+      "fallback": "minecraft:ghast_tear"
+    },
+    "trigger": {
+      "type": "itemAtLocation",
+      "itemName": "Bob's Tear",
+      "x": -933,
+      "z": -1610,
+      "radius": 8
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Tearful"
+      },
+      "suffix": {
+        "text": "Bookworm"
+      }
+    }
+  },
+  {
+    "id": "secret_dynamite",
+    "category": "secret",
+    "name": "Shh, Library",
+    "description": "Walk into Lusuco's Secret Library carrying Dynamite.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:tnt"
+    },
+    "trigger": {
+      "type": "itemAtLocation",
+      "itemName": "Dynamite",
+      "x": -200,
+      "z": -281,
+      "radius": 8
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Explosive"
+      },
+      "suffix": {
+        "text": "Archivist"
       }
     }
   }

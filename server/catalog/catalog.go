@@ -72,6 +72,21 @@ type Trigger struct {
 	Amount        int    `json:"amount,omitempty"`
 	Statistic     string `json:"statistic,omitempty"`
 	RaidName      string `json:"raidName,omitempty"`
+
+	DungeonName     string   `json:"dungeonName,omitempty"`
+	DungeonNames    []string `json:"dungeonNames,omitempty"`
+	ProfessionName  string   `json:"professionName,omitempty"`
+	ProfessionNames []string `json:"professionNames,omitempty"`
+	TerritoryNames  []string `json:"territoryNames,omitempty"`
+	Gamemodes       []string `json:"gamemodes,omitempty"`
+	GuildRank       string   `json:"guildRank,omitempty"`
+	Rarity          string   `json:"rarity,omitempty"`
+	// ItemSets is met when every item of any one set is held or worn.
+	ItemSets [][]string `json:"itemSets,omitempty"`
+	// X, Z and Radius are a circle on the map, in blocks; height is ignored.
+	X      int `json:"x,omitempty"`
+	Z      int `json:"z,omitempty"`
+	Radius int `json:"radius,omitempty"`
 }
 
 // Icon is drawn inside the tier frame. Model is an item model from the
@@ -107,7 +122,29 @@ type Catalog struct {
 
 var tierPoints = map[string]int{"bronze": 1, "silver": 3, "gold": 5}
 
-var statistics = map[string]bool{"mobsKilled": true, "chestsFound": true}
+// Statistics are account-wide counters from the Wynncraft API's globalData.
+var statistics = map[string]bool{
+	"mobsKilled": true, "chestsFound": true, "wars": true, "dungeonsCompleted": true, "raidsCompleted": true,
+	"lootruns": true, "caves": true, "worldEvents": true, "completedQuests": true,
+}
+
+var professions = map[string]bool{
+	"Woodcutting": true, "Mining": true, "Fishing": true, "Farming": true, "Alchemism": true, "Armouring": true,
+	"Cooking": true, "Jeweling": true, "Scribing": true, "Tailoring": true, "Weaponsmithing": true, "Woodworking": true,
+}
+
+// Gamemodes and guild ranks use the Wynncraft API's names.
+var gamemodes = map[string]bool{
+	"hardcore": true, "ironman": true, "ultimate_ironman": true, "craftsman": true, "hunted": true,
+}
+
+var guildRanks = map[string]bool{
+	"recruit": true, "recruiter": true, "captain": true, "strategist": true, "chief": true, "owner": true,
+}
+
+var rarities = map[string]bool{
+	"unique": true, "rare": true, "set": true, "legendary": true, "fabled": true, "mythic": true,
+}
 
 var palettes = map[string]bool{
 	"rainbow": true, "red": true, "red_purple": true, "flame": true, "ember": true, "sunset": true,
@@ -264,8 +301,61 @@ func validateTrigger(t *Trigger) error {
 	case "statistic":
 		need("amount", t.Amount > 0)
 		if !statistics[t.Statistic] {
-			return fmt.Errorf("trigger.statistic must be mobsKilled or chestsFound")
+			return fmt.Errorf("unknown trigger.statistic %q", t.Statistic)
 		}
+	case "dungeon":
+		need("dungeonName", t.DungeonName != "")
+		need("amount", t.Amount > 0)
+	case "dungeonSet":
+		need("dungeonNames", allSet(t.DungeonNames))
+	case "professionLevel":
+		need("level", t.Level > 0)
+		if !professions[t.ProfessionName] {
+			return fmt.Errorf("unknown trigger.professionName %q", t.ProfessionName)
+		}
+	case "professionLevelAll":
+		need("professionNames", len(t.ProfessionNames) > 0)
+		need("level", t.Level > 0)
+		for _, name := range t.ProfessionNames {
+			if !professions[name] {
+				return fmt.Errorf("unknown profession %q in trigger.professionNames", name)
+			}
+		}
+	case "characterRoster":
+		need("level", t.Level > 0)
+	case "gamemodeLevel":
+		need("gamemodes", len(t.Gamemodes) > 0)
+		need("level", t.Level > 0)
+		for _, mode := range t.Gamemodes {
+			if !gamemodes[mode] {
+				return fmt.Errorf("unknown gamemode %q in trigger.gamemodes", mode)
+			}
+		}
+	case "playtime", "accountAge", "leaderboard", "shinyItem":
+		// Hours, years, the worst placement that counts, and items held.
+		need("amount", t.Amount > 0)
+	case "guild":
+		if !guildRanks[t.GuildRank] {
+			return fmt.Errorf("unknown trigger.guildRank %q", t.GuildRank)
+		}
+	case "coordinates":
+		need("radius", t.Radius > 0)
+	case "itemAtLocation":
+		need("itemName", t.ItemName != "")
+		need("radius", t.Radius > 0)
+	case "territorySet":
+		need("territoryNames", allSet(t.TerritoryNames))
+	case "itemRarityCount":
+		need("amount", t.Amount > 0)
+		if !rarities[t.Rarity] {
+			return fmt.Errorf("unknown trigger.rarity %q", t.Rarity)
+		}
+	case "itemSet":
+		ok := len(t.ItemSets) > 0
+		for _, set := range t.ItemSets {
+			ok = ok && allSet(set)
+		}
+		need("itemSets", ok)
 	default:
 		return fmt.Errorf("unsupported trigger type %q", t.Type)
 	}
@@ -274,6 +364,19 @@ func validateTrigger(t *Trigger) error {
 		return fmt.Errorf("trigger %s requires %s", t.Type, strings.Join(missing, ", "))
 	}
 	return nil
+}
+
+// allSet reports whether names is a list of at least two names, none empty.
+func allSet(names []string) bool {
+	if len(names) < 2 {
+		return false
+	}
+	for _, name := range names {
+		if name == "" {
+			return false
+		}
+	}
+	return true
 }
 
 func validateWord(w *Word) error {

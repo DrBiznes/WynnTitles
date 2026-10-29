@@ -137,6 +137,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			context.setScreen(() -> TitlesScreen.achievements(a -> !a.id().equals(undetectable.id())));
 			context.waitTicks(20);
 			screenshot(context, "wynntitles-achievements-tab");
+			screenshotWindowSizes(context);
 
 			context.setScreen(() -> null);
 			context.runOnClient(client -> client.getToastManager().clear());
@@ -202,6 +203,23 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		screenshotChat(context, achievement, "wynntitles-chat-wynnpack");
 	}
 
+	/**
+	 * Shoots the titles tab in a window too small for the panel at the GUI
+	 * scale, where it should shrink to fit and stay crisp, and in a large one,
+	 * then puts the window back.
+	 */
+	private static void screenshotWindowSizes(ClientGameTestContext context) {
+		int[] size = context.computeOnClient(client -> new int[] {
+				client.getWindow().getWidth(), client.getWindow().getHeight()});
+		for (int[] window : new int[][] {{800, 600}, {1920, 1080}}) {
+			context.getInput().resizeWindow(window[0], window[1]);
+			context.setScreen(TitlesScreen::new);
+			context.waitTicks(20);
+			screenshot(context, "wynntitles-titles-tab-" + window[0] + "x" + window[1]);
+		}
+		context.getInput().resizeWindow(size[0], size[1]);
+	}
+
 	/** Writes the unlock line and a command reply to an otherwise empty chat, to show the badge. */
 	private static void screenshotChat(ClientGameTestContext context, Catalog.Achievement achievement, String name) {
 		context.runOnClient(client -> {
@@ -215,7 +233,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 
 	/** Wheels the shop's list a little way down, to the palette rows, so their names can be checked for contrast. */
 	private static void scrollShopToPalettes(ClientGameTestContext context) {
-		// owo scrolls 15 GUI pixels a notch; four puts the palettes heading at the
+		// Lists scroll 15 panel pixels a notch (ScrollView.NOTCH); four puts the palettes heading at the
 		// top of the well, with the palette and animated rows below it.
 		double[] pos = context.computeOnClient(client -> new double[] {
 				client.getWindow().getScreenWidth() / 2.0,

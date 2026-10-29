@@ -35,7 +35,8 @@ class AchievementTrackerTest {
 	}
 
 	private static Catalog.Trigger trigger(String type, String questName) {
-		return new Catalog.Trigger(type, questName, null, 0, null, null, 0, null, null);
+		return new Catalog.Trigger(type, questName, null, 0, null, null, 0, null, null,
+				null, null, null, null, null, null, null, null, null, 0, 0, 0);
 	}
 
 	private static Catalog.Achievement achievement(Catalog.Trigger trigger) {

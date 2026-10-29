@@ -85,8 +85,8 @@ public class WynnTitles implements ClientModInitializer {
 		catalogs = new CatalogStore(api, dir.resolve("catalog.json"));
 		stats = new StatsStore(api);
 		titles = new TitleCache(api);
-		tracker = new AchievementTracker(
-				api, account, catalogs, WynntilsDetectors.create(), WynnTitles::announceUnlock, version);
+		tracker = new AchievementTracker(api, account, catalogs,
+				WynntilsDetectors.create(dir.resolve("territories.json")), WynnTitles::announceUnlock, version);
 
 		// Show our own new title right away instead of waiting for the cache to expire.
 		account.onChange(me -> titles.put(Mc.client().getUser().getProfileId(), me.title()));

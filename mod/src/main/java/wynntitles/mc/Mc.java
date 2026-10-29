@@ -1,11 +1,15 @@
 package wynntitles.mc;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Every call into Minecraft APIs that 26.x moved lives here, so a port only has
@@ -41,6 +45,19 @@ public final class Mc {
 				client().gui.getChat().addMessage(message);
 			}
 		});
+	}
+
+	/** Every stack the player carries, worn armour and the offhand included. */
+	public static List<ItemStack> inventory() {
+		if (client().player == null) {
+			return List.of();
+		}
+		Inventory inventory = client().player.getInventory();
+		List<ItemStack> items = new ArrayList<>(inventory.getContainerSize());
+		for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+			items.add(inventory.getItem(slot));
+		}
+		return items;
 	}
 
 	public static void toast(Toast toast) {

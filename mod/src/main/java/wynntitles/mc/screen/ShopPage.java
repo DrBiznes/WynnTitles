@@ -1,10 +1,5 @@
 package wynntitles.mc.screen;
 
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.core.Insets;
-import io.wispforest.owo.ui.core.Sizing;
-import io.wispforest.owo.ui.core.VerticalAlignment;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -18,6 +13,12 @@ import wynntitles.catalog.Catalog.ShopItem;
 import wynntitles.mc.Mc;
 import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.WynnFonts;
+import wynntitles.mc.screen.ui.Align;
+import wynntitles.mc.screen.ui.Box;
+import wynntitles.mc.screen.ui.Element;
+import wynntitles.mc.screen.ui.Insets;
+import wynntitles.mc.screen.ui.ScrollView;
+import wynntitles.mc.screen.ui.Size;
 import wynntitles.titles.Title;
 import wynntitles.titles.TitleWord;
 
@@ -37,13 +38,14 @@ final class ShopPage {
 	private Me me;
 	private TitleWord prefixWord;
 	private TitleWord suffixWord;
-	private FlowLayout footer;
+	private Box footer;
+	private ScrollView items;
 
 	ShopPage(Consumer<Me> onSaved) {
 		this.onSaved = onSaved;
 	}
 
-	FlowLayout build(Catalog catalog, Me me, TitleWord prefixWord, TitleWord suffixWord, int width, int height) {
+	Box build(Catalog catalog, Me me, TitleWord prefixWord, TitleWord suffixWord, int width, int height) {
 		this.catalog = catalog;
 		this.me = me;
 		this.prefixWord = prefixWord;
@@ -51,31 +53,34 @@ final class ShopPage {
 		if (selected != null && catalog.shopItem(selected.id()).isEmpty()) {
 			selected = null;
 		}
-		footer = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+		footer = Box.row(Size.content(), Size.content());
 		footer.gap(8);
-		footer.verticalAlignment(VerticalAlignment.CENTER);
+		footer.alignY(Align.CENTER);
 
-		FlowLayout page = UIContainers.verticalFlow(Sizing.fixed(width), Sizing.fixed(height));
+		Box page = Box.column(Size.fixed(width), Size.fixed(height));
 		page.gap(5);
-		page.child(StyleChips.nameplate(this::preview, me.username()));
-		FlowLayout heading = UIContainers.horizontalFlow(Sizing.fill(), Sizing.content());
+		page.child(StyleChips.nameplate(this::preview));
+		Box heading = Box.row(Size.fill(), Size.content());
 		heading.gap(6).margins(Insets.left(2));
 		heading.child(WynnUi.heading("Shop"));
 		// What the picked piece does, so the animations have names.
-		heading.child(new TitleText(this::caption, 1f, WynnUi.TEXT_DIM).sizing(Sizing.expand(), Sizing.content()));
+		heading.child(new TitleText(this::caption, 1f, WynnUi.TEXT_DIM).sizing(Size.expand(), Size.content()));
 		page.child(heading);
 
-		FlowLayout items = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
-		items.gap(3);
-		items.padding(Insets.of(0, 2, 3, 2));
-		StyleChips.addGroups(items, catalog, i -> true, this::chip, true);
-		page.child(WynnUi.well(Sizing.fill(), Sizing.expand(), items));
+		Box list = Box.column(Size.fill(), Size.content());
+		list.gap(3);
+		list.padding(Insets.of(0, 2, 3, 2));
+		StyleChips.addGroups(list, catalog, i -> true, this::chip, true);
+		// Buying rebuilds the page; stay where the player was in the list.
+		double offset = items == null ? 0 : items.offset();
+		items = WynnUi.well(Size.fill(), Size.expand(), list).scrollTo(offset);
+		page.child(items);
 
 		refreshFooter();
 		return page;
 	}
 
-	FlowLayout footer() {
+	Box footer() {
 		return footer;
 	}
 
@@ -97,10 +102,10 @@ final class ShopPage {
 		return selected == null ? Component.empty() : WynnFonts.body(StyleChips.describe(catalog, selected));
 	}
 
-	private FlowLayout chip(ShopItem item) {
+	private Box chip(ShopItem item) {
 		boolean owned = me.owns(item.id());
 		// The price is in the tooltip and on the buy button, so the chips stay short.
-		Component badge = owned ? WynnFonts.small("owned").withColor(WynnUi.UNLOCKED) : null;
+		Element badge = owned ? StyleChips.ownedMark() : null;
 		Component tooltip = StyleChips.tooltip(item.name(), StyleChips.describe(catalog, item), ChatFormatting.GRAY)
 				.append(owned
 						? Component.literal("\nOwned: wear it from the Styles tab").withStyle(ChatFormatting.GREEN)

@@ -1,10 +1,5 @@
 package wynntitles.mc.screen;
 
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.core.Insets;
-import io.wispforest.owo.ui.core.Sizing;
-import io.wispforest.owo.ui.core.VerticalAlignment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +14,11 @@ import wynntitles.catalog.Catalog.ShopItem;
 import wynntitles.mc.Mc;
 import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.WynnFonts;
+import wynntitles.mc.screen.ui.Align;
+import wynntitles.mc.screen.ui.Box;
+import wynntitles.mc.screen.ui.Insets;
+import wynntitles.mc.screen.ui.ScrollView;
+import wynntitles.mc.screen.ui.Size;
 import wynntitles.titles.Title;
 import wynntitles.titles.TitleStyle;
 import wynntitles.titles.TitleWord;
@@ -53,8 +53,9 @@ final class StylesPage {
 	private Me me;
 	private TitleWord prefixWord;
 	private TitleWord suffixWord;
-	private FlowLayout slots;
-	private FlowLayout footer;
+	private Box slots;
+	private Box footer;
+	private ScrollView ownedList;
 
 	StylesPage(Consumer<Me> onSaved) {
 		this.onSaved = onSaved;
@@ -67,33 +68,35 @@ final class StylesPage {
 	}
 
 	/** The words are the ones picked on the titles tab, equipped or not. */
-	FlowLayout build(Catalog catalog, Me me, TitleWord prefixWord, TitleWord suffixWord, int width, int height) {
+	Box build(Catalog catalog, Me me, TitleWord prefixWord, TitleWord suffixWord, int width, int height) {
 		this.catalog = catalog;
 		this.me = me;
 		this.prefixWord = prefixWord;
 		this.suffixWord = suffixWord;
-		// Built fresh each time: owo does not draw a layout again once its parent has removed it.
-		footer = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+		footer = Box.row(Size.content(), Size.content());
 		footer.gap(8);
-		footer.verticalAlignment(VerticalAlignment.CENTER);
+		footer.alignY(Align.CENTER);
 
-		FlowLayout page = UIContainers.verticalFlow(Sizing.fixed(width), Sizing.fixed(height));
+		Box page = Box.column(Size.fixed(width), Size.fixed(height));
 		page.gap(5);
-		page.child(StyleChips.nameplate(this::preview, me.username()));
+		page.child(StyleChips.nameplate(this::preview));
 
-		FlowLayout columns = UIContainers.horizontalFlow(Sizing.fill(), Sizing.expand());
+		Box columns = Box.row(Size.fill(), Size.expand());
 		columns.gap(8);
-		FlowLayout left = UIContainers.verticalFlow(Sizing.fixed(SLOT_WIDTH), Sizing.fill());
+		Box left = Box.column(Size.fixed(SLOT_WIDTH), Size.fill());
 		left.gap(3);
 		left.child(WynnUi.heading("Slot").margins(Insets.left(2)));
-		slots = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
-		left.child(WynnUi.well(Sizing.fill(), Sizing.expand(), slots));
+		slots = Box.column(Size.fill(), Size.content());
+		left.child(WynnUi.well(Size.fill(), Size.expand(), slots));
 		columns.child(left);
 
-		FlowLayout right = UIContainers.verticalFlow(Sizing.expand(), Sizing.fill());
+		Box right = Box.column(Size.expand(), Size.fill());
 		right.gap(3);
 		right.child(WynnUi.heading("Your styles").margins(Insets.left(2)));
-		right.child(WynnUi.well(Sizing.fill(), Sizing.expand(), owned()));
+		// Wearing rebuilds the page; stay where the player was in the list.
+		double offset = ownedList == null ? 0 : ownedList.offset();
+		ownedList = WynnUi.well(Size.fill(), Size.expand(), owned()).scrollTo(offset);
+		right.child(ownedList);
 		columns.child(right);
 		page.child(columns);
 
@@ -102,7 +105,7 @@ final class StylesPage {
 	}
 
 	/** The actions for the panel's footer, from the last build. */
-	FlowLayout footer() {
+	Box footer() {
 		return footer;
 	}
 
@@ -121,11 +124,11 @@ final class StylesPage {
 				: TitleRenderer.render(title);
 	}
 
-	private FlowLayout slotRow(Slot s, TitleWord word) {
-		FlowLayout row = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
+	private Box slotRow(Slot s, TitleWord word) {
+		Box row = Box.column(Size.fill(), Size.content());
 		row.gap(2);
 		row.padding(Insets.of(3, 3, 5, 2));
-		FlowLayout heading = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+		Box heading = Box.row(Size.content(), Size.content());
 		heading.gap(4);
 		heading.child(WynnUi.label(WynnFonts.small(s.label), s == slot ? WynnUi.GOLD : WynnUi.TEXT_DIM));
 		if (drafts[s.ordinal()] == null) {
@@ -146,13 +149,13 @@ final class StylesPage {
 		return row;
 	}
 
-	private FlowLayout owned() {
-		FlowLayout list = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
+	private Box owned() {
+		Box list = Box.column(Size.fill(), Size.content());
 		list.gap(3);
 		list.padding(Insets.of(2, 2, 3, 2));
 
 		list.child(WynnUi.heading("Look"));
-		FlowLayout look = StyleChips.row();
+		Box look = StyleChips.row();
 		look.child(StyleChips.chip(WynnUi.label(WynnFonts.body("Native"), WynnUi.TEXT), null,
 				() -> draft() == null,
 				StyleChips.tooltip("Native", "The word's own style from its achievement", ChatFormatting.GRAY),

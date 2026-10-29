@@ -1,16 +1,6 @@
 package wynntitles.mc.screen;
 
-import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.LabelComponent;
-import io.wispforest.owo.ui.component.UIComponents;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.container.ScrollContainer;
-import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.core.Color;
-import io.wispforest.owo.ui.core.Insets;
-import io.wispforest.owo.ui.core.Sizing;
-import io.wispforest.owo.ui.core.Surface;
-import io.wispforest.owo.ui.core.UIComponent;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -21,6 +11,13 @@ import net.minecraft.sounds.SoundEvents;
 import wynntitles.WynnTitles;
 import wynntitles.mc.Mc;
 import wynntitles.mc.WynnFonts;
+import wynntitles.mc.screen.ui.Box;
+import wynntitles.mc.screen.ui.Element;
+import wynntitles.mc.screen.ui.Insets;
+import wynntitles.mc.screen.ui.Label;
+import wynntitles.mc.screen.ui.Painter;
+import wynntitles.mc.screen.ui.ScrollView;
+import wynntitles.mc.screen.ui.Size;
 
 /**
  * The look of WynnTitles' screens, after Wynncraft's raid start screen: a regal
@@ -53,6 +50,10 @@ final class WynnUi {
 	static final Identifier ROW_HOVER = sprite("row_hover");
 	static final Identifier ROW_SELECTED = sprite("row_selected");
 
+	/** The lighter band on every other row of a list. */
+	static final Painter STRIPE = (graphics, e) ->
+			graphics.fill(e.x(), e.y(), e.x() + e.width(), e.y() + e.height(), 0x0FFFF5EB);
+
 	static final int BUTTON_HEIGHT = 18;
 	static final int SCROLLBAR_WIDTH = 5;
 	/** How much narrower a well's content is than the well. */
@@ -70,9 +71,9 @@ final class WynnUi {
 		return Identifier.fromNamespaceAndPath(WynnTitles.MOD_ID, "widget/" + name);
 	}
 
-	static Surface surface(Identifier sprite) {
-		return (graphics, component) -> blit(graphics, sprite,
-				component.x(), component.y(), component.width(), component.height());
+	/** The sprite stretched (or nine-sliced, per its .mcmeta) over the element. */
+	static Painter surface(Identifier sprite) {
+		return (graphics, e) -> blit(graphics, sprite, e.x(), e.y(), e.width(), e.height());
 	}
 
 	static void blit(GuiGraphics graphics, Identifier sprite, int x, int y, int width, int height) {
@@ -84,60 +85,43 @@ final class WynnUi {
 		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, width, height, 0xFF000000 | tint);
 	}
 
-	static LabelComponent label(Component text, int color) {
-		LabelComponent label = UIComponents.label(text);
-		label.color(Color.ofRgb(color)).shadow(false);
-		return label;
+	static Label label(Component text, int color) {
+		return new Label(text, color);
 	}
 
 	/** The red ribbon across the top edge, with the screen's title in outlined white. */
-	static FlowLayout ribbon(String text) {
-		FlowLayout ribbon = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(20));
-		ribbon.padding(Insets.of(3, 0, 13, 13)).surface(surface(RIBBON));
+	static Box ribbon(String text) {
+		Box ribbon = Box.row(Size.content(), Size.fixed(20));
+		ribbon.padding(Insets.of(3, 0, 13, 13)).background(surface(RIBBON));
 		ribbon.child(new OutlinedText(WynnFonts.body(text), 0xFFFFFF, OUTLINE));
 		return ribbon;
 	}
 
 	/** A small-caps label such as a column heading. */
-	static LabelComponent heading(String text) {
+	static Label heading(String text) {
 		return label(WynnFonts.small(text), GOLD);
 	}
 
 	/** A stone button with dark lettering, like the raid screen's "Ready!". */
-	static ButtonComponent button(String text, int width, boolean active, Runnable onPress) {
-		ButtonComponent button = UIComponents.button(
-				WynnFonts.small(text).withColor(active ? INK : INK_DISABLED), b -> onPress.run());
-		button.renderer((graphics, b, delta) -> blit(graphics,
-						!b.active ? BUTTON_DISABLED : b.isHovered() ? BUTTON_HOVER : BUTTON,
-						b.getX(), b.getY(), b.getWidth(), b.getHeight()))
-				.textShadow(false)
-				.sizing(Sizing.fixed(width), Sizing.fixed(BUTTON_HEIGHT));
-		button.active(active);
-		return button;
+	static Element button(String text, int width, boolean active, Runnable onPress) {
+		return new StoneButton(WynnFonts.small(text).withColor(active ? INK : INK_DISABLED), width, active, onPress);
 	}
 
 	/**
-	 * Scrolls its content inside an engraved well, with a gold handle. owo draws
-	 * the scrollbar over the content's right edge, so the content is padded clear of it.
-	 * No scroll step: owo rounds a stepped offset down to a whole step, so the
-	 * last few pixels of a list could never scroll into view.
+	 * Scrolls its content inside an engraved well, with a gold handle. The
+	 * scrollbar is drawn over the content's right edge, so the content is padded clear of it.
 	 */
-	static ScrollContainer<UIComponent> well(Sizing width, Sizing height, UIComponent content) {
-		FlowLayout clear = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
+	static ScrollView well(Size width, Size height, Element content) {
+		Box clear = Box.column(Size.fill(), Size.content());
 		clear.child(content);
 		clear.padding(Insets.right(SCROLLBAR_WIDTH + 1));
-		ScrollContainer<UIComponent> scroll = UIContainers.verticalScroll(width, height, clear);
-		scroll.scrollbar((graphics, x, y, w, h, trackX, trackY, trackW, trackH, lastInteract, direction, active) -> {
-					if (!active) {
-						return;
-					}
+		return new ScrollView(width, height, clear)
+				.scrollbar((graphics, thumbX, thumbY, thumbW, thumbH, trackX, trackY, trackW, trackH) -> {
 					blit(graphics, SCROLL_TRACK, trackX, trackY, trackW, trackH);
-					blit(graphics, SCROLL_THUMB, x, y, w, h);
-				})
-				.scrollbarThiccness(SCROLLBAR_WIDTH)
+					blit(graphics, SCROLL_THUMB, thumbX, thumbY, thumbW, thumbH);
+				}, SCROLLBAR_WIDTH)
 				.padding(Insets.of(3, 3, 3, 2))
-				.surface(surface(WELL));
-		return scroll;
+				.background(surface(WELL));
 	}
 
 	static void playClick() {
@@ -150,5 +134,46 @@ final class WynnUi {
 
 	private static void play(SoundEvent sound, float pitch) {
 		Mc.client().getSoundManager().play(SimpleSoundInstance.forUI(sound, pitch));
+	}
+
+	/**
+	 * Fires on press, like vanilla buttons, and sinks its lettering a pixel
+	 * while held, so it feels pushed in.
+	 */
+	private static final class StoneButton extends Element {
+		private final Component text;
+		private final boolean active;
+		private final Runnable onPress;
+
+		StoneButton(Component text, int width, boolean active, Runnable onPress) {
+			this.text = text;
+			this.active = active;
+			this.onPress = onPress;
+			sizing(Size.fixed(width), Size.fixed(BUTTON_HEIGHT));
+		}
+
+		@Override
+		protected boolean click(double mouseX, double mouseY) {
+			if (!active) {
+				return false;
+			}
+			playClick();
+			onPress.run();
+			return true;
+		}
+
+		@Override
+		protected boolean clickable(double mouseX, double mouseY) {
+			return active;
+		}
+
+		@Override
+		public void draw(GuiGraphics graphics, int mouseX, int mouseY) {
+			blit(graphics, !active ? BUTTON_DISABLED : hovered() ? BUTTON_HOVER : BUTTON, x, y, width, height);
+			Font font = Mc.client().font;
+			int sink = active && pressed() ? 1 : 0;
+			graphics.drawString(font, text, x + (width - font.width(text)) / 2, y + (height - 8) / 2 + sink,
+					0xFFFFFFFF, false);
+		}
 	}
 }

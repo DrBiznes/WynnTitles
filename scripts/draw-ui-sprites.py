@@ -426,6 +426,28 @@ def chip(state):
     return cv, dict(width=W, height=H, border=3)
 
 
+# The tick on a shop chip for a piece you own: a green seal with a light check.
+OWNED = [
+    '.#######.',
+    '#hhhhhhh#',
+    '#ggggggg#',
+    '#gggggwg#',
+    '#ggggwgg#',
+    '#gwgwggg#',
+    '#ggwgggg#',
+    '#ddddddd#',
+    '.#######.',
+]
+OWNED_PAL = {'#': OUT, 'h': c('#7fd96a'), 'g': c('#3f9b3a'), 'd': c('#26661f'), 'w': c('#f4ffe8')}
+
+
+def owned():
+    """9x9 tick drawn at the right of an owned shop chip (StyleChips), not stretched."""
+    cv = Canvas(9, 9)
+    cv.stamp(0, 0, OWNED, OWNED_PAL)
+    return cv, None
+
+
 def scroll_track():
     """5x16 scrollbar track, border 2."""
     cv = Canvas(5, 16)
@@ -626,6 +648,7 @@ SPRITES = {
     'chip': chip('normal'),
     'chip_hover': chip('hover'),
     'chip_selected': chip('selected'),
+    'owned': owned(),
     'scroll_track': scroll_track(),
     'scroll_thumb': scroll_thumb(),
     'nameplate': nameplate(),
@@ -641,7 +664,7 @@ SPRITES = {
     'toast': toast(),
 }
 
-for rows in (SKULL, EYE):
+for rows in (SKULL, EYE, OWNED):
     assert len({len(r) for r in rows}) == 1, rows
 
 out = sys.argv[1]

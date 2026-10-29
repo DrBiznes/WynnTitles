@@ -76,6 +76,51 @@ func TestRaidTrigger(t *testing.T) {
 	}
 }
 
+func TestTriggerParameters(t *testing.T) {
+	withTrigger := func(trigger string) []byte {
+		return []byte(`[` + strings.Replace(valid("a"), `{"type": "quest", "questName": "Q"}`, trigger, 1) + `]`)
+	}
+	good := []string{
+		`{"type": "statistic", "statistic": "wars", "amount": 100}`,
+		`{"type": "dungeon", "dungeonName": "Decrepit Sewers", "amount": 1}`,
+		`{"type": "dungeonSet", "dungeonNames": ["Ice Barrows", "Infested Pit"]}`,
+		`{"type": "professionLevel", "professionName": "Mining", "level": 132}`,
+		`{"type": "professionLevelAll", "professionNames": ["Mining", "Fishing"], "level": 125}`,
+		`{"type": "characterRoster", "level": 50}`,
+		`{"type": "gamemodeLevel", "gamemodes": ["hardcore", "hunted"], "level": 80}`,
+		`{"type": "playtime", "amount": 100}`,
+		`{"type": "guild", "guildRank": "owner"}`,
+		`{"type": "coordinates", "x": 13777, "z": -4042, "radius": 64}`,
+		`{"type": "itemAtLocation", "itemName": "Dynamite", "x": -200, "z": -281, "radius": 8}`,
+		`{"type": "territorySet", "territoryNames": ["Ragni", "Detlas"]}`,
+		`{"type": "itemRarityCount", "rarity": "mythic", "amount": 3}`,
+		`{"type": "itemSet", "itemSets": [["A", "B"], ["C", "D"]]}`,
+	}
+	for _, trigger := range good {
+		if _, err := Parse(withTrigger(trigger), []byte(testShop)); err != nil {
+			t.Errorf("%s: %v", trigger, err)
+		}
+	}
+	bad := []string{
+		`{"type": "statistic", "statistic": "pvpKills", "amount": 1}`,
+		`{"type": "dungeon", "dungeonName": "Decrepit Sewers"}`,
+		`{"type": "dungeonSet", "dungeonNames": ["Ice Barrows"]}`,
+		`{"type": "professionLevel", "professionName": "Smithing", "level": 100}`,
+		`{"type": "professionLevelAll", "professionNames": ["Mining", "mining"], "level": 100}`,
+		`{"type": "gamemodeLevel", "gamemodes": ["HARDCORE"], "level": 50}`,
+		`{"type": "guild", "guildRank": "king"}`,
+		`{"type": "coordinates", "x": 1, "z": 1}`,
+		`{"type": "itemAtLocation", "x": 1, "z": 1, "radius": 8}`,
+		`{"type": "itemRarityCount", "rarity": "epic", "amount": 1}`,
+		`{"type": "itemSet", "itemSets": [["A", "B"], ["C"]]}`,
+	}
+	for _, trigger := range bad {
+		if _, err := Parse(withTrigger(trigger), []byte(testShop)); err == nil {
+			t.Errorf("%s: expected an error", trigger)
+		}
+	}
+}
+
 func TestParseRejectsBadEntries(t *testing.T) {
 	cases := map[string]string{
 		"duplicate id":  `[` + valid("a") + `,` + valid("a") + `]`,
