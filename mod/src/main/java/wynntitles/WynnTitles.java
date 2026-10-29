@@ -12,6 +12,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
@@ -144,15 +145,20 @@ public class WynnTitles implements ClientModInitializer {
 		if (!WynnTitlesConfig.get().announceUnlocks) {
 			return;
 		}
+		Mc.chat(unlockMessage(achievement));
+		Mc.toast(new UnlockToast(achievement));
+	}
+
+	/** The chat line for an unlock, badge included. */
+	public static MutableComponent unlockMessage(Catalog.Achievement achievement) {
 		Title reward = Title.of(achievement.rewards().prefix(), achievement.rewards().suffix());
 		var message = Component.literal("Achievement unlocked: ").withStyle(ChatFormatting.GOLD)
 				.append(Component.literal(achievement.name()).withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD));
 		if (reward != null) {
 			message.append(Component.literal("\n New title words: ").withStyle(ChatFormatting.GRAY))
 					.append(TitleRenderer.render(reward))
-					.append(Component.literal(" (press ` or /wt to equip)").withStyle(ChatFormatting.DARK_GRAY));
+					.append(Component.literal(" (press ` or /titles to equip)").withStyle(ChatFormatting.DARK_GRAY));
 		}
-		Mc.chat(Mc.tagged(message));
-		Mc.toast(new UnlockToast(achievement));
+		return Mc.tagged(message);
 	}
 }

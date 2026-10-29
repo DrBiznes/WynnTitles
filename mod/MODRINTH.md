@@ -27,7 +27,7 @@ WynnTitles adds achievements to Wynncraft. Each achievement unlocks title words,
 
 - 30 achievements at launch for combat levels, profession levels, quests, places, items and statistics. New achievements arrive from the server without a mod update.
 - Titles show on the Wynntils nametag stack, above player names.
-- Achievement and title screens: press `` ` `` or type `/wt`.
+- Achievement and title screens: press `` ` `` or type `/titles`.
 - Unlock toasts and chat announcements, both optional.
 - Options in Mod Menu: hide other players' titles, turn off announcements, or point the mod at your own server.
 
@@ -37,7 +37,7 @@ WynnTitles is a Wynntils addon. It needs Wynntils, owo-lib and Fabric API, and t
 
 **Network and privacy**
 
-WynnTitles talks to the WynnTitles server at `wynntitles.jamino.me`, and only while you are connected to Wynncraft. It sends nothing in singleplayer or on other servers unless you open its screen or run `/wt` there. Here is everything it sends and why:
+WynnTitles talks to the WynnTitles server at `wynntitles.jamino.me`, and only while you are connected to Wynncraft. It sends nothing in singleplayer or on other servers unless you open its screen or run `/titles` there. Here is everything it sends and why:
 
 - **Login.** When you join Wynncraft, the mod proves that you own your Minecraft account with the standard Mojang session check, the one every multiplayer server uses. Your access token goes only to Mojang's session server, never to WynnTitles. WynnTitles receives your username and UUID.
 - **Achievements.** When you earn an achievement, the mod sends the achievement ID along with the Wynntils data that triggered it (for example your combat level or the quest name).

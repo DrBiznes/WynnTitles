@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "server-dev",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd server && WT_OFFLINE_AUTH=true WT_ADDR=127.0.0.1:8090 WT_DB=data/dev.db exec go run ./cmd/wynntitles"],
+      "port": 8090,
+      "url": "http://localhost:8090"
+    }
+  ]
+}

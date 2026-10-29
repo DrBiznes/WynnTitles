@@ -79,6 +79,11 @@ final class WynnUi {
 		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, width, height);
 	}
 
+	/** Like blit, with the sprite's colors multiplied by an RGB tint, for sprites drawn in greys to be tinted. */
+	static void blit(GuiGraphics graphics, Identifier sprite, int x, int y, int width, int height, int tint) {
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, width, height, 0xFF000000 | tint);
+	}
+
 	static LabelComponent label(Component text, int color) {
 		LabelComponent label = UIComponents.label(text);
 		label.color(Color.ofRgb(color)).shadow(false);
@@ -114,6 +119,8 @@ final class WynnUi {
 	/**
 	 * Scrolls its content inside an engraved well, with a gold handle. owo draws
 	 * the scrollbar over the content's right edge, so the content is padded clear of it.
+	 * No scroll step: owo rounds a stepped offset down to a whole step, so the
+	 * last few pixels of a list could never scroll into view.
 	 */
 	static ScrollContainer<UIComponent> well(Sizing width, Sizing height, UIComponent content) {
 		FlowLayout clear = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
@@ -128,7 +135,6 @@ final class WynnUi {
 					blit(graphics, SCROLL_THUMB, x, y, w, h);
 				})
 				.scrollbarThiccness(SCROLLBAR_WIDTH)
-				.scrollStep(14)
 				.padding(Insets.of(3, 3, 3, 2))
 				.surface(surface(WELL));
 		return scroll;

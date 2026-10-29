@@ -159,8 +159,10 @@ final class StylesPage {
 				() -> setDraft(null)));
 		list.child(look);
 
-		StyleChips.addGroups(list, catalog, i -> me.owns(i.id()), item -> StyleChips.chip(
-				StyleChips.label(catalog, item), null, () -> wears(item), null, () -> toggle(item)));
+		StyleChips.addGroups(list, catalog, i -> me.owns(i.id()), item -> StyleChips.chip(item,
+				StyleChips.label(catalog, item), null, () -> wears(item),
+				StyleChips.tooltip(item.name(), StyleChips.describe(catalog, item), ChatFormatting.GRAY),
+				() -> toggle(item)));
 		if (me.owned().isEmpty()) {
 			list.child(WynnUi.label(WynnFonts.body("Buy colors, palettes and formats on the Shop tab."), WynnUi.TEXT_DIM)
 					.maxWidth(220)

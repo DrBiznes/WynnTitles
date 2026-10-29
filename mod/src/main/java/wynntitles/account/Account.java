@@ -96,7 +96,7 @@ public final class Account {
 		});
 	}
 
-	/** Forces a fresh Mojang handshake, e.g. from /wt login. */
+	/** Forces a fresh Mojang handshake, e.g. from /titles login. */
 	public CompletableFuture<Me> relogin() {
 		forgetSession();
 		return refresh();

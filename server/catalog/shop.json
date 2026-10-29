@@ -184,79 +184,90 @@
   {
     "id": "animated_red",
     "kind": "animatedPalette",
-    "name": "Crimson",
-    "price": 8,
-    "palette": "red"
+    "name": "Heartbeat",
+    "price": 9,
+    "palette": "red",
+    "animation": "pulse"
   },
   {
     "id": "animated_red_purple",
     "kind": "animatedPalette",
-    "name": "Blood Moon",
-    "price": 8,
-    "palette": "red_purple"
+    "name": "Blood Tide",
+    "price": 9,
+    "palette": "red_purple",
+    "animation": "flow"
   },
   {
     "id": "animated_flame",
     "kind": "animatedPalette",
-    "name": "Flame",
-    "price": 8,
-    "palette": "flame"
+    "name": "Wildfire",
+    "price": 9,
+    "palette": "flame",
+    "animation": "flicker"
   },
   {
     "id": "animated_ember",
     "kind": "animatedPalette",
-    "name": "Ember",
-    "price": 8,
-    "palette": "ember"
+    "name": "Cinders",
+    "price": 9,
+    "palette": "ember",
+    "animation": "sparkle"
   },
   {
     "id": "animated_sunset",
     "kind": "animatedPalette",
-    "name": "Sunset",
-    "price": 8,
-    "palette": "sunset"
+    "name": "Golden Hour",
+    "price": 9,
+    "palette": "sunset",
+    "animation": "flow"
   },
   {
     "id": "animated_ocean",
     "kind": "animatedPalette",
-    "name": "Ocean",
-    "price": 8,
-    "palette": "ocean"
+    "name": "Riptide",
+    "price": 9,
+    "palette": "ocean",
+    "animation": "wave"
   },
   {
     "id": "animated_ice",
     "kind": "animatedPalette",
-    "name": "Ice",
-    "price": 8,
-    "palette": "ice"
+    "name": "Frostglint",
+    "price": 9,
+    "palette": "ice",
+    "animation": "shimmer"
   },
   {
     "id": "animated_toxic",
     "kind": "animatedPalette",
-    "name": "Toxic",
-    "price": 8,
-    "palette": "toxic"
+    "name": "Meltdown",
+    "price": 9,
+    "palette": "toxic",
+    "animation": "flicker"
   },
   {
     "id": "animated_forest",
     "kind": "animatedPalette",
-    "name": "Forest",
-    "price": 8,
-    "palette": "forest"
+    "name": "Canopy",
+    "price": 9,
+    "palette": "forest",
+    "animation": "wave"
   },
   {
     "id": "animated_royal",
     "kind": "animatedPalette",
-    "name": "Royal",
-    "price": 8,
-    "palette": "royal"
+    "name": "Regalia",
+    "price": 9,
+    "palette": "royal",
+    "animation": "shimmer"
   },
   {
     "id": "animated_void",
     "kind": "animatedPalette",
-    "name": "Void",
-    "price": 8,
-    "palette": "void"
+    "name": "Starfall",
+    "price": 9,
+    "palette": "void",
+    "animation": "sparkle"
   },
   {
     "id": "rainbow",

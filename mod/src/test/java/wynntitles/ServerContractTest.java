@@ -111,6 +111,18 @@ class ServerContractTest {
 		assertNull(me.styles().prefix());
 		assertEquals(first.points() + greg.points(), me.balance());
 
+		// An animated palette carries its animation through the server to the nametag.
+		Catalog.Achievement palace = catalog.get("raid_twp").orElseThrow();
+		account.withToken(t -> api.claim(t, palace.id(), palace.trigger().type(), evidence, "test")).get();
+		Catalog.ShopItem animated = catalog.shopItem("animated_ocean").orElseThrow();
+		account.buy(List.of(animated.id())).get();
+		TitleStyle wave = new TitleStyle(animated.id(), List.of());
+		me = account.setStyle(wave, null).get();
+		assertEquals(catalog.restyle(greg.rewards().prefix(), wave).runs(), me.title().runs());
+		assertEquals(animated.animation(), me.title().runs().get(0).effect().animation());
+		me = account.resetPurchases().get();
+		assertEquals(first.points() + greg.points() + palace.points(), me.balance());
+
 		// A second Account reuses the cached token instead of logging in again.
 		Account restarted = new Account(api, new FakeSession(uuid, username) {
 			@Override

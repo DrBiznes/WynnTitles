@@ -11,7 +11,9 @@ import java.util.concurrent.CompletableFuture;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.player.RemotePlayer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +26,7 @@ import wynntitles.api.ApiTypes.Me;
 import wynntitles.catalog.Catalog;
 import wynntitles.config.WynnTitlesConfig;
 import wynntitles.mc.Icons;
+import wynntitles.mc.Mc;
 import wynntitles.mc.UnlockToast;
 import wynntitles.mc.WynnFonts;
 import wynntitles.mc.screen.TitlesScreen;
@@ -92,6 +95,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			}
 			context.waitTicks(5);
 			screenshot(context, "wynntitles-nametag");
+			screenshotAnimatedNametags(context, catalog, dummyAchievement);
 
 			context.setScreen(TitlesScreen::new);
 			context.waitForScreen(TitlesScreen.class);
@@ -119,6 +123,10 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			context.setScreen(TitlesScreen::shop);
 			context.waitTicks(20);
 			screenshot(context, "wynntitles-shop-tab");
+			scrollShopToPalettes(context);
+			screenshot(context, "wynntitles-shop-tab-palettes");
+			scrollShopToEnd(context);
+			screenshot(context, "wynntitles-shop-tab-scrolled");
 
 			// Pretend this mod version cannot detect the first locked achievement,
 			// as if the catalog had gained a trigger type after it shipped.
@@ -136,6 +144,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			// Let the toast slide in fully before the shot.
 			context.waitTicks(30);
 			context.takeScreenshot("wynntitles-unlock-toast");
+			screenshotChat(context, ownAchievement, "wynntitles-chat");
 
 			screenshotWithWynncraftPack(context, ownAchievement);
 		}
@@ -179,6 +188,8 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		context.setScreen(TitlesScreen::shop);
 		context.waitTicks(20);
 		screenshot(context, "wynntitles-shop-tab-wynnpack");
+		scrollShopToPalettes(context);
+		screenshot(context, "wynntitles-shop-tab-palettes-wynnpack");
 		context.setScreen(TitlesScreen::achievements);
 		context.waitTicks(20);
 		screenshot(context, "wynntitles-achievements-tab-wynnpack");
@@ -187,6 +198,75 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		context.runOnClient(client -> client.getToastManager().addToast(new UnlockToast(achievement)));
 		context.waitTicks(30);
 		context.takeScreenshot("wynntitles-unlock-toast-wynnpack");
+		context.runOnClient(client -> check(WynnFonts.pillsLoaded(), "the Wynncraft pack should provide its chat pills"));
+		screenshotChat(context, achievement, "wynntitles-chat-wynnpack");
+	}
+
+	/** Writes the unlock line and a command reply to an otherwise empty chat, to show the badge. */
+	private static void screenshotChat(ClientGameTestContext context, Catalog.Achievement achievement, String name) {
+		context.runOnClient(client -> {
+			client.gui.getChat().clearMessages(false);
+			Mc.chat(WynnTitles.unlockMessage(achievement));
+			Mc.chat(Mc.tagged(Component.literal("Reloaded titles and achievements.").withStyle(ChatFormatting.GREEN)));
+		});
+		context.waitTicks(5);
+		screenshot(context, name);
+	}
+
+	/** Wheels the shop's list a little way down, to the palette rows, so their names can be checked for contrast. */
+	private static void scrollShopToPalettes(ClientGameTestContext context) {
+		// owo scrolls 15 GUI pixels a notch; four puts the palettes heading at the
+		// top of the well, with the palette and animated rows below it.
+		double[] pos = context.computeOnClient(client -> new double[] {
+				client.getWindow().getScreenWidth() / 2.0,
+				client.getWindow().getScreenHeight() / 2.0 + 30 * client.getWindow().getGuiScale()});
+		context.getInput().setCursorPos(pos[0], pos[1]);
+		for (int i = 0; i < 4; i++) {
+			context.getInput().scroll(-1);
+		}
+		context.waitTicks(20);
+	}
+
+	/** Wheels the shop's list as far down as it goes, so the shot shows whether the last row is cut off. */
+	private static void scrollShopToEnd(ClientGameTestContext context) {
+		// The list's well sits about 30 GUI pixels below the middle of the screen.
+		double[] pos = context.computeOnClient(client -> new double[] {
+				client.getWindow().getScreenWidth() / 2.0,
+				client.getWindow().getScreenHeight() / 2.0 + 30 * client.getWindow().getGuiScale()});
+		context.getInput().setCursorPos(pos[0], pos[1]);
+		for (int i = 0; i < 20; i++) {
+			context.getInput().scroll(-1);
+		}
+		context.waitTicks(20);
+	}
+
+	/**
+	 * Dresses the dummy's nametag in one animated palette per animation, as the
+	 * mod's own preview builds it, and shoots two frames of each, so the shots
+	 * show the nametag moving the way the shop's chips do. Client side only: the
+	 * title cache is told the dummy's title directly, then given it back.
+	 */
+	private static void screenshotAnimatedNametags(ClientGameTestContext context, Catalog catalog,
+			Catalog.Achievement achievement) {
+		UUID dummy = offlineUuid(DUMMY_NAME);
+		wynntitles.titles.TitleWord prefix = achievement.rewards().prefix();
+		wynntitles.titles.TitleWord suffix = achievement.rewards().suffix();
+		java.util.Set<String> shot = new java.util.HashSet<>();
+		for (Catalog.ShopItem item : catalog.shop()) {
+			if (!Catalog.ShopItem.ANIMATED_PALETTE.equals(item.kind()) || !shot.add(item.animation())) {
+				continue;
+			}
+			TitleStyle style = new TitleStyle(item.id(), List.of());
+			wynntitles.titles.Title title = wynntitles.titles.Title.of(
+					catalog.restyle(prefix, style), catalog.restyle(suffix, style));
+			context.runOnClient(client -> WynnTitles.titles().put(dummy, title));
+			context.waitTicks(3);
+			screenshot(context, "wynntitles-nametag-" + item.animation() + "-1");
+			context.waitTicks(8);
+			screenshot(context, "wynntitles-nametag-" + item.animation() + "-2");
+		}
+		check(shot.size() == wynntitles.titles.TitleAnimation.values().length, "the shop should sell every animation, got " + shot);
+		context.runOnClient(client -> WynnTitles.titles().put(dummy, wynntitles.titles.Title.of(prefix, suffix)));
 	}
 
 	/** Icons resolve through the fake pack, and fall back when a model is missing. */

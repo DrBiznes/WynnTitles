@@ -27,6 +27,32 @@ func TestEmbeddedCatalogIsValid(t *testing.T) {
 	}
 }
 
+// Every animated palette should be its own look: no two share a palette, and
+// every animation is on sale.
+func TestEmbeddedShopAnimationsAreDistinct(t *testing.T) {
+	c, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	palettes := map[string]string{}
+	used := map[string]bool{}
+	for _, item := range c.Shop {
+		if item.Kind != "animatedPalette" {
+			continue
+		}
+		if other, dup := palettes[item.Palette]; dup {
+			t.Errorf("%s and %s both animate the %s palette", item.ID, other, item.Palette)
+		}
+		palettes[item.Palette] = item.ID
+		used[item.Animation] = true
+	}
+	for animation := range animations {
+		if !used[animation] {
+			t.Errorf("no animated palette uses %s", animation)
+		}
+	}
+}
+
 func TestPlainWordsGetOneRun(t *testing.T) {
 	c, err := Parse([]byte(`[`+valid("a")+`]`), []byte(testShop))
 	if err != nil {
@@ -63,6 +89,10 @@ func TestParseRejectsBadEntries(t *testing.T) {
 			`"model": "minecraft:item/Wynn"`, 1),
 		"styled runs mismatch": strings.Replace(`[`+valid("a")+`]`, `"text": "Hero"}`,
 			`"text": "Hero", "runs": [{"text": "Her"}]}`, 1),
+		"unknown animation": strings.Replace(`[`+valid("a")+`]`, `"text": "Hero"}`,
+			`"text": "Hero", "runs": [{"text": "Hero", "effect": {"type": "gradient", "palette": "ice", "animated": true, "animation": "spin"}}]}`, 1),
+		"animation without animated": strings.Replace(`[`+valid("a")+`]`, `"text": "Hero"}`,
+			`"text": "Hero", "runs": [{"text": "Hero", "effect": {"type": "gradient", "palette": "ice", "animation": "wave"}}]}`, 1),
 	}
 
 	for name, input := range cases {
@@ -87,7 +117,7 @@ func valid(id string) string {
 const testShop = `[
 	{"id": "color_red", "kind": "color", "name": "Red", "price": 2, "color": "red"},
 	{"id": "palette_ice", "kind": "palette", "name": "Ice", "price": 5, "palette": "ice"},
-	{"id": "animated_ice", "kind": "animatedPalette", "name": "Ice", "price": 8, "palette": "ice"},
+	{"id": "animated_ice", "kind": "animatedPalette", "name": "Frostglint", "price": 9, "palette": "ice", "animation": "shimmer"},
 	{"id": "rainbow", "kind": "rainbow", "name": "Rainbow", "price": 20},
 	{"id": "bold", "kind": "format", "name": "Bold", "price": 3, "format": "bold"}
 ]`
@@ -99,6 +129,9 @@ func TestParseRejectsBadShopItems(t *testing.T) {
 		"unknown kind":       `[{"id": "x", "kind": "glow", "name": "G", "price": 1}]`,
 		"obfuscated":         `[{"id": "x", "kind": "format", "name": "O", "price": 1, "format": "obfuscated"}]`,
 		"rainbow palette":    `[{"id": "x", "kind": "palette", "name": "R", "price": 1, "palette": "rainbow"}]`,
+		"no animation":       `[{"id": "x", "kind": "animatedPalette", "name": "I", "price": 1, "palette": "ice"}]`,
+		"unknown animation":  `[{"id": "x", "kind": "animatedPalette", "name": "I", "price": 1, "palette": "ice", "animation": "spin"}]`,
+		"static animation":   `[{"id": "x", "kind": "palette", "name": "I", "price": 1, "palette": "ice", "animation": "wave"}]`,
 		"bad color":          `[{"id": "x", "kind": "color", "name": "P", "price": 1, "color": "pink"}]`,
 		"stray field":        `[{"id": "x", "kind": "color", "name": "R", "price": 1, "color": "red", "palette": "ice"}]`,
 		"bad id":             `[{"id": "Red Thing", "kind": "rainbow", "name": "R", "price": 1}]`,
@@ -137,7 +170,7 @@ func TestCheckStyleAndRestyle(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := c.Restyle(native, &style)
-	want := []Run{{Text: "Greg", Bold: true, Effect: &Effect{Type: "gradient", Palette: "ice", Animated: true}}}
+	want := []Run{{Text: "Greg", Bold: true, Effect: &Effect{Type: "gradient", Palette: "ice", Animated: true, Animation: "shimmer"}}}
 	if !reflect.DeepEqual(got.Runs, want) {
 		t.Fatalf("restyled = %+v, want %+v", got.Runs, want)
 	}

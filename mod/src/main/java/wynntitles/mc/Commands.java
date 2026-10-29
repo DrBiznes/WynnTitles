@@ -12,14 +12,13 @@ import wynntitles.api.ApiException;
 import wynntitles.config.WynnTitlesConfig;
 import wynntitles.mc.screen.TitlesScreen;
 
-/** /wt opens the title screen; the subcommands are for troubleshooting. */
+/** /titles opens the title screen; the subcommands are for troubleshooting. */
 public final class Commands {
 	private Commands() {}
 
 	public static void register() {
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(literal("wt")
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(literal("titles")
 				.executes(Commands::open)
-				.then(literal("titles").executes(Commands::open))
 				.then(literal("achievements").executes(ctx -> {
 					Mc.openScreen(TitlesScreen.achievements());
 					return 1;

@@ -493,6 +493,122 @@ def progress(fill):
     return cv, dict(width=16, height=8, border=1 if fill else 2)
 
 
+# The unlock toast's layout; UnlockToastArt.java places the icon and text to match.
+TOAST_W, TOAST_H = 64, 32
+TOAST_RIM = 3               # outline, two rows of stone, then the inner outline
+TOAST_NICHE_X1 = 32         # last column of the dark niche the hex sits in
+TOAST_FIELD_X0 = TOAST_NICHE_X1 + 5   # past the stone divider
+
+
+def toast():
+    """64x32 unlock toast: a stone rim round a purple field like the panel's, with
+    a dark stone niche at the left for the achievement's hex, a bolted stone
+    divider and gold ticks in the field's corners. Border 42 left (niche, divider
+    and ticks), 9 elsewhere (rim and ticks), so the toast can be any width."""
+    W, H = TOAST_W, TOAST_H
+    cv = Canvas(W, H)
+    rim = {  # (top, left, bottom, right) shading of each stone row
+        1: (STONE_HI, STONE_LIGHT, STONE_LO, STONE_LO),
+        2: (STONE_LIGHT, STONE, STONE_MID, STONE_MID),
+    }
+    dx0, dx1 = TOAST_NICHE_X1 + 1, TOAST_FIELD_X0 - 1   # the divider, outline to outline
+    for y in range(H):
+        for x in range(W):
+            d = edge_dist(x, y, W, H)
+            if d == 0 or d == TOAST_RIM:
+                col = OUT
+            elif d in rim:
+                top, left, bottom, right = rim[d]
+                col = top if y == d else left if x == d else bottom if y == H - 1 - d else right
+            elif x <= TOAST_NICHE_X1:
+                # The niche is recessed: shadow under the rim, light on its lower lip.
+                col = WELL_SHADE if (y == TOAST_RIM + 1 or x == TOAST_RIM + 1) else \
+                    WELL_LIGHT if y == H - 2 - TOAST_RIM else WELL
+            elif x <= dx1:
+                col = OUT if x in (dx0, dx1) else STONE_LIGHT if x == dx0 + 1 else STONE_LO
+            else:
+                fd = min(x - TOAST_FIELD_X0, y - TOAST_RIM - 1, W - 2 - TOAST_RIM - x, H - 2 - TOAST_RIM - y)
+                if fd == 0 and (x == TOAST_FIELD_X0 or y == TOAST_RIM + 1):
+                    col = F_EDGE        # shadow under the rim and divider
+                elif fd == 0 or (fd == 1 and (x == TOAST_FIELD_X0 + 1 or y == TOAST_RIM + 2)):
+                    col = F_SHADE
+                elif (x * 7 + y * 11) % 31 == 0:
+                    col = F_SHADE
+                else:
+                    col = F_BASE
+            cv.set(x, y, col)
+    rounded(cv, 2)
+    # Bolt heads where the divider meets the rim.
+    cv.stamp(dx0, 1, BOLT, STONE_PAL)
+    cv.stamp(dx0, H - 5, BOLT, STONE_PAL)
+    # Gold ticks in the field's corners, like the panel's pinstripe corners.
+    fx0, fy0, fx1, fy1 = TOAST_FIELD_X0 + 1, TOAST_RIM + 2, W - 3 - TOAST_RIM, H - 3 - TOAST_RIM
+    for (x, y, sx, sy) in [(fx0, fy0, 1, 1), (fx1, fy0, -1, 1), (fx0, fy1, 1, -1), (fx1, fy1, -1, -1)]:
+        for i in range(4):
+            cv.set(x + sx * i, y, GOLD if i < 3 else GOLD_LO)
+            cv.set(x, y + sy * i, GOLD if i < 3 else GOLD_LO)
+    return cv, dict(width=W, height=H, border=dict(left=TOAST_FIELD_X0 + 5, right=9, top=9, bottom=9))
+
+
+# Shop tiers, after the achievement frames' metals (draw-icon-frames.py): light,
+# mid and shade. Colors and formats are stone, palettes silver, animated
+# palettes gold, and rainbow prismatic: drawn in greys and tinted in game.
+METALS = {
+    'stone': (STONE_HI, STONE_LIGHT, STONE_LO),
+    'silver': (c('#ffffff'), c('#c4c8d2'), c('#878b97')),
+    'gold': (c('#fff0a0'), c('#e9bd3a'), c('#b0801c')),
+    'prismatic': (c('#ffffff'), c('#d8d8d8'), c('#9a9a9a')),
+}
+
+
+def chip_rim(tier):
+    """16x13 metal rim laid over a shop chip (see chip), border 3, so pricier
+    tiers stand out: lit along the top and left, a glint in the top-left corner,
+    and for gold and prismatic a faint inner glow. Clear inside, so the chip's
+    hover shows through; StyleChips leaves it off while the chip is picked."""
+    W, H = 16, 13
+    hi, mid, lo = METALS[tier]
+    cv = Canvas(W, H)
+    for y in range(H):
+        for x in range(W):
+            d = edge_dist(x, y, W, H)
+            if d == 1:
+                col = hi if y == 1 else mid if x == 1 else lo if (y == H - 2 or x == W - 2) else mid
+            elif d == 2 and tier in ('gold', 'prismatic'):
+                col = hi[:3] + (70,)
+            else:
+                col = None
+            cv.set(x, y, col)
+    cv.set(1, 1, (255, 255, 255, 255))
+    cv.set(2, 1, hi)
+    cv.set(W - 2, H - 2, hi)        # a second glint where the light leaves
+    return cv, dict(width=W, height=H, border=3)
+
+
+def plaque(tier):
+    """16x11 metal tag for a shop group's price, border 3: outlined, lit on top,
+    shaded underneath, with notched ends like a hanging tag. Dark ink sits on it."""
+    W, H = 16, 11
+    hi, mid, lo = METALS[tier]
+    cv = Canvas(W, H)
+    for y in range(H):
+        for x in range(W):
+            d = edge_dist(x, y, W, H)
+            if d == 0:
+                col = OUT
+            elif y == 1:
+                col = hi
+            elif y == H - 2:
+                col = lo
+            else:
+                col = mid
+            cv.set(x, y, col)
+    rounded(cv, 2)
+    for x in (1, W - 2):            # notches at mid-height
+        cv.set(x, H // 2, OUT)
+    return cv, dict(width=W, height=H, border=3)
+
+
 SPRITES = {
     'panel': panel(),
     'ribbon': ribbon(),
@@ -515,6 +631,14 @@ SPRITES = {
     'nameplate': nameplate(),
     'progress': progress(False),
     'progress_fill': progress(True),
+    'chip_rim_silver': chip_rim('silver'),
+    'chip_rim_gold': chip_rim('gold'),
+    'chip_rim_prismatic': chip_rim('prismatic'),
+    'plaque_stone': plaque('stone'),
+    'plaque_silver': plaque('silver'),
+    'plaque_gold': plaque('gold'),
+    'plaque_prismatic': plaque('prismatic'),
+    'toast': toast(),
 }
 
 for rows in (SKULL, EYE):

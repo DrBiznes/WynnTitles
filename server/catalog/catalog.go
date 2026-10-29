@@ -21,12 +21,18 @@ var embedded []byte
 //go:embed shop.json
 var embeddedShop []byte
 
+// Effect colors a run letter by letter. Animation picks how an animated
+// effect moves (see animations); empty is "flow", the scrolling gradient that
+// native styles and rainbow use. Mods that predate animations ignore the field
+// and show flow, so it degrades gracefully. CycleMs overrides the animation's
+// own beat.
 type Effect struct {
-	Type     string   `json:"type"`
-	Colors   []string `json:"colors,omitempty"`
-	Palette  string   `json:"palette,omitempty"`
-	Animated bool     `json:"animated,omitempty"`
-	CycleMs  int      `json:"cycleMs,omitempty"`
+	Type      string   `json:"type"`
+	Colors    []string `json:"colors,omitempty"`
+	Palette   string   `json:"palette,omitempty"`
+	Animated  bool     `json:"animated,omitempty"`
+	CycleMs   int      `json:"cycleMs,omitempty"`
+	Animation string   `json:"animation,omitempty"`
 }
 
 type Run struct {
@@ -106,6 +112,17 @@ var statistics = map[string]bool{"mobsKilled": true, "chestsFound": true}
 var palettes = map[string]bool{
 	"rainbow": true, "red": true, "red_purple": true, "flame": true, "ember": true, "sunset": true,
 	"ocean": true, "ice": true, "toxic": true, "forest": true, "royal": true, "void": true,
+}
+
+// Animations are how an animated effect moves; the mod draws them (titles/TitleAnimation.java):
+//   - flow: the gradient scrolls along the word
+//   - pulse: the whole word breathes through the palette at once
+//   - shimmer: a bright highlight sweeps across the word
+//   - wave: colors ripple letter by letter
+//   - flicker: letters waver and flare at random, like fire or a glitch
+//   - sparkle: letters twinkle bright one at a time, like sparks or stars
+var animations = map[string]bool{
+	"flow": true, "pulse": true, "shimmer": true, "wave": true, "flicker": true, "sparkle": true,
 }
 
 var namedColors = map[string]bool{
@@ -318,6 +335,14 @@ func validateEffect(e *Effect) error {
 	}
 	if e.CycleMs < 0 {
 		return fmt.Errorf("cycleMs must be positive")
+	}
+	if e.Animation != "" {
+		if !animations[e.Animation] {
+			return fmt.Errorf("unknown animation %q", e.Animation)
+		}
+		if !e.Animated {
+			return fmt.Errorf("animation needs animated: true")
+		}
 	}
 	return nil
 }

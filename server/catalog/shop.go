@@ -7,15 +7,18 @@ import (
 
 // ShopItem is one style piece players buy with achievement points. Kind picks
 // what it does: a color source ("color", "palette", "animatedPalette" or
-// "rainbow") or a "format" flag. The remaining fields are its parameters.
+// "rainbow") or a "format" flag. The remaining fields are its parameters; an
+// animated palette names both its palette and its animation, so each one is a
+// single finished look rather than a combination players assemble.
 type ShopItem struct {
-	ID      string `json:"id"`
-	Kind    string `json:"kind"`
-	Name    string `json:"name"`
-	Price   int    `json:"price"`
-	Color   string `json:"color,omitempty"`
-	Palette string `json:"palette,omitempty"`
-	Format  string `json:"format,omitempty"`
+	ID        string `json:"id"`
+	Kind      string `json:"kind"`
+	Name      string `json:"name"`
+	Price     int    `json:"price"`
+	Color     string `json:"color,omitempty"`
+	Palette   string `json:"palette,omitempty"`
+	Animation string `json:"animation,omitempty"`
+	Format    string `json:"format,omitempty"`
 }
 
 // IsSource reports whether the item colors a word, as opposed to formatting it.
@@ -90,6 +93,12 @@ func validateShopItem(i *ShopItem) error {
 		if !palettes[i.Palette] || i.Palette == "rainbow" {
 			return fmt.Errorf("unknown palette %q", i.Palette)
 		}
+		if i.Kind == "animatedPalette" {
+			want = append(want, "animation")
+			if !animations[i.Animation] {
+				return fmt.Errorf("animation must be flow, pulse, shimmer, wave, flicker or sparkle")
+			}
+		}
 	case "rainbow":
 	case "format":
 		want = []string{"format"}
@@ -100,7 +109,9 @@ func validateShopItem(i *ShopItem) error {
 		return fmt.Errorf("unsupported kind %q", i.Kind)
 	}
 
-	set := map[string]bool{"color": i.Color != "", "palette": i.Palette != "", "format": i.Format != ""}
+	set := map[string]bool{
+		"color": i.Color != "", "palette": i.Palette != "", "animation": i.Animation != "", "format": i.Format != "",
+	}
 	for _, field := range want {
 		delete(set, field)
 	}
@@ -150,7 +161,7 @@ func (c *Catalog) Restyle(w Word, s *Style) Word {
 		case "palette":
 			run.Effect = &Effect{Type: "gradient", Palette: item.Palette}
 		case "animatedPalette":
-			run.Effect = &Effect{Type: "gradient", Palette: item.Palette, Animated: true}
+			run.Effect = &Effect{Type: "gradient", Palette: item.Palette, Animated: true, Animation: item.Animation}
 		case "rainbow":
 			run.Effect = &Effect{Type: "rainbow", Animated: true}
 		}

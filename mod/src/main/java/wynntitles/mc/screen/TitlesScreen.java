@@ -248,7 +248,7 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		boolean selected = t == tab;
 		boolean[] hovered = {false};
 		FlowLayout button = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(14));
-		button.padding(Insets.of(4, 0, 7, 6)).verticalAlignment(VerticalAlignment.TOP);
+		button.padding(Insets.of(3, 0, 7, 6)).verticalAlignment(VerticalAlignment.TOP);
 		button.surface((graphics, c) -> WynnUi.surface(selected ? WynnUi.TAB_SELECTED
 				: hovered[0] ? WynnUi.TAB_HOVER : WynnUi.TAB).draw(graphics, c));
 		button.child(WynnUi.label(WynnFonts.small(t.label), selected ? WynnUi.GOLD : WynnUi.TEXT));
@@ -266,21 +266,12 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 
 	private void buildTitles() {
 		// How the title will look over your head: the title, then your name.
-		FlowLayout nameplate = UIContainers.verticalFlow(Sizing.fill(), Sizing.fixed(36));
-		nameplate.gap(2);
-		nameplate.surface(WynnUi.surface(WynnUi.NAMEPLATE))
-				.horizontalAlignment(HorizontalAlignment.CENTER)
-				.verticalAlignment(VerticalAlignment.CENTER);
-		nameplate.child(new TitleText(this::preview, 1.5f, WynnUi.TEXT));
-		nameplate.child(WynnUi.label(Component.literal(me.username()), 0xFFFFFF));
-		body.child(nameplate);
+		body.child(StyleChips.nameplate(this::preview, me.username()));
 
 		FlowLayout columns = UIContainers.horizontalFlow(Sizing.fill(), Sizing.expand());
 		columns.gap(8);
-		columns.child(wordColumn("Prefix", me.words().prefixes(), me.styles().prefix(),
-				() -> selectedPrefix, w -> selectedPrefix = w));
-		columns.child(wordColumn("Suffix", me.words().suffixes(), me.styles().suffix(),
-				() -> selectedSuffix, w -> selectedSuffix = w));
+		columns.child(wordColumn("Prefix", me.words().prefixes(), () -> selectedPrefix, w -> selectedPrefix = w));
+		columns.child(wordColumn("Suffix", me.words().suffixes(), () -> selectedSuffix, w -> selectedSuffix = w));
 		body.child(columns);
 		titlesFooter();
 	}
@@ -313,7 +304,8 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		return catalog == null ? word : catalog.restyle(word, style);
 	}
 
-	private FlowLayout wordColumn(String heading, List<TitleWord> words, TitleStyle style,
+	/** Lists words in their native styles; only the preview shows the slot's shop style. */
+	private FlowLayout wordColumn(String heading, List<TitleWord> words,
 			Supplier<String> selected, Consumer<String> select) {
 		FlowLayout column = UIContainers.verticalFlow(Sizing.fixed(COLUMN_WIDTH), Sizing.fill());
 		column.gap(3);
@@ -322,7 +314,7 @@ public class TitlesScreen extends BaseOwoScreen<FlowLayout> {
 		FlowLayout rows = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
 		rows.child(wordRow(null, selected, select));
 		for (TitleWord word : words) {
-			rows.child(wordRow(styled(word, style), selected, select));
+			rows.child(wordRow(word, selected, select));
 		}
 		column.child(WynnUi.well(Sizing.fill(), Sizing.expand(), rows));
 		return column;

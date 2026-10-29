@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import wynntitles.titles.EffectColors;
+import wynntitles.titles.TitleAnimation;
 import wynntitles.titles.TitleEffect;
 import wynntitles.titles.TitleRun;
 import wynntitles.titles.TitleStyle;
@@ -45,9 +47,10 @@ public record Catalog(String version, List<Achievement> achievements, List<ShopI
 		if (source != null) {
 			switch (source.kind()) {
 				case ShopItem.COLOR -> color = source.color();
-				case ShopItem.PALETTE -> effect = new TitleEffect("gradient", null, source.palette(), false, 0);
-				case ShopItem.ANIMATED_PALETTE -> effect = new TitleEffect("gradient", null, source.palette(), true, 0);
-				case ShopItem.RAINBOW -> effect = new TitleEffect("rainbow", null, null, true, 0);
+				case ShopItem.PALETTE -> effect = new TitleEffect("gradient", null, source.palette(), false, 0, null);
+				case ShopItem.ANIMATED_PALETTE ->
+						effect = new TitleEffect("gradient", null, source.palette(), true, 0, source.animation());
+				case ShopItem.RAINBOW -> effect = new TitleEffect("rainbow", null, null, true, 0, null);
 				default -> {}
 			}
 		}
@@ -101,9 +104,11 @@ public record Catalog(String version, List<Achievement> achievements, List<ShopI
 	/**
 	 * A style piece bought with achievement points. Kind is a color source
 	 * (color, palette, animatedPalette, rainbow) or a format; an unknown kind
-	 * comes from a newer catalog and is shown as needing an update.
+	 * comes from a newer catalog and is shown as needing an update. An animated
+	 * palette also names its animation.
 	 */
-	public record ShopItem(String id, String kind, String name, int price, String color, String palette, String format) {
+	public record ShopItem(
+			String id, String kind, String name, int price, String color, String palette, String animation, String format) {
 		public static final String COLOR = "color";
 		public static final String PALETTE = "palette";
 		public static final String ANIMATED_PALETTE = "animatedPalette";
@@ -117,13 +122,21 @@ public record Catalog(String version, List<Achievement> achievements, List<ShopI
 		/** False for kinds added to the shop after this mod version shipped. */
 		public boolean supported() {
 			return switch (kind) {
-				case COLOR, PALETTE, ANIMATED_PALETTE, RAINBOW -> true;
+				case COLOR, RAINBOW -> true;
+				// A newer catalog may add palettes or animations this mod cannot draw yet.
+				case PALETTE -> EffectColors.knowsPalette(palette);
+				case ANIMATED_PALETTE -> EffectColors.knowsPalette(palette) && TitleAnimation.byId(animation) != null;
 				case FORMAT -> switch (format == null ? "" : format) {
 					case "bold", "italic", "underlined", "strikethrough" -> true;
 					default -> false;
 				};
 				default -> false;
 			};
+		}
+
+		/** How an animated palette moves, or null for every other kind. */
+		public TitleAnimation motion() {
+			return ANIMATED_PALETTE.equals(kind) ? TitleAnimation.byId(animation) : null;
 		}
 	}
 }

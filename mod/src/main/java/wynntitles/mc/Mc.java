@@ -12,6 +12,10 @@ import net.minecraft.network.chat.MutableComponent;
  * to touch this file (26.2 moved screens to Minecraft#gui and chat to Hud).
  */
 public final class Mc {
+	private static final String BADGE = "TITLES";
+	/** The gold of the screens' labels (WynnUi.GOLD). */
+	private static final int BADGE_COLOR = 0xF7C948;
+
 	private Mc() {}
 
 	public static Minecraft client() {
@@ -43,10 +47,19 @@ public final class Mc {
 		run(() -> client().getToastManager().addToast(toast));
 	}
 
-	/** A chat line with the [WynnTitles] tag in front. */
+	/**
+	 * A chat line with the mod's badge in front: a gold TITLES pill like the
+	 * ones Wynncraft puts on its own lines when the pack is loaded, and a
+	 * star and the word in bold otherwise. Every chat line the mod writes goes
+	 * through here.
+	 */
 	public static MutableComponent tagged(Component message) {
+		MutableComponent badge = WynnFonts.pillsLoaded()
+				? WynnFonts.pill(BADGE)
+				: Component.literal("\u2726 " + BADGE).withStyle(ChatFormatting.BOLD);
 		return Component.empty()
-				.append(Component.literal("[WynnTitles] ").withStyle(ChatFormatting.AQUA))
+				.append(badge.withColor(BADGE_COLOR))
+				.append(" ")
 				.append(message);
 	}
 }

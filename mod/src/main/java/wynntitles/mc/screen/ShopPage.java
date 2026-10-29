@@ -22,7 +22,7 @@ import wynntitles.titles.Title;
 import wynntitles.titles.TitleWord;
 
 /**
- * The shop tab: every style piece with its price. Picking one previews it on
+ * The shop tab: every style piece, priced in its tooltip. Picking one previews it on
  * your title; bought pieces are worn from the styles tab. Refunding gives every
  * point back, so trying things is never a trap.
  */
@@ -58,12 +58,17 @@ final class ShopPage {
 		FlowLayout page = UIContainers.verticalFlow(Sizing.fixed(width), Sizing.fixed(height));
 		page.gap(5);
 		page.child(StyleChips.nameplate(this::preview, me.username()));
-		page.child(WynnUi.heading("Shop").margins(Insets.left(2)));
+		FlowLayout heading = UIContainers.horizontalFlow(Sizing.fill(), Sizing.content());
+		heading.gap(6).margins(Insets.left(2));
+		heading.child(WynnUi.heading("Shop"));
+		// What the picked piece does, so the animations have names.
+		heading.child(new TitleText(this::caption, 1f, WynnUi.TEXT_DIM).sizing(Sizing.expand(), Sizing.content()));
+		page.child(heading);
 
 		FlowLayout items = UIContainers.verticalFlow(Sizing.fill(), Sizing.content());
 		items.gap(3);
 		items.padding(Insets.of(0, 2, 3, 2));
-		StyleChips.addGroups(items, catalog, i -> true, this::chip);
+		StyleChips.addGroups(items, catalog, i -> true, this::chip, true);
 		page.child(WynnUi.well(Sizing.fill(), Sizing.expand(), items));
 
 		refreshFooter();
@@ -88,15 +93,19 @@ final class ShopPage {
 		return TitleRenderer.render(title);
 	}
 
+	private Component caption() {
+		return selected == null ? Component.empty() : WynnFonts.body(StyleChips.describe(catalog, selected));
+	}
+
 	private FlowLayout chip(ShopItem item) {
 		boolean owned = me.owns(item.id());
-		Component badge = owned
-				? WynnFonts.small("owned").withColor(WynnUi.UNLOCKED)
-				: WynnFonts.small(String.valueOf(item.price()));
-		Component tooltip = owned
-				? StyleChips.tooltip(item.name(), "Owned: wear it from the Styles tab", ChatFormatting.GREEN)
-				: StyleChips.tooltip(item.name(), StyleChips.points(item.price()), ChatFormatting.GOLD);
-		return StyleChips.chip(StyleChips.label(catalog, item), badge,
+		// The price is in the tooltip and on the buy button, so the chips stay short.
+		Component badge = owned ? WynnFonts.small("owned").withColor(WynnUi.UNLOCKED) : null;
+		Component tooltip = StyleChips.tooltip(item.name(), StyleChips.describe(catalog, item), ChatFormatting.GRAY)
+				.append(owned
+						? Component.literal("\nOwned: wear it from the Styles tab").withStyle(ChatFormatting.GREEN)
+						: Component.literal("\n" + StyleChips.points(item.price())).withStyle(ChatFormatting.GOLD));
+		return StyleChips.chip(item, StyleChips.label(catalog, item), badge,
 				() -> selected != null && selected.id().equals(item.id()), tooltip, () -> select(item));
 	}
 
