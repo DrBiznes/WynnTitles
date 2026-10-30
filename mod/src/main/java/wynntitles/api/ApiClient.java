@@ -115,11 +115,6 @@ public final class ApiClient {
 		return post("/v1/shop/buy", token, body).thenApply(resp -> parse(resp, Me.class));
 	}
 
-	/** Refunds every purchase and puts both slots back to their native style. */
-	public CompletableFuture<Me> resetPurchases(String token) {
-		return post("/v1/shop/reset", token, new JsonObject()).thenApply(resp -> parse(resp, Me.class));
-	}
-
 	public CompletableFuture<ClaimResult> claim(
 			String token, String achievementId, String triggerType, JsonObject evidence, String modVersion) {
 		JsonObject body = new JsonObject();

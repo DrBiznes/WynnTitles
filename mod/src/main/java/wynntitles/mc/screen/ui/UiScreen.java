@@ -94,6 +94,38 @@ public abstract class UiScreen extends Screen {
 		}
 	}
 
+	/**
+	 * The middle of the first element with a tooltip of its own, not a box's, in
+	 * window pixels, or null; for tests that point the mouse at it. Valid once
+	 * the screen has rendered.
+	 */
+	public double[] tooltipTarget() {
+		Element target = root == null ? null : tooltipLeaf(root);
+		if (target == null) {
+			return null;
+		}
+		int guiScale = minecraft.getWindow().getGuiScale();
+		return new double[] {
+				(originX + (target.x() + target.width() / 2.0) * scale) * guiScale,
+				(originY + (target.y() + target.height() / 2.0) * scale) * guiScale};
+	}
+
+	private static Element tooltipLeaf(Element element) {
+		if (element instanceof Box box) {
+			for (Element child : box.children()) {
+				Element found = tooltipLeaf(child);
+				if (found != null) {
+					return found;
+				}
+			}
+			return null;
+		}
+		if (element instanceof ScrollView scroll) {
+			return tooltipLeaf(scroll.child());
+		}
+		return element.tooltip(element.x(), element.y()) != null ? element : null;
+	}
+
 	/** Picks the scale and where the picture's corner goes, both on whole window pixels. */
 	private void fit() {
 		Window window = minecraft.getWindow();

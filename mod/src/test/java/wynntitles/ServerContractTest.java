@@ -112,12 +112,8 @@ class ServerContractTest {
 		assertFalse(me.title().runs().get(0).obfuscated());
 		assertEquals(me.title(), api.titles(List.of(serverUuid)).get().get(serverUuid));
 
-		me = account.resetPurchases().get();
-		assertTrue(me.owned().isEmpty());
-		assertNull(me.styles().prefix());
-		assertEquals(earned, me.balance());
-
 		// An animated palette carries its animation through the server to the nametag.
+		// Purchases are final, so each step below buys only pieces it does not own yet.
 		Catalog.Achievement palace = catalog.get("raid_twp").orElseThrow();
 		account.withToken(t -> api.claim(t, palace.id(), palace.trigger().type(), evidence, "test")).get();
 		Catalog.ShopItem animated = catalog.shopItem("animated_ocean").orElseThrow();
@@ -126,14 +122,12 @@ class ServerContractTest {
 		me = account.setStyle(wave, null).get();
 		assertEquals(catalog.restyle(greg.rewards().prefix(), wave).runs(), me.title().runs());
 		assertEquals(animated.animation(), me.title().runs().get(0).effect().animation());
-		me = account.resetPurchases().get();
-		assertEquals(earned, me.balance());
 
 		// Every font survives purchase, persistence, public lookup and preview
 		// exactly. A bought font replaces native obfuscation just like a color.
 		account.buy(catalog.shop().stream().filter(i -> Catalog.ShopItem.FONT.equals(i.kind()))
 				.map(Catalog.ShopItem::id).toList()).get();
-		account.buy(List.of("color_red", "bold", "palette_ice")).get();
+		account.buy(List.of("palette_ice")).get();
 		for (Catalog.ShopItem font : catalog.shop()) {
 			if (!Catalog.ShopItem.FONT.equals(font.kind())) continue;
 			TitleStyle fontStyle = new TitleStyle("color_red", font.banner() ? List.of() : List.of("bold"),
@@ -153,8 +147,9 @@ class ServerContractTest {
 				assertEquals(catalog.restyle(greg.rewards().prefix(), fallback).runs(), me.title().runs());
 			}
 		}
-		me = account.resetPurchases().get();
-		assertEquals(earned, me.balance());
+		Me owner = me;
+		int spent = catalog.shop().stream().filter(i -> owner.owns(i.id())).mapToInt(Catalog.ShopItem::price).sum();
+		assertEquals(earned - spent, me.balance());
 
 		// A second Account reuses the cached token instead of logging in again.
 		Account restarted = new Account(api, new FakeSession(uuid, username) {

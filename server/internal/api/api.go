@@ -60,7 +60,6 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("PUT /v1/me/title", s.authed(s.putTitle))
 	mux.HandleFunc("PUT /v1/me/style", s.authed(s.putStyle))
 	mux.HandleFunc("POST /v1/shop/buy", s.authed(s.buy))
-	mux.HandleFunc("POST /v1/shop/reset", s.authed(s.resetPurchases))
 	mux.HandleFunc("POST /v1/claims", s.authed(s.claim))
 	mux.HandleFunc("POST /v1/titles/batch", s.batchTitles)
 	return s.recoverer(mux)
@@ -288,7 +287,7 @@ func (s *Server) me(ctx context.Context, uuid string) (*meResponse, error) {
 	}
 
 	// Purchases of items since removed from the shop still count as spent
-	// until a reset refunds them.
+	// until a dashboard reset refunds them.
 	owned := map[string]bool{}
 	me.Balance = me.Points
 	for _, p := range purchases {
@@ -513,18 +512,6 @@ func (s *Server) buy(w http.ResponseWriter, r *http.Request, uuid string) {
 		return
 	}
 	s.Log.Info("shop purchase", "uuid", uuid, "items", req.ItemIDs)
-	s.writeMe(w, r, uuid)
-}
-
-// resetPurchases refunds every purchase and puts both slots back to native.
-// Styles are cosmetic, so trying things out should never be a trap.
-func (s *Server) resetPurchases(w http.ResponseWriter, r *http.Request, uuid string) {
-	s.mutationMu.Lock()
-	defer s.mutationMu.Unlock()
-	if err := s.Store.ResetPurchases(r.Context(), uuid); err != nil {
-		s.internalError(w, err)
-		return
-	}
 	s.writeMe(w, r, uuid)
 }
 

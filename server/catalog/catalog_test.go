@@ -268,8 +268,10 @@ func TestFontRulesAndPricing(t *testing.T) {
 	if fonts != 10 {
 		t.Fatalf("fonts = %d", fonts)
 	}
+	// Completionists can buy most of the shop but not all of it, so points
+	// still mean something until the next batch of achievements and items.
 	ratio := float64(points) / float64(cost)
-	if ratio < 0.58 || ratio > 0.62 {
+	if ratio < 0.80 || ratio > 0.85 {
 		t.Fatalf("earnable/shop = %.3f (%d/%d)", ratio, points, cost)
 	}
 	for _, style := range []Style{{Font: "bold"}, {Source: "font_pill"}, {Formats: []string{"font_pill"}}, {Font: "font_wynnic", LetterColor: "red"}, {Color: "red", Formats: []string{"bold"}}} {

@@ -20,4 +20,13 @@ public interface Detector {
 	default boolean supports(Catalog.Trigger trigger) {
 		return true;
 	}
+
+	/**
+	 * How close the trigger is, as a line like "37 / 100 levels" for the
+	 * achievements screen, or null when there is nothing to count or the data
+	 * has not arrived. Called on the client thread.
+	 */
+	default String progress(Catalog.Trigger trigger) {
+		return null;
+	}
 }

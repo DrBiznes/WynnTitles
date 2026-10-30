@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -62,6 +63,11 @@ public final class Mc {
 
 	public static void toast(Toast toast) {
 		run(() -> client().getToastManager().addToast(toast));
+	}
+
+	/** Shows tooltip when the chat text is hovered (HoverEvent became records in 1.21.5). */
+	public static MutableComponent withHover(MutableComponent text, Component tooltip) {
+		return text.withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(tooltip)));
 	}
 
 	/**

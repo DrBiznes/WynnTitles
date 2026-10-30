@@ -396,21 +396,3 @@ func (s *Store) Buy(ctx context.Context, uuid string, items []Purchase, earned i
 	}
 	return tx.Commit()
 }
-
-// ResetPurchases refunds everything a player has bought and puts both slots
-// back to their native style.
-func (s *Store) ResetPurchases(ctx context.Context, uuid string) error {
-	tx, err := s.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-	if _, err := tx.ExecContext(ctx, `DELETE FROM purchases WHERE uuid = ?`, uuid); err != nil {
-		return err
-	}
-	if _, err := tx.ExecContext(ctx,
-		`UPDATE players SET prefix_style = NULL, suffix_style = NULL WHERE uuid = ?`, uuid); err != nil {
-		return err
-	}
-	return tx.Commit()
-}

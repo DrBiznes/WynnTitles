@@ -293,7 +293,7 @@ func TestAchievementStatsAreCached(t *testing.T) {
 	}
 }
 
-func TestShopStylesAndReset(t *testing.T) {
+func TestShopStyles(t *testing.T) {
 	h := newHarness(t)
 	token := h.login()
 
@@ -376,12 +376,12 @@ func TestShopStylesAndReset(t *testing.T) {
 		t.Fatalf("public title after restart = %+v", got)
 	}
 
-	// Resetting refunds everything and goes back to native.
-	h.do("POST", "/v1/shop/reset", token, nil, fresh())
-	if me.Balance != earned || len(me.Owned) != 0 || me.Styles.Prefix != nil || !me.Title.Runs[0].Obfuscated {
-		t.Fatalf("after reset: balance %d, owned %v, style %+v, title %+v", me.Balance, me.Owned, me.Styles.Prefix, me.Title)
+	// Players cannot refund their own purchases; only the dashboard resets them.
+	if code := h.do("POST", "/v1/shop/reset", token, nil, nil); code != 404 {
+		t.Fatalf("player reset: got %d, want 404", code)
 	}
-	if got := lookup(); got == nil || !got.Runs[0].Obfuscated {
-		t.Fatalf("public title after reset = %+v", got)
+	h.do("GET", "/v1/me", token, nil, fresh())
+	if len(me.Owned) != 2 || me.Styles.Prefix == nil {
+		t.Fatalf("player reset changed owned %v, style %+v", me.Owned, me.Styles.Prefix)
 	}
 }

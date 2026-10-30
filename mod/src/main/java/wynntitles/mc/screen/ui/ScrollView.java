@@ -37,6 +37,10 @@ public class ScrollView extends Element {
 		sizing(width, height);
 	}
 
+	Element child() {
+		return child;
+	}
+
 	public ScrollView padding(Insets padding) {
 		this.padding = padding;
 		return this;

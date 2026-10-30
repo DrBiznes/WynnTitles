@@ -256,4 +256,4 @@ These depend on exact chat text, festival menus or boss messages that still need
 
 ## Shop impact
 
-Earnable points go from 129 to 592. The shop is 216 points, about 36% of what can now be earned, against the roughly 60% the shop roadmap aims for. Keeping 60% would need about 355 points of new items, such as the glow outline and shader kinds.
+Earnable points go from 129 to 592. The shop is 216 points, about 36% of what can now be earned, against the roughly 60% the shop roadmap aims for. Keeping 60% would need about 355 points of new items, such as the glow outline and shader kinds. (Since then the target moved to 80–85% and the shop was repriced to 720; see TODO.md section 5.)

@@ -3,189 +3,189 @@
     "id": "color_black",
     "kind": "color",
     "name": "Black",
-    "price": 5,
+    "price": 4,
     "color": "black"
   },
   {
     "id": "color_dark_blue",
     "kind": "color",
     "name": "Dark Blue",
-    "price": 5,
+    "price": 4,
     "color": "dark_blue"
   },
   {
     "id": "color_dark_green",
     "kind": "color",
     "name": "Dark Green",
-    "price": 5,
+    "price": 4,
     "color": "dark_green"
   },
   {
     "id": "color_dark_aqua",
     "kind": "color",
     "name": "Dark Aqua",
-    "price": 5,
+    "price": 4,
     "color": "dark_aqua"
   },
   {
     "id": "color_dark_red",
     "kind": "color",
     "name": "Dark Red",
-    "price": 5,
+    "price": 4,
     "color": "dark_red"
   },
   {
     "id": "color_dark_purple",
     "kind": "color",
     "name": "Dark Purple",
-    "price": 5,
+    "price": 4,
     "color": "dark_purple"
   },
   {
     "id": "color_gold",
     "kind": "color",
     "name": "Gold",
-    "price": 5,
+    "price": 4,
     "color": "gold"
   },
   {
     "id": "color_gray",
     "kind": "color",
     "name": "Gray",
-    "price": 5,
+    "price": 4,
     "color": "gray"
   },
   {
     "id": "color_dark_gray",
     "kind": "color",
     "name": "Dark Gray",
-    "price": 5,
+    "price": 4,
     "color": "dark_gray"
   },
   {
     "id": "color_blue",
     "kind": "color",
     "name": "Blue",
-    "price": 5,
+    "price": 4,
     "color": "blue"
   },
   {
     "id": "color_green",
     "kind": "color",
     "name": "Green",
-    "price": 5,
+    "price": 4,
     "color": "green"
   },
   {
     "id": "color_aqua",
     "kind": "color",
     "name": "Aqua",
-    "price": 5,
+    "price": 4,
     "color": "aqua"
   },
   {
     "id": "color_red",
     "kind": "color",
     "name": "Red",
-    "price": 5,
+    "price": 4,
     "color": "red"
   },
   {
     "id": "color_light_purple",
     "kind": "color",
     "name": "Light Purple",
-    "price": 5,
+    "price": 4,
     "color": "light_purple"
   },
   {
     "id": "color_yellow",
     "kind": "color",
     "name": "Yellow",
-    "price": 5,
+    "price": 4,
     "color": "yellow"
   },
   {
     "id": "palette_red",
     "kind": "palette",
     "name": "Crimson",
-    "price": 16,
+    "price": 12,
     "palette": "red"
   },
   {
     "id": "palette_red_purple",
     "kind": "palette",
     "name": "Blood Moon",
-    "price": 16,
+    "price": 12,
     "palette": "red_purple"
   },
   {
     "id": "palette_flame",
     "kind": "palette",
     "name": "Flame",
-    "price": 16,
+    "price": 12,
     "palette": "flame"
   },
   {
     "id": "palette_ember",
     "kind": "palette",
     "name": "Ember",
-    "price": 16,
+    "price": 12,
     "palette": "ember"
   },
   {
     "id": "palette_sunset",
     "kind": "palette",
     "name": "Sunset",
-    "price": 16,
+    "price": 12,
     "palette": "sunset"
   },
   {
     "id": "palette_ocean",
     "kind": "palette",
     "name": "Ocean",
-    "price": 16,
+    "price": 12,
     "palette": "ocean"
   },
   {
     "id": "palette_ice",
     "kind": "palette",
     "name": "Ice",
-    "price": 16,
+    "price": 12,
     "palette": "ice"
   },
   {
     "id": "palette_toxic",
     "kind": "palette",
     "name": "Toxic",
-    "price": 16,
+    "price": 12,
     "palette": "toxic"
   },
   {
     "id": "palette_forest",
     "kind": "palette",
     "name": "Forest",
-    "price": 16,
+    "price": 12,
     "palette": "forest"
   },
   {
     "id": "palette_royal",
     "kind": "palette",
     "name": "Royal",
-    "price": 16,
+    "price": 12,
     "palette": "royal"
   },
   {
     "id": "palette_void",
     "kind": "palette",
     "name": "Void",
-    "price": 16,
+    "price": 12,
     "palette": "void"
   },
   {
     "id": "animated_red",
     "kind": "animatedPalette",
     "name": "Heartbeat",
-    "price": 29,
+    "price": 20,
     "palette": "red",
     "animation": "pulse"
   },
@@ -193,7 +193,7 @@
     "id": "animated_red_purple",
     "kind": "animatedPalette",
     "name": "Blood Tide",
-    "price": 29,
+    "price": 20,
     "palette": "red_purple",
     "animation": "flow"
   },
@@ -201,7 +201,7 @@
     "id": "animated_flame",
     "kind": "animatedPalette",
     "name": "Wildfire",
-    "price": 29,
+    "price": 20,
     "palette": "flame",
     "animation": "flicker"
   },
@@ -209,7 +209,7 @@
     "id": "animated_ember",
     "kind": "animatedPalette",
     "name": "Cinders",
-    "price": 29,
+    "price": 20,
     "palette": "ember",
     "animation": "sparkle"
   },
@@ -217,7 +217,7 @@
     "id": "animated_sunset",
     "kind": "animatedPalette",
     "name": "Golden Hour",
-    "price": 29,
+    "price": 20,
     "palette": "sunset",
     "animation": "flow"
   },
@@ -225,7 +225,7 @@
     "id": "animated_ocean",
     "kind": "animatedPalette",
     "name": "Riptide",
-    "price": 29,
+    "price": 20,
     "palette": "ocean",
     "animation": "wave"
   },
@@ -233,7 +233,7 @@
     "id": "animated_ice",
     "kind": "animatedPalette",
     "name": "Frostglint",
-    "price": 29,
+    "price": 20,
     "palette": "ice",
     "animation": "shimmer"
   },
@@ -241,7 +241,7 @@
     "id": "animated_toxic",
     "kind": "animatedPalette",
     "name": "Meltdown",
-    "price": 29,
+    "price": 20,
     "palette": "toxic",
     "animation": "flicker"
   },
@@ -249,7 +249,7 @@
     "id": "animated_forest",
     "kind": "animatedPalette",
     "name": "Canopy",
-    "price": 29,
+    "price": 20,
     "palette": "forest",
     "animation": "wave"
   },
@@ -257,7 +257,7 @@
     "id": "animated_royal",
     "kind": "animatedPalette",
     "name": "Regalia",
-    "price": 29,
+    "price": 20,
     "palette": "royal",
     "animation": "shimmer"
   },
@@ -265,7 +265,7 @@
     "id": "animated_void",
     "kind": "animatedPalette",
     "name": "Starfall",
-    "price": 29,
+    "price": 20,
     "palette": "void",
     "animation": "sparkle"
   },
@@ -273,41 +273,41 @@
     "id": "rainbow",
     "kind": "rainbow",
     "name": "Rainbow",
-    "price": 60
+    "price": 45
   },
   {
     "id": "bold",
     "kind": "format",
     "name": "Bold",
-    "price": 8,
+    "price": 6,
     "format": "bold"
   },
   {
     "id": "italic",
     "kind": "format",
     "name": "Italic",
-    "price": 8,
+    "price": 6,
     "format": "italic"
   },
   {
     "id": "underlined",
     "kind": "format",
     "name": "Underlined",
-    "price": 8,
+    "price": 6,
     "format": "underlined"
   },
   {
     "id": "strikethrough",
     "kind": "format",
     "name": "Strikethrough",
-    "price": 8,
+    "price": 6,
     "format": "strikethrough"
   },
   {
     "id": "font_wynncraft",
     "kind": "font",
     "name": "Wynncraft",
-    "price": 22,
+    "price": 15,
     "font": "minecraft:language/wynncraft",
     "allows": [
       "color",
@@ -321,7 +321,7 @@
     "id": "font_small_caps",
     "kind": "font",
     "name": "Small caps",
-    "price": 22,
+    "price": 15,
     "font": "minecraft:language/five",
     "allows": [
       "color",
@@ -335,7 +335,7 @@
     "id": "font_outline",
     "kind": "font",
     "name": "Outline",
-    "price": 22,
+    "price": 15,
     "font": "minecraft:language/wynncraft_outline",
     "allows": [
       "color",
@@ -349,7 +349,7 @@
     "id": "font_wynnic",
     "kind": "font",
     "name": "Wynnic",
-    "price": 30,
+    "price": 22,
     "font": "minecraft:language/wynnic",
     "allows": [
       "color",
@@ -363,7 +363,7 @@
     "id": "font_high_gavellian",
     "kind": "font",
     "name": "High Gavellian",
-    "price": 30,
+    "price": 22,
     "font": "minecraft:language/high_gavellian",
     "allows": [
       "color",
@@ -377,7 +377,7 @@
     "id": "font_old_fruman",
     "kind": "font",
     "name": "Old Fruman",
-    "price": 30,
+    "price": 22,
     "font": "minecraft:language/old_fruman",
     "allows": [
       "color",
@@ -391,7 +391,7 @@
     "id": "font_pill",
     "kind": "font",
     "name": "Pill banner",
-    "price": 44,
+    "price": 32,
     "font": "minecraft:banner/pill",
     "allows": [
       "color"
@@ -402,7 +402,7 @@
     "id": "font_box",
     "kind": "font",
     "name": "Box banner",
-    "price": 44,
+    "price": 32,
     "font": "minecraft:banner/box",
     "allows": [
       "color"
@@ -413,7 +413,7 @@
     "id": "font_flag",
     "kind": "font",
     "name": "Flag banner",
-    "price": 44,
+    "price": 32,
     "font": "minecraft:banner/flag",
     "allows": [
       "color"
@@ -424,7 +424,7 @@
     "id": "font_ribbon",
     "kind": "font",
     "name": "Ribbon banner",
-    "price": 44,
+    "price": 32,
     "font": "minecraft:banner/ribbon",
     "allows": [
       "color"

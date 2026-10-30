@@ -58,31 +58,62 @@ public final class WynntilsDetectors {
 	/** Visited territories for territorySet triggers are kept in visitedFile. */
 	public static Map<String, Detector> create(Path visitedFile) {
 		Map<String, Detector> detectors = new HashMap<>();
-		detectors.put("combatLevel", WynntilsDetectors::combatLevel);
-		detectors.put("combatLevelAnyClass", WynntilsDetectors::combatLevelAnyClass);
-		detectors.put("totalProfessionLevel", WynntilsDetectors::totalProfessionLevel);
+		detectors.put("combatLevel", detector(WynntilsDetectors::combatLevel, WynntilsDetectors::combatLevelProgress));
+		detectors.put("combatLevelAnyClass",
+				detector(WynntilsDetectors::combatLevelAnyClass, WynntilsDetectors::combatLevelAnyClassProgress));
+		detectors.put("totalProfessionLevel",
+				detector(WynntilsDetectors::totalProfessionLevel, WynntilsDetectors::totalProfessionLevelProgress));
 		detectors.put("professionLevel", new ProfessionLevelDetector());
 		detectors.put("professionLevelAll", new ProfessionLevelDetector());
 		detectors.put("location", WynntilsDetectors::location);
 		detectors.put("territorySet", new TerritorySetDetector(new VisitedTerritories(visitedFile)));
 		detectors.put("coordinates", trigger -> nearby(trigger, new JsonObject()));
 		detectors.put("itemAtLocation", WynntilsDetectors::itemAtLocation);
-		detectors.put("inventoryItem", WynntilsDetectors::inventoryItem);
-		detectors.put("itemSet", WynntilsDetectors::itemSet);
-		detectors.put("itemRarityCount", WynntilsDetectors::itemRarityCount);
-		detectors.put("shinyItem", WynntilsDetectors::shinyItem);
+		detectors.put("inventoryItem", detector(WynntilsDetectors::inventoryItem, WynntilsDetectors::inventoryItemProgress));
+		detectors.put("itemSet", detector(WynntilsDetectors::itemSet, WynntilsDetectors::itemSetProgress));
+		detectors.put("itemRarityCount",
+				detector(WynntilsDetectors::itemRarityCount, WynntilsDetectors::itemRarityCountProgress));
+		detectors.put("shinyItem", detector(WynntilsDetectors::shinyItem, WynntilsDetectors::shinyItemProgress));
 		detectors.put("statistic", new StatisticDetector());
 		detectors.put("quest", new QuestDetector());
 		detectors.put("raid", RAIDS);
-		detectors.put("dungeon", WynntilsDetectors::dungeon);
-		detectors.put("dungeonSet", WynntilsDetectors::dungeonSet);
-		detectors.put("characterRoster", WynntilsDetectors::characterRoster);
-		detectors.put("gamemodeLevel", WynntilsDetectors::gamemodeLevel);
-		detectors.put("playtime", WynntilsDetectors::playtime);
-		detectors.put("accountAge", WynntilsDetectors::accountAge);
+		detectors.put("dungeon", detector(WynntilsDetectors::dungeon, WynntilsDetectors::dungeonProgress));
+		detectors.put("dungeonSet", detector(WynntilsDetectors::dungeonSet, WynntilsDetectors::dungeonSetProgress));
+		detectors.put("characterRoster",
+				detector(WynntilsDetectors::characterRoster, WynntilsDetectors::characterRosterProgress));
+		detectors.put("gamemodeLevel", detector(WynntilsDetectors::gamemodeLevel, WynntilsDetectors::gamemodeLevelProgress));
+		detectors.put("playtime", detector(WynntilsDetectors::playtime, WynntilsDetectors::playtimeProgress));
+		detectors.put("accountAge", detector(WynntilsDetectors::accountAge, WynntilsDetectors::accountAgeProgress));
 		detectors.put("guild", new GuildDetector());
-		detectors.put("leaderboard", WynntilsDetectors::leaderboard);
+		detectors.put("leaderboard", detector(WynntilsDetectors::leaderboard, WynntilsDetectors::leaderboardProgress));
 		return detectors;
+	}
+
+	/** A detector from a check and its progress line. */
+	private static Detector detector(Detector check, Function<Trigger, String> progress) {
+		return new Detector() {
+			@Override
+			public JsonObject check(Trigger trigger) {
+				return check.check(trigger);
+			}
+
+			@Override
+			public String progress(Trigger trigger) {
+				return progress.apply(trigger);
+			}
+		};
+	}
+
+	/**
+	 * "37 / 100 levels", the current value capped at the target since a met
+	 * trigger may not have been claimed yet. Null for a target of 1, which has
+	 * nothing to count.
+	 */
+	private static String count(long current, long target, String unit) {
+		if (target <= 1) {
+			return null;
+		}
+		return String.format(Locale.ROOT, "%,d / %,d %s", Math.min(current, target), target, unit);
 	}
 
 	private static JsonObject combatLevel(Trigger trigger) {
@@ -114,14 +145,54 @@ public final class WynntilsDetectors {
 		return evidence;
 	}
 
-	private static JsonObject totalProfessionLevel(Trigger trigger) {
+	/**
+	 * The best character of the class: the one being played, or any other from
+	 * the API profile. Claiming still needs the class's character to be played.
+	 */
+	private static String combatLevelProgress(Trigger trigger) {
+		boolean playing = Models.Character.hasCharacter()
+				&& Models.Character.getClassType().getName().equalsIgnoreCase(trigger.className());
+		if (!playing && PROFILE.get() == null) {
+			return null;
+		}
+		int best = characters().stream()
+				.filter(c -> c.classType().getName().equalsIgnoreCase(trigger.className()))
+				.mapToInt(CharacterData::level)
+				.max()
+				.orElse(0);
+		if (playing) {
+			best = Math.max(best, Models.CombatXp.getCombatLevel().current());
+		}
+		return count(best, trigger.level(), "levels");
+	}
+
+	private static String combatLevelAnyClassProgress(Trigger trigger) {
 		if (!Models.Character.hasCharacter()) {
 			return null;
 		}
+		return count(Models.CombatXp.getCombatLevel().current(), trigger.level(), "levels");
+	}
+
+	private static int totalProfessionLevelNow() {
 		int total = 0;
 		for (ProfessionType type : ProfessionType.values()) {
 			total += Models.Profession.getLevel(type);
 		}
+		return total;
+	}
+
+	private static String totalProfessionLevelProgress(Trigger trigger) {
+		if (!Models.Character.hasCharacter()) {
+			return null;
+		}
+		return count(totalProfessionLevelNow(), trigger.level(), "total profession levels");
+	}
+
+	private static JsonObject totalProfessionLevel(Trigger trigger) {
+		if (!Models.Character.hasCharacter()) {
+			return null;
+		}
+		int total = totalProfessionLevelNow();
 		if (total < trigger.level()) {
 			return null;
 		}
@@ -152,6 +223,19 @@ public final class WynntilsDetectors {
 				evidence.addProperty(type.getDisplayName(), level);
 			}
 			return evidence;
+		}
+
+		@Override
+		public String progress(Trigger trigger) {
+			List<ProfessionType> types = professions(trigger);
+			if (types == null || !Models.Character.hasCharacter()) {
+				return null;
+			}
+			if (types.size() == 1) {
+				return count(Models.Profession.getLevel(types.get(0)), trigger.level(), "levels");
+			}
+			long done = types.stream().filter(type -> Models.Profession.getLevel(type) >= trigger.level()).count();
+			return count(done, types.size(), "professions at level " + trigger.level());
 		}
 
 		private static List<ProfessionType> professions(Trigger trigger) {
@@ -219,6 +303,16 @@ public final class WynntilsDetectors {
 			evidence.addProperty("last", territory.getName());
 			return evidence;
 		}
+
+		@Override
+		public String progress(Trigger trigger) {
+			if (Mc.client().player == null) {
+				return null;
+			}
+			String player = Mc.client().player.getStringUUID();
+			long done = trigger.territoryNames().stream().filter(name -> visited.contains(player, name)).count();
+			return count(done, trigger.territoryNames().size(), "territories visited");
+		}
 	}
 
 	/** Adds the player's position to evidence if they are within the trigger's circle, otherwise null. */
@@ -260,6 +354,13 @@ public final class WynntilsDetectors {
 		return evidence;
 	}
 
+	private static String inventoryItemProgress(Trigger trigger) {
+		if (!Models.Character.hasCharacter()) {
+			return null;
+		}
+		return count(Models.Inventory.getAmountInInventory(trigger.itemName()), trigger.amount(), "carried");
+	}
+
 	/** Item names the way Wynntils matches them in getAmountInInventory, worn items included. */
 	private static List<String> carriedNames() {
 		List<String> names = new ArrayList<>();
@@ -290,10 +391,25 @@ public final class WynntilsDetectors {
 		return null;
 	}
 
-	private static JsonObject itemRarityCount(Trigger trigger) {
+	/** The set with the most pieces held or worn. */
+	private static String itemSetProgress(Trigger trigger) {
 		if (!Models.Character.hasCharacter()) {
 			return null;
 		}
+		List<String> carried = carriedNames();
+		long best = 0;
+		int size = 0;
+		for (List<String> set : trigger.itemSets()) {
+			long held = set.stream().filter(item -> carried.stream().anyMatch(name -> name.endsWith(item))).count();
+			if (held > best || size == 0) {
+				best = held;
+				size = set.size();
+			}
+		}
+		return count(best, size, "set pieces carried");
+	}
+
+	private static int rarityCount(Trigger trigger) {
 		int count = 0;
 		for (ItemStack stack : Mc.inventory()) {
 			boolean matches = Models.Item.asWynnItemProperty(stack, GearTierItemProperty.class)
@@ -303,6 +419,21 @@ public final class WynntilsDetectors {
 				count++;
 			}
 		}
+		return count;
+	}
+
+	private static String itemRarityCountProgress(Trigger trigger) {
+		if (!Models.Character.hasCharacter()) {
+			return null;
+		}
+		return count(rarityCount(trigger), trigger.amount(), trigger.rarity() + " items carried");
+	}
+
+	private static JsonObject itemRarityCount(Trigger trigger) {
+		if (!Models.Character.hasCharacter()) {
+			return null;
+		}
+		int count = rarityCount(trigger);
 		if (count < trigger.amount()) {
 			return null;
 		}
@@ -311,10 +442,7 @@ public final class WynntilsDetectors {
 		return evidence;
 	}
 
-	private static JsonObject shinyItem(Trigger trigger) {
-		if (!Models.Character.hasCharacter()) {
-			return null;
-		}
+	private static List<String> shinies() {
 		List<String> shinies = new ArrayList<>();
 		for (ItemStack stack : Mc.inventory()) {
 			boolean shiny = Models.Item.asWynnItemProperty(stack, ShinyItemProperty.class)
@@ -324,6 +452,21 @@ public final class WynntilsDetectors {
 				shinies.add(stack.getHoverName().getString());
 			}
 		}
+		return shinies;
+	}
+
+	private static String shinyItemProgress(Trigger trigger) {
+		if (!Models.Character.hasCharacter()) {
+			return null;
+		}
+		return count(shinies().size(), trigger.amount(), "shiny items carried");
+	}
+
+	private static JsonObject shinyItem(Trigger trigger) {
+		if (!Models.Character.hasCharacter()) {
+			return null;
+		}
+		List<String> shinies = shinies();
 		if (shinies.size() < trigger.amount()) {
 			return null;
 		}
@@ -346,6 +489,16 @@ public final class WynntilsDetectors {
 				"caves", GlobalData::caves,
 				"worldEvents", GlobalData::worldEvents,
 				"completedQuests", GlobalData::completedQuests);
+		private static final Map<String, String> UNITS = Map.of(
+				"mobsKilled", "mobs killed",
+				"chestsFound", "chests found",
+				"wars", "wars",
+				"dungeonsCompleted", "dungeons",
+				"raidsCompleted", "raids",
+				"lootruns", "lootruns",
+				"caves", "caves",
+				"worldEvents", "world events",
+				"completedQuests", "quests");
 
 		@Override
 		public boolean supports(Trigger trigger) {
@@ -354,17 +507,28 @@ public final class WynntilsDetectors {
 
 		@Override
 		public JsonObject check(Trigger trigger) {
-			WynnPlayerInfo info = Models.Account.getPlayerInfo();
-			if (info == null || info.globalData().isEmpty()) {
-				return null;
-			}
-			long value = STATISTICS.get(trigger.statistic()).applyAsLong(info.globalData().get());
-			if (value < trigger.amount()) {
+			Long value = value(trigger);
+			if (value == null || value < trigger.amount()) {
 				return null;
 			}
 			JsonObject evidence = new JsonObject();
 			evidence.addProperty(trigger.statistic(), value);
 			return evidence;
+		}
+
+		@Override
+		public String progress(Trigger trigger) {
+			Long value = value(trigger);
+			return value == null ? null : count(value, trigger.amount(), UNITS.get(trigger.statistic()));
+		}
+
+		/** Null until the API profile arrives. */
+		private static Long value(Trigger trigger) {
+			WynnPlayerInfo info = Models.Account.getPlayerInfo();
+			if (info == null || info.globalData().isEmpty()) {
+				return null;
+			}
+			return STATISTICS.get(trigger.statistic()).applyAsLong(info.globalData().get());
 		}
 
 		private static long total(ContentCompletedData data) {
@@ -419,6 +583,16 @@ public final class WynntilsDetectors {
 		}
 
 		@Override
+		public String progress(Trigger trigger) {
+			int thisSession = completedThisSession.getOrDefault(key(trigger.raidName()), 0);
+			if (thisSession == 0 && PROFILE.get() == null) {
+				return null;
+			}
+			int onAccount = completions(GlobalData::raids).getOrDefault(key(trigger.raidName()), 0);
+			return count(Math.max(thisSession, onAccount), trigger.amount(), "clears");
+		}
+
+		@Override
 		public JsonObject check(Trigger trigger) {
 			String raid = key(trigger.raidName());
 			int thisSession = completedThisSession.getOrDefault(raid, 0);
@@ -465,6 +639,22 @@ public final class WynntilsDetectors {
 		return evidence;
 	}
 
+	private static String dungeonProgress(Trigger trigger) {
+		if (PROFILE.get() == null) {
+			return null;
+		}
+		return count(completions(GlobalData::dungeons).getOrDefault(key(trigger.dungeonName()), 0), trigger.amount(), "clears");
+	}
+
+	private static String dungeonSetProgress(Trigger trigger) {
+		if (PROFILE.get() == null) {
+			return null;
+		}
+		Map<String, Integer> completed = completions(GlobalData::dungeons);
+		long done = trigger.dungeonNames().stream().filter(d -> completed.getOrDefault(key(d), 0) > 0).count();
+		return count(done, trigger.dungeonNames().size(), "dungeons cleared");
+	}
+
 	private static JsonObject dungeonSet(Trigger trigger) {
 		Map<String, Integer> completed = completions(GlobalData::dungeons);
 		JsonObject evidence = new JsonObject();
@@ -482,6 +672,26 @@ public final class WynntilsDetectors {
 	private static List<CharacterData> characters() {
 		WynnPlayerInfo info = PROFILE.get();
 		return info == null ? List.of() : List.copyOf(info.characters().values());
+	}
+
+	/** Classes with a character at the level, on any characters of the account. */
+	private static String characterRosterProgress(Trigger trigger) {
+		if (PROFILE.get() == null) {
+			return null;
+		}
+		List<CharacterData> characters = characters();
+		int classes = 0;
+		int done = 0;
+		for (ClassType type : ClassType.values()) {
+			if (type == ClassType.NONE) {
+				continue;
+			}
+			classes++;
+			if (characters.stream().anyMatch(c -> c.classType() == type && c.level() >= trigger.level())) {
+				done++;
+			}
+		}
+		return count(done, classes, "classes at level " + trigger.level());
 	}
 
 	/** A character of every class at the level, on any characters of the account. */
@@ -505,15 +715,31 @@ public final class WynntilsDetectors {
 		return evidence;
 	}
 
+	private static boolean hasGamemodes(CharacterData character, Trigger trigger) {
+		Set<String> modes = new HashSet<>();
+		for (CharacterGamemode mode : character.gamemodes()) {
+			modes.add(key(mode.getApiName()));
+		}
+		return trigger.gamemodes().stream().allMatch(mode -> modes.contains(key(mode)));
+	}
+
+	/** The highest character with every listed gamemode. */
+	private static String gamemodeLevelProgress(Trigger trigger) {
+		if (PROFILE.get() == null) {
+			return null;
+		}
+		int best = characters().stream()
+				.filter(c -> hasGamemodes(c, trigger))
+				.mapToInt(CharacterData::level)
+				.max()
+				.orElse(0);
+		return count(best, trigger.level(), "levels");
+	}
+
 	/** One character with every listed gamemode at the level. A dead hardcore character loses the mode in the API. */
 	private static JsonObject gamemodeLevel(Trigger trigger) {
 		for (CharacterData character : characters()) {
-			Set<String> modes = new HashSet<>();
-			for (CharacterGamemode mode : character.gamemodes()) {
-				modes.add(key(mode.getApiName()));
-			}
-			if (character.level() >= trigger.level()
-					&& trigger.gamemodes().stream().allMatch(mode -> modes.contains(key(mode)))) {
+			if (character.level() >= trigger.level() && hasGamemodes(character, trigger)) {
 				JsonObject evidence = new JsonObject();
 				evidence.addProperty("className", character.classType().getName());
 				evidence.addProperty("level", character.level());
@@ -533,6 +759,24 @@ public final class WynntilsDetectors {
 		JsonObject evidence = new JsonObject();
 		evidence.addProperty("hours", (long) hours);
 		return evidence;
+	}
+
+	private static String playtimeProgress(Trigger trigger) {
+		WynnPlayerInfo info = PROFILE.get();
+		if (info == null || info.playtime().isEmpty()) {
+			return null;
+		}
+		return count(info.playtime().get().longValue(), trigger.amount(), "hours played");
+	}
+
+	private static String accountAgeProgress(Trigger trigger) {
+		WynnPlayerInfo info = PROFILE.get();
+		Instant firstJoin = info == null ? null : info.firstJoinTimestamp().orElse(null);
+		if (firstJoin == null) {
+			return null;
+		}
+		double years = Duration.between(firstJoin, Instant.now()).toDays() / 365.25;
+		return String.format(Locale.ROOT, "%.1f / %d years", Math.min(years, trigger.amount()), trigger.amount());
 	}
 
 	/** Amount is years since the account first joined Wynncraft. */
@@ -567,6 +811,24 @@ public final class WynntilsDetectors {
 			return evidence;
 		}
 
+		@Override
+		public String progress(Trigger trigger) {
+			WynnPlayerInfo info = PROFILE.get();
+			if (info == null) {
+				return null;
+			}
+			PlayerGuildInfo guild = info.guildInfo().orElse(null);
+			if (guild == null || guild.guildRank() == null) {
+				return "Not in a guild";
+			}
+			return "Rank " + rankName(guild.guildRank()) + ", needs " + rankName(rank(trigger));
+		}
+
+		private static String rankName(GuildRank rank) {
+			String name = rank.name().toLowerCase(Locale.ROOT);
+			return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+		}
+
 		private static GuildRank rank(Trigger trigger) {
 			try {
 				return GuildRank.valueOf(trigger.guildRank().toUpperCase(Locale.ROOT));
@@ -591,5 +853,22 @@ public final class WynntilsDetectors {
 			}
 		}
 		return null;
+	}
+
+	/** The best placement on any leaderboard. */
+	private static String leaderboardProgress(Trigger trigger) {
+		WynnPlayerInfo info = PROFILE.get();
+		if (info == null) {
+			return null;
+		}
+		int best = info.leaderboardPlacements().values().stream()
+				.filter(placement -> placement != null && placement > 0)
+				.mapToInt(Integer::intValue)
+				.min()
+				.orElse(0);
+		if (best == 0) {
+			return "Not on a leaderboard yet";
+		}
+		return String.format(Locale.ROOT, "Best placement #%,d, needs top %,d", best, trigger.amount());
 	}
 }

@@ -134,9 +134,10 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 					.filter(a -> !a.id().equals(ownAchievement.id()))
 					.findFirst()
 					.orElseThrow();
-			context.setScreen(() -> TitlesScreen.achievements(a -> !a.id().equals(undetectable.id())));
+			context.setScreen(() -> TitlesScreen.achievements(a -> !a.id().equals(undetectable.id()), a -> null));
 			context.waitTicks(20);
 			screenshot(context, "wynntitles-achievements-tab");
+			screenshotProgressTooltip(context);
 			screenshotWindowSizes(context);
 
 			context.setScreen(() -> null);
@@ -146,6 +147,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			context.waitTicks(30);
 			context.takeScreenshot("wynntitles-unlock-toast");
 			screenshotChat(context, ownAchievement, "wynntitles-chat");
+			screenshotUnlockSummary(context, catalog);
 
 			screenshotFonts(context, catalog, "fallbacks");
 			screenshotIconGallery(context, catalog, "fallbacks");
@@ -329,6 +331,19 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 	}
 
 	/** Writes the unlock line and a command reply to an otherwise empty chat, to show the badge. */
+	/** What a first login shows instead of a toast per achievement: one summary toast and chat line. */
+	private static void screenshotUnlockSummary(ClientGameTestContext context, Catalog catalog) {
+		List<Catalog.Achievement> batch = catalog.achievements().subList(0, 23);
+		context.runOnClient(client -> {
+			client.getToastManager().clear();
+			client.getToastManager().addToast(new UnlockToast(batch));
+			client.gui.getChat().clearMessages(false);
+			Mc.chat(WynnTitles.unlockSummary(batch));
+		});
+		context.waitTicks(30);
+		context.takeScreenshot("wynntitles-unlock-summary");
+	}
+
 	private static void screenshotChat(ClientGameTestContext context, Catalog.Achievement achievement, String name) {
 		context.runOnClient(client -> {
 			client.gui.getChat().clearMessages(false);
@@ -337,6 +352,17 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		});
 		context.waitTicks(5);
 		screenshot(context, name);
+	}
+
+	/** Gives every locked achievement a progress line and hovers the first "Locked" label, to shoot its tooltip. */
+	private static void screenshotProgressTooltip(ClientGameTestContext context) {
+		context.setScreen(() -> TitlesScreen.achievements(a -> true, a -> "37 / 100 levels"));
+		context.waitTicks(20);
+		double[] pos = context.computeOnClient(client -> ((TitlesScreen) client.screen).tooltipTarget());
+		check(pos != null, "a locked achievement should have a progress tooltip");
+		context.getInput().setCursorPos(pos[0], pos[1]);
+		context.waitTicks(5);
+		screenshot(context, "wynntitles-achievements-progress");
 	}
 
 	/** Wheels the shop's list a little way down, to the palette rows, so their names can be checked for contrast. */

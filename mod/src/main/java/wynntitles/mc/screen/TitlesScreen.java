@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import net.minecraft.client.input.KeyEvent;
@@ -61,7 +62,8 @@ public class TitlesScreen extends UiScreen {
 	}
 
 	private Tab tab = Tab.TITLES;
-	private AchievementsPage achievements = new AchievementsPage(a -> WynnTitles.tracker().canDetect(a));
+	private AchievementsPage achievements =
+			new AchievementsPage(a -> WynnTitles.tracker().canDetect(a), a -> WynnTitles.tracker().progress(a));
 	private final StylesPage styles = new StylesPage(this::profileSaved);
 	private final ShopPage shop = new ShopPage(this::profileSaved);
 	private Me me;
@@ -105,9 +107,10 @@ public class TitlesScreen extends UiScreen {
 	}
 
 	/** The achievements tab with a stand-in for the tracker, for tests. */
-	public static TitlesScreen achievements(Predicate<Catalog.Achievement> canDetect) {
+	public static TitlesScreen achievements(
+			Predicate<Catalog.Achievement> canDetect, Function<Catalog.Achievement, String> progress) {
 		TitlesScreen screen = achievements();
-		screen.achievements = new AchievementsPage(canDetect);
+		screen.achievements = new AchievementsPage(canDetect, progress);
 		return screen;
 	}
 
@@ -210,7 +213,7 @@ public class TitlesScreen extends UiScreen {
 		}
 	}
 
-	/** After wearing, buying or refunding: a refund also takes styles off. */
+	/** After wearing or buying. */
 	private void profileSaved(Me updated) {
 		me = updated;
 		styles.reset(updated);

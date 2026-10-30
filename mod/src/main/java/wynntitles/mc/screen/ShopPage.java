@@ -24,14 +24,14 @@ import wynntitles.titles.TitleWord;
 
 /**
  * The shop tab: every style piece, priced in its tooltip. Picking one previews it on
- * your title; bought pieces are worn from the styles tab. Refunding gives every
- * point back, so trying things is never a trap.
+ * your title; bought pieces are worn from the styles tab. Purchases are final, so
+ * Buy asks once before spending.
  */
 final class ShopPage {
 	private final Consumer<Me> onSaved;
 	private ShopItem selected;
 	private boolean saving;
-	private boolean confirmRefund;
+	private boolean confirmBuy;
 	private String error;
 
 	private Catalog catalog;
@@ -119,7 +119,7 @@ final class ShopPage {
 	private void select(ShopItem item) {
 		if (!Objects.equals(selected, item)) {
 			selected = item;
-			confirmRefund = false;
+			confirmBuy = false;
 			WynnUi.playClick();
 			refreshFooter();
 		}
@@ -138,37 +138,30 @@ final class ShopPage {
 			footer.child(WynnUi.button("Need " + (selected.price() - me.balance()) + " more", 104, false, () -> {}));
 		} else {
 			ShopItem item = selected;
-			footer.child(WynnUi.button("Buy for " + StyleChips.points(item.price()), 104, true, () -> buy(item)));
+			String label = confirmBuy ? "Spend " + StyleChips.points(item.price()) + "?" : "Buy for " + StyleChips.points(item.price());
+			footer.child(WynnUi.button(label, 104, true, () -> buy(item)));
 		}
-		footer.child(WynnUi.button(confirmRefund ? "Refund all?" : "Refund", 72,
-				!saving && !me.owned().isEmpty(), this::refund));
 		if (error != null) {
 			footer.child(WynnUi.label(WynnFonts.body(error), WynnUi.ERROR));
 		}
 	}
 
+	/** Asks once, then spends the points. There is no refund. */
 	private void buy(ShopItem item) {
-		saving = true;
-		refreshFooter();
-		WynnTitles.account().buy(List.of(item.id())).whenComplete((updated, t) -> finish(updated, t, "Could not buy"));
-	}
-
-	/** Asks once, then refunds every purchase and puts both slots back to their native style. */
-	private void refund() {
-		if (!confirmRefund) {
-			confirmRefund = true;
+		if (!confirmBuy) {
+			confirmBuy = true;
 			refreshFooter();
 			return;
 		}
 		saving = true;
 		refreshFooter();
-		WynnTitles.account().resetPurchases().whenComplete((updated, t) -> finish(updated, t, "Could not refund"));
+		WynnTitles.account().buy(List.of(item.id())).whenComplete((updated, t) -> finish(updated, t, "Could not buy"));
 	}
 
 	private void finish(Me updated, Throwable t, String failure) {
 		Mc.run(() -> {
 			saving = false;
-			confirmRefund = false;
+			confirmBuy = false;
 			if (t != null) {
 				error = failure + ": " + ApiException.describe(t);
 				refreshFooter();

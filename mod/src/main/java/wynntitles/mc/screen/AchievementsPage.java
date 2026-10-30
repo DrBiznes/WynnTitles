@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import net.minecraft.client.gui.GuiGraphics;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import wynntitles.mc.screen.ui.Align;
 import wynntitles.mc.screen.ui.Box;
 import wynntitles.mc.screen.ui.Element;
 import wynntitles.mc.screen.ui.Insets;
+import wynntitles.mc.screen.ui.Label;
 import wynntitles.mc.screen.ui.Painter;
 import wynntitles.mc.screen.ui.Size;
 import wynntitles.titles.Title;
@@ -78,6 +80,8 @@ final class AchievementsPage {
 	}
 
 	private final Predicate<Catalog.Achievement> canDetect;
+	/** A line like "37 / 100 levels" for a locked achievement, or null. */
+	private final Function<Catalog.Achievement, String> progress;
 	/** Null shows every category. */
 	private String category;
 	private Map<String, Long> unlockedAt = Map.of();
@@ -87,8 +91,9 @@ final class AchievementsPage {
 	private Box list;
 	private int textWidth;
 
-	AchievementsPage(Predicate<Catalog.Achievement> canDetect) {
+	AchievementsPage(Predicate<Catalog.Achievement> canDetect, Function<Catalog.Achievement, String> progress) {
 		this.canDetect = canDetect;
+		this.progress = progress;
 	}
 
 	/** Stats are null while they load, or when the server could not send them. */
@@ -217,7 +222,10 @@ final class AchievementsPage {
 		return row;
 	}
 
-	/** The rarity column: share of players, the Wynncraft tier that maps to, and the unlock date. */
+	/**
+	 * The rarity column: share of players, the Wynncraft tier that maps to, and
+	 * the unlock date, or "Locked" with the progress so far on hover.
+	 */
 	private Box rarity(Catalog.Achievement achievement, Long claimedAt) {
 		Box column = Box.column(Size.fixed(RARITY_WIDTH), Size.content());
 		column.gap(2);
@@ -232,10 +240,17 @@ final class AchievementsPage {
 		} else {
 			column.child(WynnUi.label(WynnFonts.body("..."), WynnUi.TEXT_DIM));
 		}
-		column.child(claimedAt != null
-				? WynnUi.label(WynnFonts.small(UNLOCK_DATE.format(
-						Instant.ofEpochMilli(claimedAt).atZone(ZoneId.systemDefault()))), WynnUi.UNLOCKED)
-				: WynnUi.label(WynnFonts.small("Locked"), WynnUi.TEXT_DIM));
+		if (claimedAt != null) {
+			column.child(WynnUi.label(WynnFonts.small(UNLOCK_DATE.format(
+					Instant.ofEpochMilli(claimedAt).atZone(ZoneId.systemDefault()))), WynnUi.UNLOCKED));
+		} else {
+			Label locked = WynnUi.label(WynnFonts.small("Locked"), WynnUi.TEXT_DIM);
+			String line = progress.apply(achievement);
+			if (line != null) {
+				locked.tooltip(WynnFonts.body(line));
+			}
+			column.child(locked);
+		}
 		return column;
 	}
 

@@ -81,10 +81,6 @@ public final class Account {
 		return withToken(token -> api.buy(token, itemIds)).thenApply(this::update);
 	}
 
-	public CompletableFuture<Me> resetPurchases() {
-		return withToken(api::resetPurchases).thenApply(this::update);
-	}
-
 	/** Runs an authenticated call, logging in first if needed and once more if the token was rejected. */
 	public <T> CompletableFuture<T> withToken(Function<String, CompletableFuture<T>> call) {
 		return token().thenCompose(call).exceptionallyCompose(t -> {

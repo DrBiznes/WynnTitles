@@ -44,22 +44,22 @@ The unlock toast (`mc/UnlockToast.java`) still draws vanilla's `toast/advancemen
 
 ## 5. Shop pricing scales with achievements
 
-Retuned for the 164-achievement catalog and ten new fonts: the shop costs **994 points** against **592 earnable**, so all achievements buy **59.6%** of the shop. `TestFontRulesAndPricing` checks the ratio stays within 58–62%; revisit the prices after future achievement batches. Purchases keep their price paid, so repricing never changes existing balances or refunds.
+Retuned before launch so completionists can buy most of the shop: it costs **720 points** against **592 earnable**, so all achievements buy **82.2%** of it. `TestFontRulesAndPricing` checks the ratio stays within 80–85%. Ship future achievements and shop items together in batches to stay in that band; roughly 100 new achievement points pays for about 120 points of new items. Purchases keep their price paid, so never lower an existing price after launch; to make the shop cheaper, raise achievement points instead, which lifts every balance. New item kinds (glow, shaders) should cost more than rainbow.
 
 | Kind | Items | Price |
 | --- | --- | --- |
-| Color | 15 | 5 |
-| Format | 4 | 8 |
-| Palette | 11 | 16 |
-| Animated palette | 11 | 29 |
-| Rainbow | 1 | 60 |
-| Plain font | 3 | 22 |
-| Script font | 3 | 30 |
-| Banner font | 4 | 44 |
+| Color | 15 | 4 |
+| Format | 4 | 6 |
+| Palette | 11 | 12 |
+| Animated palette | 11 | 20 |
+| Rainbow | 1 | 45 |
+| Plain font | 3 | 15 |
+| Script font | 3 | 22 |
+| Banner font | 4 | 32 |
 
 - [x] Recheck shop total vs earnable points after this batch
 - [x] Add a pricier new item kind (fonts) alongside retuned existing prices
-- [x] Keep resets free, returning the full price paid
+- [x] Keep resets free, returning the full price paid (dashboard only; players cannot refund)
 
 ## 6. Shop overhaul before release
 
@@ -123,7 +123,7 @@ How the banners work: each banner font has a `_background` glyph per character (
 - [x] The server's `Restyle` rejects incompatible combos too (banner plus palette, banner plus formats), and the contract test covers it
 - [x] Render fonts in `TitleText` (chat and screens) and `TitleRenderer` (nametags). Measure banner width including the edges so nametags stay centered
 - [x] Generalize `WynnFonts.pill` into banner drawing with background and foreground layers for pill, box, flag and ribbon. Add all the new font ids to the reload check
-- [x] Price them as a new tier (see section 5). Final prices: plain fonts 22, scripts 30, banners 44. Shop total is 994 vs 592 earnable points
+- [x] Price them as a new tier (see section 5). Prices were 22/30/44 at first, now plain fonts 15, scripts 22, banners 32 (section 5). Shop total is 720 vs 592 earnable points
 - [x] Run `WT_WYNN_PACK=... scripts/smoke-test.sh` and look at every font in chat, the shop and nametags, with and without the pack
 
 Font checks include all ten server/mod round trips, incompatible-combination rejections, font-switch previews, a banner width assertion, and screenshots of every font in contact sheets, chat, the shop and nametags, with and without the real pack. Assets remain in the external pack; the mod only supplies ids and its own codepoint logic.

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import wynntitles.WynnTitles;
@@ -32,6 +33,8 @@ public final class AchievementTracker {
 	private final Set<String> inFlight = ConcurrentHashMap.newKeySet();
 	private final Map<String, Long> retryAt = new ConcurrentHashMap<>();
 	private final Set<String> failingTypes = ConcurrentHashMap.newKeySet();
+	/** Set by a successful claim; one profile refresh follows once no claim is in flight. */
+	private final AtomicBoolean refreshPending = new AtomicBoolean();
 	private int ticks;
 
 	public AchievementTracker(
@@ -55,6 +58,11 @@ public final class AchievementTracker {
 			return;
 		}
 		ticks = 0;
+
+		// A first login claims dozens at once; refresh the profile once, not per claim.
+		if (inFlight.isEmpty() && refreshPending.compareAndSet(true, false)) {
+			account.refresh();
+		}
 
 		Catalog catalog = catalogs.catalog();
 		Me me = account.me();
@@ -98,6 +106,19 @@ public final class AchievementTracker {
 		return detector != null && detector.supports(achievement.trigger());
 	}
 
+	/** The detector's progress line for a locked achievement, or null when it has none. */
+	public String progress(Catalog.Achievement achievement) {
+		if (!canDetect(achievement)) {
+			return null;
+		}
+		try {
+			return detectors.get(achievement.trigger().type()).progress(achievement.trigger());
+		} catch (Throwable t) {
+			// Wynntils data that is not loaded yet; the tick loop logs detector failures.
+			return null;
+		}
+	}
+
 	private void claim(Catalog.Achievement achievement, JsonObject evidence) {
 		String id = achievement.id();
 		inFlight.add(id);
@@ -117,7 +138,7 @@ public final class AchievementTracker {
 					if (result.newlyUnlocked()) {
 						onUnlocked.accept(achievement);
 					}
-					account.refresh();
+					refreshPending.set(true);
 				});
 	}
 

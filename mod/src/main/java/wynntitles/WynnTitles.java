@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.mod.event.WynncraftConnectionEvent;
 import java.nio.file.Path;
+import java.util.List;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wynntitles.account.Account;
 import wynntitles.achievements.AchievementTracker;
+import wynntitles.achievements.UnlockBatcher;
 import wynntitles.achievements.WynntilsDetectors;
 import wynntitles.api.ApiClient;
 import wynntitles.api.ApiException;
@@ -34,6 +36,7 @@ import wynntitles.mc.MojangSession;
 import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.UnlockToast;
 import wynntitles.mc.WynnFonts;
+import wynntitles.mc.screen.UnlockToastArt;
 import wynntitles.mc.screen.TitlesScreen;
 import wynntitles.titles.Title;
 import wynntitles.titles.TitleCache;
@@ -47,6 +50,7 @@ public class WynnTitles implements ClientModInitializer {
 	private static StatsStore stats;
 	private static TitleCache titles;
 	private static AchievementTracker tracker;
+	private static UnlockBatcher unlocks;
 
 	private KeyMapping openKey;
 	private static boolean loadedThisSession;
@@ -85,8 +89,9 @@ public class WynnTitles implements ClientModInitializer {
 		catalogs = new CatalogStore(api, dir.resolve("catalog.json"));
 		stats = new StatsStore(api);
 		titles = new TitleCache(api);
+		unlocks = new UnlockBatcher(WynnTitles::announceUnlocks);
 		tracker = new AchievementTracker(api, account, catalogs,
-				WynntilsDetectors.create(dir.resolve("territories.json")), WynnTitles::announceUnlock, version);
+				WynntilsDetectors.create(dir.resolve("territories.json")), unlocks::add, version);
 
 		// Show our own new title right away instead of waiting for the cache to expire.
 		account.onChange(me -> titles.put(Mc.client().getUser().getProfileId(), me.title()));
@@ -110,6 +115,7 @@ public class WynnTitles implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			titles.tick();
 			tracker.tick();
+			unlocks.tick();
 			while (openKey.consumeClick()) {
 				if (Mc.screen() == null) {
 					Mc.openScreen(new TitlesScreen());
@@ -140,13 +146,23 @@ public class WynnTitles implements ClientModInitializer {
 		});
 	}
 
-	private static void announceUnlock(Catalog.Achievement achievement) {
-		LOGGER.info("Unlocked {}", achievement.id());
+	/** Up to this many unlocks at once get a toast and chat line each; more become one summary. */
+	private static final int ANNOUNCE_EACH_UP_TO = 2;
+
+	private static void announceUnlocks(List<Catalog.Achievement> unlocked) {
+		unlocked.forEach(a -> LOGGER.info("Unlocked {}", a.id()));
 		if (!WynnTitlesConfig.get().announceUnlocks) {
 			return;
 		}
-		Mc.chat(unlockMessage(achievement));
-		Mc.toast(new UnlockToast(achievement));
+		if (unlocked.size() <= ANNOUNCE_EACH_UP_TO) {
+			for (Catalog.Achievement achievement : unlocked) {
+				Mc.chat(unlockMessage(achievement));
+				Mc.toast(new UnlockToast(achievement));
+			}
+			return;
+		}
+		Mc.chat(unlockSummary(unlocked));
+		Mc.toast(new UnlockToast(unlocked));
 	}
 
 	/** The chat line for an unlock, badge included. */
@@ -157,6 +173,37 @@ public class WynnTitles implements ClientModInitializer {
 		if (reward != null) {
 			message.append(Component.literal("\n New title words: ").withStyle(ChatFormatting.GRAY))
 					.append(TitleRenderer.render(reward))
+					.append(Component.literal(" (press ` or /titles to equip)").withStyle(ChatFormatting.DARK_GRAY));
+		}
+		return Mc.tagged(message);
+	}
+
+	/** Names in a summary's tooltip before the rest are counted, so it fits on screen. */
+	private static final int SUMMARY_NAMES = 12;
+
+	/** One chat line for a batch of unlocks; hovering the count lists them, best first. */
+	public static MutableComponent unlockSummary(List<Catalog.Achievement> unlocked) {
+		List<Catalog.Achievement> best = unlocked.stream().sorted(UnlockToastArt.BEST_FIRST).toList();
+		MutableComponent names = Component.empty();
+		for (int i = 0; i < Math.min(best.size(), SUMMARY_NAMES); i++) {
+			names.append(Component.literal((i == 0 ? "" : "\n") + best.get(i).name()).withStyle(ChatFormatting.GREEN));
+		}
+		if (best.size() > SUMMARY_NAMES) {
+			names.append(Component.literal("\n...and " + (best.size() - SUMMARY_NAMES) + " more").withStyle(ChatFormatting.GRAY));
+		}
+		int points = unlocked.stream().mapToInt(Catalog.Achievement::points).sum();
+		long words = unlocked.stream()
+				.filter(a -> a.rewards() != null)
+				.mapToLong(a -> (a.rewards().prefix() != null ? 1 : 0) + (a.rewards().suffix() != null ? 1 : 0))
+				.sum();
+
+		var message = Component.literal("Unlocked ").withStyle(ChatFormatting.GOLD)
+				.append(Mc.withHover(
+						Component.literal(unlocked.size() + " achievements").withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD, ChatFormatting.UNDERLINE),
+						names))
+				.append(Component.literal(" (+" + points + " points)").withStyle(ChatFormatting.GRAY));
+		if (words > 0) {
+			message.append(Component.literal("\n " + words + " new title words").withStyle(ChatFormatting.GRAY))
 					.append(Component.literal(" (press ` or /titles to equip)").withStyle(ChatFormatting.DARK_GRAY));
 		}
 		return Mc.tagged(message);

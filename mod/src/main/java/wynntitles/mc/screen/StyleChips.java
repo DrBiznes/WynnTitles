@@ -283,7 +283,9 @@ final class StyleChips {
 	/** The nameplate the tabs preview the title on. */
 	static Box nameplate(Supplier<Component> title) {
 		Box nameplate = Box.column(Size.fill(), Size.fixed(24));
+		// Glyphs sit at the top of the line box, so pad the top to centre them by eye.
 		nameplate.background(WynnUi.surface(WynnUi.NAMEPLATE))
+				.padding(Insets.top(2))
 				.alignX(Align.CENTER)
 				.alignY(Align.CENTER);
 		nameplate.child(new TitleText(title, 1.5f, WynnUi.TEXT).centered());

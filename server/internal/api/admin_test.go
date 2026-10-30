@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -272,16 +273,61 @@ func TestDeveloperGrantsAreScopedAndFree(t *testing.T) {
 	if !found {
 		t.Fatal("grant restored revoked achievement")
 	}
-	if err := s.Store.ResetPurchases(ctx, testUUID); err != nil {
-		t.Fatal(err)
+	if code := adminAction(t, h, testUUID, "reset_purchases", "*", "Clear test purchases"); code != 303 {
+		t.Fatalf("purchase reset %d", code)
 	}
 	me, _ = s.me(ctx, testUUID)
-	if me.Balance != me.Points {
-		t.Fatal("free grants generated refunds")
+	if me.Balance != me.Points || len(me.Owned) != 0 || me.Styles.Prefix != nil || me.Styles.Suffix != nil {
+		t.Fatalf("after reset: balance %d of %d, owned %v, styles %+v", me.Balance, me.Points, me.Owned, me.Styles)
+	}
+	if code := adminAction(t, h, testUUID, "reset_purchases", "*", "Nothing left to reset"); code != 400 {
+		t.Fatalf("empty reset %d", code)
 	}
 	audit, _ := s.Store.ModerationLog(ctx, "")
-	if len(audit) != 3 {
+	if len(audit) != 4 || !strings.Contains(audit[0].Details, fmt.Sprintf(`"refunded":%d`, paid.Price)) {
+		t.Fatalf("reset audit %+v", audit[0])
+	}
+	if len(audit) != 4 {
 		t.Fatalf("unexpected log count %d", len(audit))
+	}
+}
+
+func TestAdminResetEveryonesPurchases(t *testing.T) {
+	s, h := adminFixture(t)
+	ctx := context.Background()
+	red, _ := s.Catalog.ShopItem("color_red")
+	bold, _ := s.Catalog.ShopItem("bold")
+	buy := func(uuid string, item *catalog.ShopItem) {
+		if err := s.Store.Buy(ctx, uuid, []store.Purchase{{ItemID: item.ID, Price: item.Price}}, 1000, time.Now()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	buy(testUUID, red)
+	buy(otherUUID, red)
+	buy(otherUUID, bold)
+
+	page := adminRequest(h, "GET", "/", nil, true)
+	f := url.Values{"csrf": {field(t, page.Body.String(), "csrf")}, "action": {"reset_all_purchases"}, "item": {"*"}, "reason": {"Relaunching the shop"}}
+	preview := adminRequest(h, "POST", "/preview", f, true)
+	want := fmt.Sprintf("Refund all 3 purchases across 2 players, returning %d points", 2*red.Price+bold.Price)
+	if preview.Code != 200 || !strings.Contains(preview.Body.String(), want) {
+		t.Fatalf("preview %d: %s", preview.Code, preview.Body.String())
+	}
+	f.Set("signature", field(t, preview.Body.String(), "signature"))
+	if w := adminRequest(h, "POST", "/apply", f, true); w.Code != 303 || w.Header().Get("Location") != "/?updated=1" {
+		t.Fatalf("apply %d %s", w.Code, w.Header().Get("Location"))
+	}
+	for _, uuid := range []string{testUUID, otherUUID} {
+		if me, err := s.me(ctx, uuid); err != nil || len(me.Owned) != 0 || me.Balance != me.Points {
+			t.Fatalf("%s after reset: %+v %v", uuid, me, err)
+		}
+	}
+	audit, _ := s.Store.ModerationLog(ctx, otherUUID)
+	if len(audit) != 1 || audit[0].Action != "reset_all_purchases" || !strings.Contains(audit[0].Details, fmt.Sprintf(`"refunded":%d`, red.Price+bold.Price)) {
+		t.Fatalf("audit %+v", audit)
+	}
+	if w := adminRequest(h, "POST", "/preview", f, true); w.Code != 400 {
+		t.Fatalf("empty reset preview %d", w.Code)
 	}
 }
 

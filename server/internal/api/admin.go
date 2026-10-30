@@ -209,7 +209,11 @@ func (a *adminHandler) index(w http.ResponseWriter, r *http.Request) {
 		a.server.internalError(w, err)
 		return
 	}
-	a.render(w, adminPage{Query: q, Page: page, Next: page + 1, Previous: page - 1, Players: players, Audit: audit})
+	message := ""
+	if r.URL.Query().Get("updated") == "1" {
+		message = "Change saved and recorded in the audit history."
+	}
+	a.render(w, adminPage{Query: q, Page: page, Next: page + 1, Previous: page - 1, Players: players, Audit: audit, Message: message})
 }
 func (a *adminHandler) player(w http.ResponseWriter, r *http.Request) {
 	uuid, ok := auth.NormalizeUUID(r.PathValue("uuid"))
@@ -256,14 +260,27 @@ func (a *adminHandler) player(w http.ResponseWriter, r *http.Request) {
 // developer UUID can receive grants, even if someone edits a hidden form field.
 func (a *adminHandler) command(r *http.Request) (adminCommand, []store.ModerationItem, error) {
 	c := adminCommand{UUID: r.PostForm.Get("uuid"), Action: r.PostForm.Get("action"), Item: r.PostForm.Get("item"), Reason: strings.TrimSpace(r.PostForm.Get("reason"))}
+	if len(c.Reason) < 3 || len(c.Reason) > 1000 {
+		return c, nil, errors.New("provide a reason between 3 and 1000 characters")
+	}
+	// The only action without a player; apply hands it to ResetAllPurchases.
+	if c.Action == "reset_all_purchases" {
+		c.UUID, c.Item = "", "*"
+		players, items, points, err := a.server.Store.PurchaseTotals(r.Context())
+		if err != nil {
+			return c, nil, err
+		}
+		if items == 0 {
+			return c, nil, store.ErrNoChange
+		}
+		c.Description = fmt.Sprintf("Refund all %d purchases across %d players, returning %d points (free grants return nothing), and put every affected player's title slots back to their native style. Each player gets an audit entry.", items, players, points)
+		return c, nil, nil
+	}
 	uuid, ok := auth.NormalizeUUID(c.UUID)
 	if !ok {
 		return c, nil, errors.New("invalid player UUID")
 	}
 	c.UUID = uuid
-	if len(c.Reason) < 3 || len(c.Reason) > 1000 {
-		return c, nil, errors.New("provide a reason between 3 and 1000 characters")
-	}
 	ids := []string{c.Item}
 	switch c.Action {
 	case "revoke", "restore":
@@ -284,6 +301,21 @@ func (a *adminHandler) command(r *http.Request) (adminCommand, []store.Moderatio
 			return c, nil, errors.New("claim not found")
 		}
 		c.Description = c.Action + " achievement " + c.Item + ". Revocation removes its points and title words; paid purchases remain and balance may become negative. Restoring returns its rewards."
+	case "reset_purchases":
+		purchases, err := a.server.Store.Purchases(r.Context(), uuid)
+		if err != nil {
+			return c, nil, err
+		}
+		if len(purchases) == 0 {
+			return c, nil, store.ErrNoChange
+		}
+		ids = nil
+		paid := 0
+		for _, p := range purchases {
+			ids = append(ids, p.ItemID)
+			paid += p.Price
+		}
+		c.Description = fmt.Sprintf("Refund all %d purchases, returning the %d points paid (free grants return nothing), and put both title slots back to their native style.", len(purchases), paid)
 	case "grant_achievement", "grant_styles":
 		if a.config.DeveloperUUID == "" || uuid != a.config.DeveloperUUID {
 			return c, nil, errors.New("grants are restricted to WT_DEV_UUID")
@@ -307,7 +339,7 @@ func (a *adminHandler) command(r *http.Request) (adminCommand, []store.Moderatio
 			} else if _, ok := a.server.Catalog.ShopItem(c.Item); !ok {
 				return c, nil, errors.New("unknown style")
 			}
-			c.Description = "Grant selected shop styles to your developer account at zero cost. Existing paid purchases are preserved. Shop reset removes free grants and refunds zero points for them."
+			c.Description = "Grant selected shop styles to your developer account at zero cost. Existing paid purchases are preserved. A purchase reset removes free grants and refunds zero points for them."
 		}
 	default:
 		return c, nil, errors.New("unknown action")
@@ -329,6 +361,11 @@ func (a *adminHandler) preview(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 400)
 		return
 	}
+	c.Signature = a.commandSignature(c)
+	if c.Action == "reset_all_purchases" {
+		a.render(w, adminPage{Confirm: &c})
+		return
+	}
 	me, err := a.server.me(r.Context(), c.UUID)
 	if errors.Is(err, store.ErrNotFound) {
 		http.NotFound(w, r)
@@ -338,7 +375,6 @@ func (a *adminHandler) preview(w http.ResponseWriter, r *http.Request) {
 		a.server.internalError(w, err)
 		return
 	}
-	c.Signature = a.commandSignature(c)
 	a.render(w, adminPage{Player: me, Confirm: &c})
 }
 func (a *adminHandler) apply(w http.ResponseWriter, r *http.Request) {
@@ -351,6 +387,10 @@ func (a *adminHandler) apply(w http.ResponseWriter, r *http.Request) {
 	}
 	if !hmac.Equal([]byte(r.PostForm.Get("signature")), []byte(a.commandSignature(c))) {
 		http.Error(w, "Review and confirm the action first", 403)
+		return
+	}
+	if c.Action == "reset_all_purchases" {
+		a.resetAll(w, r, c)
 		return
 	}
 	err = a.server.Store.Moderate(r.Context(), a.config.Username, c.UUID, c.Action, c.Reason, ids, a.server.Now())
@@ -375,4 +415,29 @@ func (a *adminHandler) apply(w http.ResponseWriter, r *http.Request) {
 	a.server.Titles.Set(c.UUID, me.Title)
 	a.server.invalidateStats()
 	http.Redirect(w, r, "/player/"+c.UUID+"?updated=1", http.StatusSeeOther)
+}
+
+// resetAll runs under apply's mutation lock, after the signature check.
+func (a *adminHandler) resetAll(w http.ResponseWriter, r *http.Request, c adminCommand) {
+	uuids, err := a.server.Store.ResetAllPurchases(r.Context(), a.config.Username, c.Reason, a.server.Now())
+	if errors.Is(err, store.ErrNoChange) {
+		http.Error(w, err.Error(), 409)
+		return
+	}
+	if err != nil {
+		a.server.internalError(w, err)
+		return
+	}
+	// Finish cache updates even when the browser disconnects after the commit.
+	ctx := context.WithoutCancel(r.Context())
+	for _, uuid := range uuids {
+		me, err := a.server.me(ctx, uuid)
+		if err != nil {
+			a.server.internalError(w, err)
+			return
+		}
+		a.server.Titles.Set(uuid, me.Title)
+	}
+	a.server.invalidateStats()
+	http.Redirect(w, r, "/?updated=1", http.StatusSeeOther)
 }
