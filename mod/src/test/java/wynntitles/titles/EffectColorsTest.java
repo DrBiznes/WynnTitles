@@ -82,6 +82,52 @@ class EffectColorsTest {
 	}
 
 	@Test
+	void cometAndConvergeRestAtTheStillGradient() {
+		int[] still = EffectColors.colors(new TitleEffect("gradient", null, "nebula", false, 0, null), WORD.length(), T0);
+		for (TitleAnimation animation : List.of(TitleAnimation.COMET, TitleAnimation.CONVERGE)) {
+			int beat = animation.defaultCycleMs;
+			long start = T0 - T0 % beat;
+			TitleEffect effect = animated("nebula", animation);
+			assertArrayEquals(still, EffectColors.colors(effect, WORD.length(), start + beat - 50), animation + " should rest");
+			assertFalse(Arrays.equals(still, EffectColors.colors(effect, WORD.length(), start + beat / 5)), animation + " should move");
+		}
+		// Comet: the head is lightest, and letters it has not reached keep their color.
+		long start = T0 - T0 % 3200;
+		int[] mid = EffectColors.colors(animated("nebula", TitleAnimation.COMET), WORD.length(), start + 900);
+		assertEquals(still[WORD.length() - 1], mid[WORD.length() - 1]);
+	}
+
+	@Test
+	void chargeFillsFromTheLeftAndRestsDim() {
+		TitleEffect effect = animated("storm", TitleAnimation.CHARGE);
+		long start = T0 - T0 % 3000;
+		int[] resting = EffectColors.colors(effect, WORD.length(), start + 2900);
+		assertEquals(1, Arrays.stream(resting).distinct().count());
+		int dim = resting[0];
+		int[] half = EffectColors.colors(effect, WORD.length(), start + 700);
+		assertNotEquals(dim, half[0]);
+		assertEquals(dim, half[WORD.length() - 1]);
+	}
+
+	@Test
+	void rippleSpreadsEvenlyFromTheMiddle() {
+		TitleEffect effect = animated("blossom", TitleAnimation.RIPPLE);
+		for (int ms = 0; ms < 2000; ms += 130) {
+			int[] colors = EffectColors.colors(effect, 9, T0 + ms);
+			for (int i = 0; i < 4; i++) {
+				assertEquals(colors[i], colors[8 - i], "letter " + i + " at " + ms + "ms");
+			}
+		}
+	}
+
+	@Test
+	void auroraDoesNotRepeatEachBeat() {
+		TitleEffect effect = animated("borealis", TitleAnimation.AURORA);
+		assertFalse(Arrays.equals(EffectColors.colors(effect, WORD.length(), T0),
+				EffectColors.colors(effect, WORD.length(), T0 + 6000)));
+	}
+
+	@Test
 	void plainRainbowAndUnknownAnimationsStillDraw() {
 		int[] rainbow = EffectColors.colors(new TitleEffect("rainbow", null, null, true, 0, null), WORD.length(), T0);
 		assertEquals(WORD.length(), rainbow.length);
@@ -124,7 +170,7 @@ class EffectColorsTest {
 			}
 			assertReadable(item.id() + " long", EffectColors.colors(effect, 40, T0));
 		}
-		assertEquals(11, looks.size());
+		assertEquals(16, looks.size());
 	}
 
 	/** Every native effect, in every frame, reads as well as the shop's do. */

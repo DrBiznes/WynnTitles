@@ -191,7 +191,12 @@ final class StyleChips {
 			Map.entry("toxic", "Acid lime to neon green"),
 			Map.entry("forest", "Leaf and moss greens to bark brown"),
 			Map.entry("royal", "Regal purple with a band of gold"),
-			Map.entry("void", "Cold periwinkle and violet starlight"));
+			Map.entry("void", "Cold periwinkle and violet starlight"),
+			Map.entry("nebula", "Candy pink through orchid to cornflower"),
+			Map.entry("borealis", "Northern lights, mint to violet and pink"),
+			Map.entry("storm", "Electric blue and cyan to a yellow spark"),
+			Map.entry("blossom", "Soft rose and petal pink to peach"),
+			Map.entry("brass", "Verdigris teal to brass and copper"));
 
 	private static final Map<String, String> FORMAT_BLURBS = Map.of(
 			"bold", "Thicker letters",

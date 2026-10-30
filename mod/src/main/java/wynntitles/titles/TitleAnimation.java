@@ -14,6 +14,11 @@ public enum TitleAnimation {
 	WAVE("Wave", "rippling letter by letter", 1800),
 	FLICKER("Flicker", "letters wavering and flaring", 110),
 	SPARKLE("Sparkle", "letters twinkling like stars", 1700),
+	COMET("Comet", "a white-hot comet streaking across", 3200),
+	AURORA("Aurora", "curtains of light that never repeat", 6000),
+	CHARGE("Charge", "filling with power, flashing, draining", 3000),
+	RIPPLE("Ripple", "rings spreading from the middle", 2000),
+	CONVERGE("Converge", "two gleams meeting in a flash", 2800),
 	// Native only: never sold, so only achievements' own styles move this way.
 	DECIPHER("Decipher", "runes resolving into the word", 9000, true),
 	GLITCH("Glitch", "bursts of scrambled letters", 1900, true),

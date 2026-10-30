@@ -151,6 +151,7 @@ var rarities = map[string]bool{
 var palettes = map[string]bool{
 	"rainbow": true, "red": true, "red_purple": true, "flame": true, "ember": true, "sunset": true,
 	"ocean": true, "ice": true, "toxic": true, "forest": true, "royal": true, "void": true,
+	"nebula": true, "borealis": true, "storm": true, "blossom": true, "brass": true,
 }
 
 // Animations are how an animated effect moves; the mod draws them (titles/TitleAnimation.java):
@@ -160,6 +161,11 @@ var palettes = map[string]bool{
 //   - wave: colors ripple letter by letter
 //   - flicker: letters waver and flare at random, like fire or a glitch
 //   - sparkle: letters twinkle bright one at a time, like sparks or stars
+//   - comet: a white head with a fading tail streaks across, then rests
+//   - aurora: two gradients drift opposite ways at different speeds, blended
+//   - charge: the word fills from dim grey, flashes, drains and rests dim
+//   - ripple: rings of color spread out from the middle letter
+//   - converge: gleams from both ends meet in the middle and flash
 //
 // The rest are native only (see nativeOnly):
 //   - decipher: letters scramble, show as Wynnic, then resolve one by one
@@ -170,6 +176,7 @@ var palettes = map[string]bool{
 //   - swell: a bold crest rolls along a flowing gradient
 var animations = map[string]bool{
 	"flow": true, "pulse": true, "shimmer": true, "wave": true, "flicker": true, "sparkle": true,
+	"comet": true, "aurora": true, "charge": true, "ripple": true, "converge": true,
 	"decipher": true, "glitch": true, "eclipse": true, "strike": true, "heartbeat": true, "swell": true,
 }
 
