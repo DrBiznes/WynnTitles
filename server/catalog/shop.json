@@ -107,7 +107,7 @@
   {
     "id": "palette_red",
     "kind": "palette",
-    "name": "Crimson",
+    "name": "Corrupted",
     "price": 12,
     "palette": "red"
   },
@@ -121,63 +121,63 @@
   {
     "id": "palette_flame",
     "kind": "palette",
-    "name": "Flame",
+    "name": "Molten",
     "price": 12,
     "palette": "flame"
   },
   {
     "id": "palette_ember",
     "kind": "palette",
-    "name": "Ember",
+    "name": "Dwarven",
     "price": 12,
     "palette": "ember"
   },
   {
     "id": "palette_sunset",
     "kind": "palette",
-    "name": "Sunset",
+    "name": "Sun-Stained",
     "price": 12,
     "palette": "sunset"
   },
   {
     "id": "palette_ocean",
     "kind": "palette",
-    "name": "Ocean",
+    "name": "Seaskipper",
     "price": 12,
     "palette": "ocean"
   },
   {
     "id": "palette_ice",
     "kind": "palette",
-    "name": "Ice",
+    "name": "Underice",
     "price": 12,
     "palette": "ice"
   },
   {
     "id": "palette_toxic",
     "kind": "palette",
-    "name": "Toxic",
+    "name": "Grootslang",
     "price": 12,
     "palette": "toxic"
   },
   {
     "id": "palette_forest",
     "kind": "palette",
-    "name": "Forest",
+    "name": "Taproot",
     "price": 12,
     "palette": "forest"
   },
   {
     "id": "palette_royal",
     "kind": "palette",
-    "name": "Royal",
+    "name": "Fruman",
     "price": 12,
     "palette": "royal"
   },
   {
     "id": "palette_void",
     "kind": "palette",
-    "name": "Void",
+    "name": "Dernic",
     "price": 12,
     "palette": "void"
   },
@@ -219,7 +219,7 @@
   {
     "id": "animated_red",
     "kind": "animatedPalette",
-    "name": "Heartbeat",
+    "name": "Heart of War",
     "price": 20,
     "palette": "red",
     "animation": "pulse"
@@ -227,7 +227,7 @@
   {
     "id": "animated_red_purple",
     "kind": "animatedPalette",
-    "name": "Blood Tide",
+    "name": "Anathemic",
     "price": 20,
     "palette": "red_purple",
     "animation": "flow"
@@ -235,7 +235,7 @@
   {
     "id": "animated_flame",
     "kind": "animatedPalette",
-    "name": "Wildfire",
+    "name": "Eternal Flame",
     "price": 20,
     "palette": "flame",
     "animation": "flicker"
@@ -243,7 +243,7 @@
   {
     "id": "animated_ember",
     "kind": "animatedPalette",
-    "name": "Cinders",
+    "name": "Dogun Cinders",
     "price": 20,
     "palette": "ember",
     "animation": "sparkle"
@@ -251,7 +251,7 @@
   {
     "id": "animated_sunset",
     "kind": "animatedPalette",
-    "name": "Golden Hour",
+    "name": "Kingdom of Sand",
     "price": 20,
     "palette": "sunset",
     "animation": "flow"
@@ -259,7 +259,7 @@
   {
     "id": "animated_ocean",
     "kind": "animatedPalette",
-    "name": "Riptide",
+    "name": "Wavebreaker",
     "price": 20,
     "palette": "ocean",
     "animation": "wave"
@@ -267,7 +267,7 @@
   {
     "id": "animated_ice",
     "kind": "animatedPalette",
-    "name": "Frostglint",
+    "name": "Theorick's Shard",
     "price": 20,
     "palette": "ice",
     "animation": "shimmer"
@@ -275,7 +275,7 @@
   {
     "id": "animated_toxic",
     "kind": "animatedPalette",
-    "name": "Meltdown",
+    "name": "Slime Symphony",
     "price": 20,
     "palette": "toxic",
     "animation": "flicker"
@@ -283,7 +283,7 @@
   {
     "id": "animated_forest",
     "kind": "animatedPalette",
-    "name": "Canopy",
+    "name": "Amongst the Canopy",
     "price": 20,
     "palette": "forest",
     "animation": "wave"
@@ -291,7 +291,7 @@
   {
     "id": "animated_royal",
     "kind": "animatedPalette",
-    "name": "Regalia",
+    "name": "Aelumian Crown",
     "price": 20,
     "palette": "royal",
     "animation": "shimmer"
@@ -299,7 +299,7 @@
   {
     "id": "animated_void",
     "kind": "animatedPalette",
-    "name": "Starfall",
+    "name": "Eldritch",
     "price": 20,
     "palette": "void",
     "animation": "sparkle"

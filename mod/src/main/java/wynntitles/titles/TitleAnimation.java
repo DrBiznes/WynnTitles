@@ -18,19 +18,33 @@ public enum TitleAnimation {
 	AURORA("Aurora", "curtains of light that never repeat", 6000),
 	CHARGE("Charge", "filling with power, flashing, draining", 3000),
 	RIPPLE("Ripple", "rings spreading from the middle", 2000),
-	CONVERGE("Converge", "two gleams meeting in a flash", 2800);
+	CONVERGE("Converge", "two gleams meeting in a flash", 2800),
+	// Native only: never sold, so only achievements' own styles move this way.
+	DECIPHER("Decipher", "runes resolving into the word", 9000, true),
+	GLITCH("Glitch", "bursts of scrambled letters", 1900, true),
+	ECLIPSE("Eclipse", "a shadow crossing the word", 4200, true),
+	STRIKE("Strike", "a lightning flash cooling off", 3200, true),
+	HEARTBEAT("Heartbeat", "a double beat and a rest", 1500, true),
+	SWELL("Swell", "a bold crest rolling along", 2600, true);
 
 	public final String id;
 	public final String label;
 	public final String blurb;
 	/** One beat of the animation when the effect does not set cycleMs. */
 	public final int defaultCycleMs;
+	/** Reserved for native styles, like obfuscated; the server refuses it in the shop. */
+	public final boolean nativeOnly;
 
 	TitleAnimation(String label, String blurb, int defaultCycleMs) {
+		this(label, blurb, defaultCycleMs, false);
+	}
+
+	TitleAnimation(String label, String blurb, int defaultCycleMs, boolean nativeOnly) {
 		this.id = name().toLowerCase(Locale.ROOT);
 		this.label = label;
 		this.blurb = blurb;
 		this.defaultCycleMs = defaultCycleMs;
+		this.nativeOnly = nativeOnly;
 	}
 
 	/** The animation with this catalog id, flow for none, or null if a newer catalog added it. */

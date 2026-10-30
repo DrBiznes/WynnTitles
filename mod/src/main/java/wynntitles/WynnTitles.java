@@ -1,6 +1,7 @@
 package wynntitles;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.wynntils.core.components.Managers;
 import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.mod.event.WynncraftConnectionEvent;
 import java.nio.file.Path;
@@ -52,7 +53,7 @@ public class WynnTitles implements ClientModInitializer {
 	private static AchievementTracker tracker;
 	private static UnlockBatcher unlocks;
 
-	private KeyMapping openKey;
+	private static KeyMapping openKey;
 	private static boolean loadedThisSession;
 
 	public static Account account() {
@@ -77,7 +78,7 @@ public class WynnTitles implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		WynnTitlesConfig.register();
+		WynnTitlesConfig.register(WynnTitles::onServerChanged);
 
 		String version = FabricLoader.getInstance().getModContainer(MOD_ID)
 				.map(mod -> mod.getMetadata().getVersion().getFriendlyString())
@@ -146,23 +147,49 @@ public class WynnTitles implements ClientModInitializer {
 		});
 	}
 
+	/** Forgets everything from the old server and, when on Wynncraft, loads from the new one. */
+	private static void onServerChanged() {
+		LOGGER.info("Server changed to {}", WynnTitlesConfig.resolvedServerUrl());
+		titles.clear();
+		account.forgetSession();
+		loadedThisSession = false;
+		if (Managers.Connection.onServer()) {
+			onWynncraftJoin();
+		}
+	}
+
 	/** Up to this many unlocks at once get a toast and chat line each; more become one summary. */
 	private static final int ANNOUNCE_EACH_UP_TO = 2;
 
 	private static void announceUnlocks(List<Catalog.Achievement> unlocked) {
 		unlocked.forEach(a -> LOGGER.info("Unlocked {}", a.id()));
-		if (!WynnTitlesConfig.get().announceUnlocks) {
-			return;
-		}
+		WynnTitlesConfig config = WynnTitlesConfig.get();
 		if (unlocked.size() <= ANNOUNCE_EACH_UP_TO) {
 			for (Catalog.Achievement achievement : unlocked) {
-				Mc.chat(unlockMessage(achievement));
-				Mc.toast(new UnlockToast(achievement));
+				if (config.announceUnlocks) {
+					Mc.chat(unlockMessage(achievement));
+				}
+				if (config.unlockToasts) {
+					Mc.toast(new UnlockToast(achievement));
+				}
 			}
 			return;
 		}
-		Mc.chat(unlockSummary(unlocked));
-		Mc.toast(new UnlockToast(unlocked));
+		if (config.announceUnlocks) {
+			Mc.chat(unlockSummary(unlocked));
+		}
+		if (config.unlockToasts) {
+			Mc.toast(new UnlockToast(unlocked));
+		}
+	}
+
+	/** "(press ` or /titles to equip)", naming whatever key the player bound. */
+	private static MutableComponent equipHint() {
+		MutableComponent hint = Component.literal(" (").withStyle(ChatFormatting.DARK_GRAY);
+		if (openKey != null && !openKey.isUnbound()) {
+			hint.append("press ").append(openKey.getTranslatedKeyMessage()).append(" or ");
+		}
+		return hint.append("/titles to equip)");
 	}
 
 	/** The chat line for an unlock, badge included. */
@@ -173,7 +200,7 @@ public class WynnTitles implements ClientModInitializer {
 		if (reward != null) {
 			message.append(Component.literal("\n New title words: ").withStyle(ChatFormatting.GRAY))
 					.append(TitleRenderer.render(reward))
-					.append(Component.literal(" (press ` or /titles to equip)").withStyle(ChatFormatting.DARK_GRAY));
+					.append(equipHint());
 		}
 		return Mc.tagged(message);
 	}
@@ -204,7 +231,7 @@ public class WynnTitles implements ClientModInitializer {
 				.append(Component.literal(" (+" + points + " points)").withStyle(ChatFormatting.GRAY));
 		if (words > 0) {
 			message.append(Component.literal("\n " + words + " new title words").withStyle(ChatFormatting.GRAY))
-					.append(Component.literal(" (press ` or /titles to equip)").withStyle(ChatFormatting.DARK_GRAY));
+					.append(equipHint());
 		}
 		return Mc.tagged(message);
 	}

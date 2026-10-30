@@ -20,7 +20,8 @@ WT_WYNN_PACK="<cached server pack>" scripts/smoke-test.sh                       
 ## Rules
 
 - `server/catalog/achievements.json` is the only place achievements are defined, and `server/catalog/shop.json` the only place shop items and prices are. The server validates both at startup (`catalog.Parse`); the mod downloads them. There is no codegen.
-- Most title words are plain (no `runs`). Give a word a native style only when the achievement is a big one. Never sell `obfuscated` in the shop; it is reserved for native styles.
+- Most title words are plain (no `runs`). Give a word a native style only when the achievement is a big one. Never sell `obfuscated` or a native-only animation (decipher, glitch, eclipse, strike, heartbeat, swell) in the shop; they are reserved for native styles.
+- Native styles must not be buyable: effects use their own hex `colors`, never a shop `palette`; solid colors are hex, not named; no two native effects match (`TestEmbeddedNativeStylesAreUnique`). Native effects must stay readable in every frame (`EffectColorsTest.nativeStylesAreReadable`).
 - A new shop item kind needs a validation case in `server/catalog/shop.go`, a case in `Catalog.restyle` and `ShopItem.supported` in the mod, and a group in `mc/screen/StyleChips.java`. Keep `Catalog.restyle` in step with the server's `Restyle`; the contract test compares them.
 - A new trigger type needs a validation case in `server/catalog/catalog.go` and a detector in `mod/.../achievements/WynntilsDetectors.java`.
 - Claims are trusted on purpose (cosmetic mod). Do not add Wynncraft API verification. Keep evidence in `unlocks` so moderation tools can revoke later.

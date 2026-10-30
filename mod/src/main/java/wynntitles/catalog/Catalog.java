@@ -179,7 +179,8 @@ public record Catalog(String version, List<Achievement> achievements, List<ShopI
 				case COLOR, RAINBOW -> true;
 				// A newer catalog may add palettes or animations this mod cannot draw yet.
 				case PALETTE -> EffectColors.knowsPalette(palette);
-				case ANIMATED_PALETTE -> EffectColors.knowsPalette(palette) && TitleAnimation.byId(animation) != null;
+				case ANIMATED_PALETTE -> EffectColors.knowsPalette(palette) && TitleAnimation.byId(animation) != null
+						&& !TitleAnimation.byId(animation).nativeOnly;
 				case FORMAT -> switch (format == null ? "" : format) {
 					case "bold", "italic", "underlined", "strikethrough" -> true;
 					default -> false;
