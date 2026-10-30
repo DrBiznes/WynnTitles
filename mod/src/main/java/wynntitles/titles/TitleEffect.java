@@ -14,4 +14,9 @@ public record TitleEffect(String type, List<String> colors, String palette, bool
 		cycleMs = Math.max(cycleMs, 0);
 		animation = animation == null || animation.isBlank() ? null : animation;
 	}
+
+	/** The same colors held still, as drawn when the player turns animation off. */
+	public TitleEffect still() {
+		return animated ? new TitleEffect(type, colors, palette, false, cycleMs, animation) : this;
+	}
 }

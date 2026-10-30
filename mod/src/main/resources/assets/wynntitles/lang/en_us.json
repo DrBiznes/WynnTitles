@@ -7,10 +7,16 @@
 	"text.autoconfig.wynntitles.category.advanced": "Advanced",
 	"text.autoconfig.wynntitles.option.showTitles": "Show titles",
 	"text.autoconfig.wynntitles.option.showTitles.@Tooltip": "Show other players' titles above their names. Needs Wynntils' custom nametags enabled.",
-	"text.autoconfig.wynntitles.option.announceUnlocks": "Announce unlocks in chat",
+	"text.autoconfig.wynntitles.option.titleScale": "Title size (%)",
+	"text.autoconfig.wynntitles.option.titleScale.@Tooltip": "Size of titles above players, compared with their names.",
+	"text.autoconfig.wynntitles.option.animateTitles": "Animate titles",
+	"text.autoconfig.wynntitles.option.animateTitles.@Tooltip": "Let rainbow and animated palettes move and obfuscated letters scramble. Turn off for still titles everywhere.",
+	"text.autoconfig.wynntitles.option.announceUnlocks": "Unlock messages in chat",
 	"text.autoconfig.wynntitles.option.announceUnlocks.@Tooltip": "Post a chat message when you unlock an achievement.",
+	"text.autoconfig.wynntitles.option.unlockToasts": "Unlock pop-ups",
+	"text.autoconfig.wynntitles.option.unlockToasts.@Tooltip": "Show a pop-up in the corner when you unlock an achievement.",
 	"text.autoconfig.wynntitles.option.serverUrl": "Server URL",
-	"text.autoconfig.wynntitles.option.serverUrl.@Tooltip": "Leave blank to use the official server.",
+	"text.autoconfig.wynntitles.option.serverUrl.@Tooltip": "Leave blank to use the official server. Changing it logs you in again.",
 	"text.autoconfig.wynntitles.option.previewOwnTitleOnEveryone": "Preview my title on everyone",
 	"text.autoconfig.wynntitles.option.previewOwnTitleOnEveryone.@Tooltip": "Debug option: shows your own title above every player."
 }

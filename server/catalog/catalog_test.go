@@ -1,6 +1,7 @@
 package catalog
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -28,7 +29,7 @@ func TestEmbeddedCatalogIsValid(t *testing.T) {
 }
 
 // Every animated palette should be its own look: no two share a palette, and
-// every animation is on sale.
+// every animation that is not native only is on sale.
 func TestEmbeddedShopAnimationsAreDistinct(t *testing.T) {
 	c, err := Load()
 	if err != nil {
@@ -47,8 +48,44 @@ func TestEmbeddedShopAnimationsAreDistinct(t *testing.T) {
 		used[item.Animation] = true
 	}
 	for animation := range animations {
-		if !used[animation] {
+		if !used[animation] && !nativeOnly[animation] {
 			t.Errorf("no animated palette uses %s", animation)
+		}
+	}
+}
+
+// Native styles are looks nobody can buy: effects bring their own colors
+// rather than a shop palette, solid colors are hex rather than the named
+// colors the shop sells, and no two native effects are the same.
+func TestEmbeddedNativeStylesAreUnique(t *testing.T) {
+	c, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	looks := map[string]string{}
+	for _, a := range c.Achievements {
+		for _, word := range []*Word{a.Rewards.Prefix, a.Rewards.Suffix} {
+			if word == nil {
+				continue
+			}
+			for _, run := range word.Runs {
+				where := a.ID + " " + run.Text
+				if run.Color != "" && namedColors[run.Color] && !run.Obfuscated {
+					t.Errorf("%s uses %s, a color the shop sells; use a hex color", where, run.Color)
+				}
+				e := run.Effect
+				if e == nil {
+					continue
+				}
+				if e.Palette != "" || e.Type == "rainbow" {
+					t.Errorf("%s uses a shop palette; give it its own colors", where)
+				}
+				look := fmt.Sprint(e.Colors, e.Animated, e.Animation)
+				if other, dup := looks[look]; dup {
+					t.Errorf("%s looks the same as %s", where, other)
+				}
+				looks[look] = where
+			}
 		}
 	}
 }
@@ -176,6 +213,7 @@ func TestParseRejectsBadShopItems(t *testing.T) {
 		"rainbow palette":    `[{"id": "x", "kind": "palette", "name": "R", "price": 1, "palette": "rainbow"}]`,
 		"no animation":       `[{"id": "x", "kind": "animatedPalette", "name": "I", "price": 1, "palette": "ice"}]`,
 		"unknown animation":  `[{"id": "x", "kind": "animatedPalette", "name": "I", "price": 1, "palette": "ice", "animation": "spin"}]`,
+		"native animation":   `[{"id": "x", "kind": "animatedPalette", "name": "I", "price": 1, "palette": "ice", "animation": "decipher"}]`,
 		"static animation":   `[{"id": "x", "kind": "palette", "name": "I", "price": 1, "palette": "ice", "animation": "wave"}]`,
 		"bad color":          `[{"id": "x", "kind": "color", "name": "P", "price": 1, "color": "pink"}]`,
 		"stray field":        `[{"id": "x", "kind": "color", "name": "R", "price": 1, "color": "red", "palette": "ice"}]`,

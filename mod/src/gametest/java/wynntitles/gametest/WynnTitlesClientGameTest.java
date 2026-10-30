@@ -417,8 +417,42 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			context.waitTicks(8);
 			screenshot(context, "wynntitles-nametag-" + item.animation() + "-2");
 		}
-		check(shot.size() == wynntitles.titles.TitleAnimation.values().length, "the shop should sell every animation, got " + shot);
+		long sold = java.util.Arrays.stream(wynntitles.titles.TitleAnimation.values()).filter(a -> !a.nativeOnly).count();
+		check(shot.size() == sold, "the shop should sell every animation but the native ones, got " + shot);
+		// Native-only animations, each on the first achievement whose native style uses it.
+		for (wynntitles.titles.TitleAnimation animation : wynntitles.titles.TitleAnimation.values()) {
+			if (!animation.nativeOnly) {
+				continue;
+			}
+			Catalog.Achievement owner = catalog.achievements().stream()
+					.filter(a -> usesAnimation(a.rewards().prefix(), animation) || usesAnimation(a.rewards().suffix(), animation))
+					.findFirst()
+					.orElse(null);
+			check(owner != null, "no native style uses " + animation.id);
+			wynntitles.titles.Title title = wynntitles.titles.Title.of(owner.rewards().prefix(), owner.rewards().suffix());
+			context.runOnClient(client -> WynnTitles.titles().put(dummy, title));
+			int cycle = java.util.stream.Stream.of(owner.rewards().prefix(), owner.rewards().suffix())
+					.filter(word -> usesAnimation(word, animation))
+					.flatMap(word -> word.runs().stream())
+					.filter(run -> run.effect() != null && run.effect().cycleMs() > 0)
+					.mapToInt(run -> run.effect().cycleMs())
+					.findFirst()
+					.orElse(animation.defaultCycleMs);
+			// Timed into the beat, since these change in moments: the first catches
+			// decipher's runes, a glitch burst, a strike cooling and the first heartbeat.
+			float[] phases = {0.08f, 0.2f, 0.6f};
+			for (int frame = 0; frame < phases.length; frame++) {
+				long wait = Math.floorMod((long) (phases[frame] * cycle) - System.currentTimeMillis() % cycle, (long) cycle);
+				context.waitTicks((int) Math.max(1, wait / 50));
+				screenshot(context, "wynntitles-nametag-native-" + animation.id + "-" + (frame + 1));
+			}
+		}
 		context.runOnClient(client -> WynnTitles.titles().put(dummy, wynntitles.titles.Title.of(prefix, suffix)));
+	}
+
+	private static boolean usesAnimation(wynntitles.titles.TitleWord word, wynntitles.titles.TitleAnimation animation) {
+		return word != null && word.runs().stream().anyMatch(run -> run.effect() != null && run.effect().animated()
+				&& animation.id.equals(run.effect().animation()));
 	}
 
 	/** Icons resolve through the fake pack, and fall back when a model is missing. */

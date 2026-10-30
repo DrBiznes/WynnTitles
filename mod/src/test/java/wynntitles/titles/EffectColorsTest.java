@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import wynntitles.catalog.Catalog.Achievement;
 import wynntitles.catalog.Catalog.ShopItem;
 
 class EffectColorsTest {
@@ -124,6 +125,86 @@ class EffectColorsTest {
 			assertReadable(item.id() + " long", EffectColors.colors(effect, 40, T0));
 		}
 		assertEquals(11, looks.size());
+	}
+
+	/** Every native effect, in every frame, reads as well as the shop's do. */
+	@Test
+	void nativeStylesAreReadable() throws Exception {
+		Achievement[] achievements = new Gson().fromJson(
+				Files.readString(Path.of("../server/catalog/achievements.json")), Achievement[].class);
+		int effects = 0;
+		for (Achievement achievement : achievements) {
+			for (TitleWord word : new TitleWord[] {achievement.rewards().prefix(), achievement.rewards().suffix()}) {
+				if (word == null) {
+					continue;
+				}
+				for (TitleRun run : word.runs()) {
+					if (run.effect() == null) {
+						continue;
+					}
+					effects++;
+					String what = achievement.id() + " " + run.text();
+					for (int ms = 0; ms < 10_000; ms += 23) {
+						assertReadable(what + " at " + ms + "ms", EffectColors.colors(run.effect(), run.text().length(), T0 + ms));
+					}
+					assertReadable(what + " long", EffectColors.colors(run.effect(), 40, T0));
+				}
+			}
+		}
+		assertTrue(effects > 30, "only " + effects + " native effects");
+	}
+
+	@Test
+	void decipherScramblesThenReadsLeftToRight() {
+		TitleEffect effect = animated("royal", TitleAnimation.DECIPHER);
+		int beat = TitleAnimation.DECIPHER.defaultCycleMs;
+		long start = T0 - T0 % beat;
+		assertTrue(Arrays.stream(EffectColors.letters(effect, WORD.length(), start))
+				.allMatch(l -> l.glyph() == EffectColors.Glyph.SCRAMBLED));
+		// Partway in, the first letters read, one shows as a rune and the rest are still scrambled.
+		List<EffectColors.Glyph> glyphs = Arrays.stream(EffectColors.letters(effect, WORD.length(), start + beat / 5))
+				.map(EffectColors.Letter::glyph).toList();
+		assertEquals(EffectColors.Glyph.PLAIN, glyphs.get(0));
+		assertTrue(glyphs.contains(EffectColors.Glyph.RUNE), glyphs.toString());
+		assertEquals(EffectColors.Glyph.SCRAMBLED, glyphs.get(WORD.length() - 1));
+		assertTrue(Arrays.stream(EffectColors.letters(effect, WORD.length(), start + beat * 3 / 4))
+				.allMatch(l -> l.glyph() == EffectColors.Glyph.PLAIN));
+	}
+
+	@Test
+	void glitchIsMostlyStill() {
+		TitleEffect effect = animated("void", TitleAnimation.GLITCH);
+		int[] still = EffectColors.colors(new TitleEffect("gradient", null, "void", false, 0, null), WORD.length(), T0);
+		int plain = 0, frames = 0;
+		for (int ms = 0; ms < 19_000; ms += 31, frames++) {
+			if (Arrays.equals(still, EffectColors.colors(effect, WORD.length(), T0 + ms))) {
+				plain++;
+			}
+		}
+		assertTrue(plain > frames * 0.8, plain + " of " + frames + " frames still");
+	}
+
+	@Test
+	void heartbeatAndSwellBoldOnlyOnTheBeat() {
+		TitleEffect heart = animated("red", TitleAnimation.HEARTBEAT);
+		TitleEffect swell = animated("sunset", TitleAnimation.SWELL);
+		int beat = TitleAnimation.HEARTBEAT.defaultCycleMs;
+		long start = T0 - T0 % beat;
+		assertTrue(Arrays.stream(EffectColors.letters(heart, WORD.length(), start + beat * 8 / 100)).allMatch(EffectColors.Letter::bold));
+		assertTrue(Arrays.stream(EffectColors.letters(heart, WORD.length(), start + beat / 2)).noneMatch(EffectColors.Letter::bold));
+		for (int ms = 0; ms < 2600; ms += 50) {
+			long bold = Arrays.stream(EffectColors.letters(swell, WORD.length(), T0 + ms)).filter(EffectColors.Letter::bold).count();
+			assertTrue(bold <= 1, bold + " letters bold at " + ms + "ms");
+		}
+	}
+
+	@Test
+	void heldStillEveryLetterIsPlain() {
+		for (TitleAnimation animation : TitleAnimation.values()) {
+			for (EffectColors.Letter letter : EffectColors.letters(animated("ice", animation).still(), WORD.length(), T0)) {
+				assertEquals(EffectColors.Letter.of(letter.color()), letter, animation.id);
+			}
+		}
 	}
 
 	@Test

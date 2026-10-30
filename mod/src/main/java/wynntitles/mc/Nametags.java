@@ -21,7 +21,6 @@ import wynntitles.titles.Title;
  * it is the first thing to re-check after a Wynntils update.
  */
 public final class Nametags {
-	private static final float TITLE_SCALE = 0.8f;
 	private static final String NAMETAG_CLASS =
 			"com.wynntils.features.players.CustomNametagRendererFeature$CustomNametag";
 
@@ -57,7 +56,7 @@ public final class Nametags {
 				nametags.add(NEW_NAMETAG.invoke(event.getEntityRenderState().nameTag, 1f));
 			}
 			Component text = TitleRenderer.render(title);
-			nametags.add(NEW_NAMETAG.invoke(text, TITLE_SCALE));
+			nametags.add(NEW_NAMETAG.invoke(text, WynnTitlesConfig.get().titleScale / 100f));
 		} catch (Throwable t) {
 			WynnTitles.LOGGER.error("Could not add title nametag", t);
 		}

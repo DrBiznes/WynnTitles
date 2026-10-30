@@ -160,8 +160,23 @@ var palettes = map[string]bool{
 //   - wave: colors ripple letter by letter
 //   - flicker: letters waver and flare at random, like fire or a glitch
 //   - sparkle: letters twinkle bright one at a time, like sparks or stars
+//
+// The rest are native only (see nativeOnly):
+//   - decipher: letters scramble, show as Wynnic, then resolve one by one
+//   - glitch: still, then bursts of obfuscated cyan and magenta letters
+//   - eclipse: a shadow with a bright rim crosses the word
+//   - strike: a lightning flash, each letter cooling back at its own pace
+//   - heartbeat: a lub-dub double beat that brightens and bolds the word
+//   - swell: a bold crest rolls along a flowing gradient
 var animations = map[string]bool{
 	"flow": true, "pulse": true, "shimmer": true, "wave": true, "flicker": true, "sparkle": true,
+	"decipher": true, "glitch": true, "eclipse": true, "strike": true, "heartbeat": true, "swell": true,
+}
+
+// nativeOnly animations belong to achievements' native styles and are never
+// sold, like obfuscated, so the biggest titles have looks nobody can buy.
+var nativeOnly = map[string]bool{
+	"decipher": true, "glitch": true, "eclipse": true, "strike": true, "heartbeat": true, "swell": true,
 }
 
 var namedColors = map[string]bool{

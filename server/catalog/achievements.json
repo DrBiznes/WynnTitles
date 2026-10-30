@@ -196,7 +196,22 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Mehme's"
+        "text": "Mehme's",
+        "runs": [
+          {
+            "text": "Mehme's",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#E6D3FF",
+                "#B48CFF",
+                "#FFD36B"
+              ],
+              "animated": true,
+              "animation": "decipher"
+            }
+          }
+        ]
       },
       "suffix": {
         "text": "???"
@@ -245,7 +260,7 @@
         "runs": [
           {
             "text": "Bob",
-            "color": "gold",
+            "color": "#FFC94A",
             "bold": true
           },
           {
@@ -254,8 +269,8 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#ffaa00",
-                "#aa0000"
+                "#FFB347",
+                "#FF5E3A"
               ]
             }
           }
@@ -490,7 +505,11 @@
             "bold": true,
             "effect": {
               "type": "gradient",
-              "palette": "royal",
+              "colors": [
+                "#C9A2FF",
+                "#FFE08A",
+                "#8FB8FF"
+              ],
               "animated": true,
               "cycleMs": 4300,
               "animation": "wave"
@@ -604,8 +623,8 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#aa0000",
-                "#ff5555"
+                "#FF5A5A",
+                "#FF9A7A"
               ]
             }
           }
@@ -731,9 +750,13 @@
             "bold": true,
             "effect": {
               "type": "gradient",
-              "palette": "red",
+              "colors": [
+                "#FF6A4A",
+                "#FFB060",
+                "#FF5470"
+              ],
               "animated": true,
-              "cycleMs": 3000
+              "animation": "strike"
             }
           }
         ]
@@ -743,7 +766,7 @@
         "runs": [
           {
             "text": "Fallen",
-            "color": "dark_red",
+            "color": "#E85A6A",
             "bold": true,
             "italic": true
           }
@@ -848,7 +871,7 @@
         "runs": [
           {
             "text": "Chaos",
-            "color": "dark_purple",
+            "color": "#C060FF",
             "bold": true
           }
         ]
@@ -862,9 +885,9 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#aa00aa",
-                "#5555ff",
-                "#55ffff"
+                "#D070FF",
+                "#8C8CFF",
+                "#70F0FF"
               ],
               "animated": true,
               "cycleMs": 4600
@@ -975,9 +998,9 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#555555",
-                "#5555ff",
-                "#ff55ff"
+                "#A8A8C0",
+                "#8C8CFF",
+                "#FF7AFF"
               ],
               "animated": true,
               "cycleMs": 4800
@@ -990,12 +1013,12 @@
         "runs": [
           {
             "text": "Acro",
-            "color": "gold",
+            "color": "#FFB833",
             "bold": true
           },
           {
             "text": "bat",
-            "color": "yellow",
+            "color": "#FFF07A",
             "italic": true
           }
         ]
@@ -1102,7 +1125,10 @@
             "bold": true,
             "effect": {
               "type": "gradient",
-              "palette": "ember"
+              "colors": [
+                "#E8925A",
+                "#FFC07A"
+              ]
             }
           }
         ]
@@ -1115,7 +1141,11 @@
             "italic": true,
             "effect": {
               "type": "gradient",
-              "palette": "royal",
+              "colors": [
+                "#C08CFF",
+                "#7CE8C8",
+                "#FFD66B"
+              ],
               "animated": true,
               "cycleMs": 4100
             }
@@ -1145,18 +1175,17 @@
         "runs": [
           {
             "text": "Transcendent",
-            "bold": true,
             "effect": {
               "type": "gradient",
               "colors": [
-                "#ff5555",
-                "#ffaa00",
-                "#ffff55",
-                "#55ff55",
-                "#55ffff"
+                "#FFFFFF",
+                "#FFE8A0",
+                "#A8F0FF",
+                "#E0C0FF"
               ],
               "animated": true,
-              "cycleMs": 5000
+              "cycleMs": 2800,
+              "animation": "swell"
             }
           }
         ]
@@ -1166,7 +1195,7 @@
         "runs": [
           {
             "text": "Paragon",
-            "color": "aqua",
+            "color": "#7FF0FF",
             "underlined": true
           }
         ]
@@ -1236,18 +1265,17 @@
         "runs": [
           {
             "text": "Five-Sworn",
-            "bold": true,
             "effect": {
               "type": "gradient",
               "colors": [
-                "#ff5555",
-                "#ffaa00",
-                "#55ff55",
-                "#55ffff",
-                "#aa00aa"
+                "#FF6B6B",
+                "#FFC24A",
+                "#7CFF8A",
+                "#5CD6FF",
+                "#C08CFF"
               ],
               "animated": true,
-              "cycleMs": 5000
+              "animation": "swell"
             }
           }
         ]
@@ -2024,17 +2052,16 @@
         "text": "Moon-Walker",
         "runs": [
           {
-            "text": "Moon",
-            "color": "white",
-            "bold": true
-          },
-          {
-            "text": "-Walker",
+            "text": "Moon-Walker",
             "effect": {
               "type": "gradient",
-              "palette": "ice",
+              "colors": [
+                "#FFFFFF",
+                "#D6E2F0",
+                "#B8C8E0"
+              ],
               "animated": true,
-              "cycleMs": 4700
+              "animation": "eclipse"
             }
           }
         ]
@@ -2066,9 +2093,14 @@
             "text": "Void-Touched",
             "effect": {
               "type": "gradient",
-              "palette": "void",
+              "colors": [
+                "#F0EAFF",
+                "#C9B8FF",
+                "#9FB0FF"
+              ],
               "animated": true,
-              "cycleMs": 5200
+              "cycleMs": 5200,
+              "animation": "eclipse"
             }
           }
         ]
@@ -2349,7 +2381,7 @@
         "runs": [
           {
             "text": "Legendary",
-            "color": "aqua",
+            "color": "#5CF2FF",
             "bold": true
           }
         ]
@@ -2362,7 +2394,10 @@
             "bold": true,
             "effect": {
               "type": "gradient",
-              "palette": "royal"
+              "colors": [
+                "#B48CFF",
+                "#FFD66B"
+              ]
             }
           }
         ]
@@ -2498,7 +2533,22 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Gavellian"
+        "text": "Gavellian",
+        "runs": [
+          {
+            "text": "Gavellian",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#FFE9B0",
+                "#F0B860",
+                "#FF9F6B"
+              ],
+              "animated": true,
+              "animation": "decipher"
+            }
+          }
+        ]
       },
       "suffix": {
         "text": "Scribe"
@@ -2686,8 +2736,8 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#aa00aa",
-                "#ff55ff"
+                "#C060FF",
+                "#FF7AFF"
               ],
               "animated": true,
               "cycleMs": 3800,
@@ -2942,9 +2992,9 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#55ffff",
-                "#5555ff",
-                "#ffffff"
+                "#70F0FF",
+                "#8C9CFF",
+                "#FFFFFF"
               ],
               "animated": true,
               "cycleMs": 6000
@@ -2995,7 +3045,23 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Ancient"
+        "text": "Ancient",
+        "runs": [
+          {
+            "text": "Ancient",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#D8F0C0",
+                "#A8D08A",
+                "#E8D49A"
+              ],
+              "animated": true,
+              "cycleMs": 10000,
+              "animation": "decipher"
+            }
+          }
+        ]
       },
       "suffix": {
         "text": "Veteran"
@@ -3047,7 +3113,11 @@
             "bold": true,
             "effect": {
               "type": "gradient",
-              "palette": "sunset",
+              "colors": [
+                "#FFD84A",
+                "#FFA64A",
+                "#FFE9A0"
+              ],
               "animated": true,
               "cycleMs": 4200,
               "animation": "shimmer"
@@ -3209,9 +3279,9 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#ffaa00",
-                "#aa0000",
-                "#550000"
+                "#FFC14A",
+                "#FF7A4A",
+                "#FF5A6A"
               ]
             }
           }
@@ -3225,9 +3295,14 @@
             "bold": true,
             "effect": {
               "type": "gradient",
-              "palette": "red",
+              "colors": [
+                "#FF5A5A",
+                "#FFA07A",
+                "#FFD27A"
+              ],
               "animated": true,
-              "cycleMs": 3600
+              "cycleMs": 3600,
+              "animation": "wave"
             }
           }
         ]
@@ -3318,7 +3393,23 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Unfading"
+        "text": "Unfading",
+        "runs": [
+          {
+            "text": "Unfading",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#FFF6D0",
+                "#FFE08A",
+                "#FFC2E0"
+              ],
+              "animated": true,
+              "cycleMs": 4800,
+              "animation": "eclipse"
+            }
+          }
+        ]
       }
     }
   },
@@ -3417,13 +3508,12 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#aa00aa",
-                "#555555",
-                "#5555ff"
+                "#C77DFF",
+                "#9AA6C8",
+                "#E6E0FF"
               ],
               "animated": true,
-              "cycleMs": 5200,
-              "animation": "flicker"
+              "animation": "glitch"
             }
           }
         ]
@@ -3470,7 +3560,24 @@
     },
     "rewards": {
       "suffix": {
-        "text": "Scourge"
+        "text": "Scourge",
+        "runs": [
+          {
+            "text": "Scourge",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#FF4F6A",
+                "#FF8F4A",
+                "#FF4F9A"
+              ],
+              "animated": true,
+              "cycleMs": 2800,
+              "animation": "strike"
+            }
+          }
+        ]
       }
     }
   },
@@ -3517,7 +3624,23 @@
         "text": "Syndicate"
       },
       "suffix": {
-        "text": "Raidmaster"
+        "text": "Raidmaster",
+        "runs": [
+          {
+            "text": "Raidmaster",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#FFB347",
+                "#FF6A6A",
+                "#FFE066"
+              ],
+              "animated": true,
+              "cycleMs": 2400,
+              "animation": "swell"
+            }
+          }
+        ]
       }
     }
   },
@@ -3803,13 +3926,13 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#550055",
-                "#aa00aa",
-                "#ff55ff"
+                "#E070FF",
+                "#FF6FD8",
+                "#B98CFF"
               ],
               "animated": true,
-              "cycleMs": 4600,
-              "animation": "flicker"
+              "cycleMs": 2300,
+              "animation": "glitch"
             }
           }
         ]
@@ -3863,9 +3986,9 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#ffaa00",
-                "#ffff55",
-                "#aa00aa"
+                "#FFB833",
+                "#FFF07A",
+                "#D070FF"
               ],
               "animated": true,
               "cycleMs": 4800
@@ -4017,12 +4140,13 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#aa0000",
-                "#ffaa00"
+                "#8FA8CC",
+                "#B0C0D8",
+                "#7FA0D0"
               ],
               "animated": true,
-              "cycleMs": 3400,
-              "animation": "pulse"
+              "cycleMs": 3600,
+              "animation": "strike"
             }
           }
         ]
@@ -4146,16 +4270,15 @@
         "runs": [
           {
             "text": "Deathless",
-            "bold": true,
             "effect": {
               "type": "gradient",
               "colors": [
-                "#aa0000",
-                "#ffffff"
+                "#FF4A5A",
+                "#FF8080",
+                "#FF4A5A"
               ],
               "animated": true,
-              "cycleMs": 3200,
-              "animation": "pulse"
+              "animation": "heartbeat"
             }
           }
         ]
@@ -4209,7 +4332,23 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Solitary"
+        "text": "Solitary",
+        "runs": [
+          {
+            "text": "Solitary",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#9FC8FF",
+                "#E0F0FF",
+                "#9FC8FF"
+              ],
+              "animated": true,
+              "cycleMs": 2400,
+              "animation": "heartbeat"
+            }
+          }
+        ]
       },
       "suffix": {
         "text": "Hermit"
@@ -4297,16 +4436,16 @@
         "runs": [
           {
             "text": "Unyielding",
-            "bold": true,
             "effect": {
               "type": "gradient",
               "colors": [
-                "#aa0000",
-                "#555555"
+                "#FF7048",
+                "#C8B0B0",
+                "#FF7048"
               ],
               "animated": true,
-              "cycleMs": 3000,
-              "animation": "flicker"
+              "cycleMs": 1300,
+              "animation": "heartbeat"
             }
           }
         ]

@@ -139,7 +139,8 @@ public final class Account {
 		return s.token();
 	}
 
-	private synchronized void forgetSession() {
+	/** Drops the cached token, e.g. because it belongs to a different server. */
+	public synchronized void forgetSession() {
 		session = null;
 		try {
 			Files.deleteIfExists(sessionFile);
