@@ -1111,12 +1111,8 @@
         "text": "Ritualist",
         "runs": [
           {
-            "text": "Ritual",
-            "color": "dark_purple",
-            "underlined": true
-          },
-          {
-            "text": "ist",
+            "text": "Ritualist",
+            "italic": true,
             "effect": {
               "type": "gradient",
               "palette": "royal",
