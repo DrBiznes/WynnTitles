@@ -35,7 +35,7 @@ public final class Nametags {
 	 */
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public static void addTitle(PlayerNametagRenderEvent event, List nametags) {
-		if (NEW_NAMETAG == null || !WynnTitlesConfig.get().showTitles) {
+		if (NEW_NAMETAG == null || !titlesVisible()) {
 			return;
 		}
 		Entity entity = ((EntityRenderStateExtension) event.getEntityRenderState()).getEntity();
@@ -60,6 +60,15 @@ public final class Nametags {
 		} catch (Throwable t) {
 			WynnTitles.LOGGER.error("Could not add title nametag", t);
 		}
+	}
+
+	/**
+	 * Reads Wynntils' current raid rather than following its raid events: it
+	 * clears the raid when one is interrupted too, which posts no end event.
+	 */
+	private static boolean titlesVisible() {
+		WynnTitlesConfig config = WynnTitlesConfig.get();
+		return config.showTitles && !(config.hideTitlesInRaids && Models.Raid.getCurrentRaid() != null);
 	}
 
 	private static MethodHandle findConstructor() {

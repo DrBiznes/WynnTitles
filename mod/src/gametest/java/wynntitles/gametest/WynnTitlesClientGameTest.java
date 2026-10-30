@@ -1,6 +1,9 @@
 package wynntitles.gametest;
 
 import com.mojang.authlib.GameProfile;
+import com.wynntils.core.components.Models;
+import com.wynntils.mc.event.TitleSetTextEvent;
+import com.wynntils.models.raid.raids.TheNamelessAnomalyRaid;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -96,6 +99,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			context.waitTicks(5);
 			screenshot(context, "wynntitles-nametag");
 			screenshotAnimatedNametags(context, catalog, dummyAchievement);
+			checkHiddenInRaids(context, dummyTitle);
 
 			context.setScreen(TitlesScreen::new);
 			context.waitForScreen(TitlesScreen.class);
@@ -448,6 +452,31 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			}
 		}
 		context.runOnClient(client -> WynnTitles.titles().put(dummy, wynntitles.titles.Title.of(prefix, suffix)));
+	}
+
+	/** Wynntils enters a raid on its entry title and leaves it when the raid fails, as on Wynncraft. */
+	private static void checkHiddenInRaids(ClientGameTestContext context, String title) {
+		context.runOnClient(client -> Models.Raid.onTitle(
+				new TitleSetTextEvent(new TheNamelessAnomalyRaid().getEntryTitle().getComponent())));
+		check(context.computeOnClient(client -> Models.Raid.getCurrentRaid() != null), "the entry title should start a raid");
+		checkTitleDrawn(context, title, false, "in a raid");
+		screenshot(context, "wynntitles-nametag-raid");
+
+		context.runOnClient(client -> WynnTitlesConfig.get().hideTitlesInRaids = false);
+		checkTitleDrawn(context, title, true, "in a raid with the option off");
+		context.runOnClient(client -> WynnTitlesConfig.get().hideTitlesInRaids = true);
+		checkTitleDrawn(context, title, false, "in a raid with the option back on");
+
+		context.runOnClient(client -> Models.Raid.failedRaid());
+		check(context.computeOnClient(client -> Models.Raid.getCurrentRaid() == null), "failing should end the raid");
+		checkTitleDrawn(context, title, true, "after the raid");
+	}
+
+	private static void checkTitleDrawn(ClientGameTestContext context, String title, boolean expected, String when) {
+		context.runOnClient(client -> NametagProbe.clear());
+		context.waitTicks(5);
+		check(NametagProbe.drawn(title) == expected, "title \"" + title + "\" should "
+				+ (expected ? "" : "not ") + "be drawn " + when + "; drew " + NametagProbe.all());
 	}
 
 	private static boolean usesAnimation(wynntitles.titles.TitleWord word, wynntitles.titles.TitleAnimation animation) {

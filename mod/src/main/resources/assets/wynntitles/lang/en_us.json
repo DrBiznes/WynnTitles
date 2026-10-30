@@ -7,6 +7,8 @@
 	"text.autoconfig.wynntitles.category.advanced": "Advanced",
 	"text.autoconfig.wynntitles.option.showTitles": "Show titles",
 	"text.autoconfig.wynntitles.option.showTitles.@Tooltip": "Show other players' titles above their names. Needs Wynntils' custom nametags enabled.",
+	"text.autoconfig.wynntitles.option.hideTitlesInRaids": "Hide titles in raids",
+	"text.autoconfig.wynntitles.option.hideTitlesInRaids.@Tooltip": "Hide titles above players while you are in a raid. Needs Wynntils' raid tracking enabled.",
 	"text.autoconfig.wynntitles.option.titleScale": "Title size (%)",
 	"text.autoconfig.wynntitles.option.titleScale.@Tooltip": "Size of titles above players, compared with their names.",
 	"text.autoconfig.wynntitles.option.animateTitles": "Animate titles",

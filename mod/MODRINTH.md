@@ -29,7 +29,7 @@ WynnTitles adds achievements to Wynncraft. Each achievement unlocks title words,
 - Titles show on the Wynntils nametag stack, above player names.
 - Achievement and title screens: press `` ` `` or type `/titles`.
 - Unlock toasts and chat announcements, both optional.
-- Options in Mod Menu: hide other players' titles, turn off announcements, or point the mod at your own server.
+- Options in Mod Menu: hide other players' titles, always or just in raids, turn off announcements, or point the mod at your own server.
 
 **Requirements**
 

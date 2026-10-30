@@ -19,6 +19,10 @@ public final class NametagProbe {
 		return DRAWN.contains(text);
 	}
 
+	public static void clear() {
+		DRAWN.clear();
+	}
+
 	public static Set<String> all() {
 		return Set.copyOf(DRAWN);
 	}
