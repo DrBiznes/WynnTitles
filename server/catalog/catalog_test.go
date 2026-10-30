@@ -92,6 +92,35 @@ func TestEmbeddedNativeStylesAreUnique(t *testing.T) {
 	}
 }
 
+// The title builder looks words up by text and keeps the first, so a repeated
+// prefix or suffix would silently leave its achievement with nothing to wear.
+func TestEmbeddedTitleWordsAreUnique(t *testing.T) {
+	c, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	prefixes, suffixes := map[string]string{}, map[string]string{}
+	for _, a := range c.Achievements {
+		for _, slot := range []struct {
+			kind  string
+			word  *Word
+			owner map[string]string
+		}{
+			{"prefix", a.Rewards.Prefix, prefixes},
+			{"suffix", a.Rewards.Suffix, suffixes},
+		} {
+			if slot.word == nil {
+				continue
+			}
+			key := strings.ToLower(slot.word.Text)
+			if other, dup := slot.owner[key]; dup {
+				t.Errorf("%s %q on %s is already used by %s", slot.kind, slot.word.Text, a.ID, other)
+			}
+			slot.owner[key] = a.ID
+		}
+	}
+}
+
 func TestPlainWordsGetOneRun(t *testing.T) {
 	c, err := Parse([]byte(`[`+valid("a")+`]`), []byte(testShop))
 	if err != nil {

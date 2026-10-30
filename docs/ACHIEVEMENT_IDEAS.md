@@ -84,7 +84,7 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | Woodcutting 100 | silver | professionLevel 100 |  | Lumberjack |
 | Woodcutting 132 | gold | professionLevel 132 | Timbered |  |
 | Mining 100 | silver | professionLevel 100 |  | Prospector |
-| Mining 132 | gold | professionLevel 132 | Deep-Delved |  |
+| Mining 132 | gold | professionLevel 132 | Obsidian |  |
 | Farming 100 | silver | professionLevel 100 |  | Harvester |
 | Farming 132 | gold | professionLevel 132 | Harvest-Blessed |  |
 | Fishing 100 | silver | professionLevel 100 |  | Angler |
@@ -92,7 +92,7 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | Alchemism 100 | silver | professionLevel 100 |  | Alchemist |
 | Alchemism 132 | gold | professionLevel 132 | Transmuting |  |
 | Armouring 100 | silver | professionLevel 100 |  | Armourer |
-| Armouring 132 | gold | professionLevel 132 | Plate-Forged |  |
+| Armouring 132 | gold | professionLevel 132 | Unbreachable |  |
 | Cooking 100 | silver | professionLevel 100 |  | Gourmand |
 | Cooking 132 | gold | professionLevel 132 | Savoury |  |
 | Jeweling 100 | silver | professionLevel 100 |  | Lapidary |

@@ -1503,7 +1503,7 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Deep-Delved"
+        "text": "Obsidian"
       }
     }
   },
@@ -1679,7 +1679,7 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Plate-Forged"
+        "text": "Unbreachable"
       }
     }
   },
@@ -3246,10 +3246,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Colossal"
+        "text": "Merciless"
       },
       "suffix": {
-        "text": "Colossus-Slayer"
+        "text": "Colossus Killer"
       }
     }
   },
@@ -3300,10 +3300,10 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Spire-Crowned",
+        "text": "Wrathful",
         "runs": [
           {
-            "text": "Spire-Crowned",
+            "text": "Wrathful",
             "bold": true,
             "effect": {
               "type": "gradient",
