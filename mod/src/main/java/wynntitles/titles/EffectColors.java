@@ -53,7 +53,17 @@ public final class EffectColors {
 			// Royal: a band of gold across regal purple, like a crown.
 			Map.entry("royal", List.of(0xA070FF, 0xC4A2FF, 0xF7C948, 0xC4A2FF, 0xA070FF)),
 			// Void: cold periwinkle and violet starlight, bluer than Royal.
-			Map.entry("void", List.of(0x7C8CFF, 0x9F7BFF, 0x8C9CFF, 0xD8CCFF)));
+			Map.entry("void", List.of(0x7C8CFF, 0x9F7BFF, 0x8C9CFF, 0xD8CCFF)),
+			// Nebula: candy pink through orchid to cornflower, a night sky for comets.
+			Map.entry("nebula", List.of(0xFF7AD0, 0xD58BFF, 0x8FA8FF)),
+			// Borealis: northern lights, mint green through cyan and violet to pink.
+			Map.entry("borealis", List.of(0x4CF0A0, 0x3CD8E8, 0x9F92FF, 0xFF86D8)),
+			// Storm: lightning, electric blue to cyan to a yellow spark.
+			Map.entry("storm", List.of(0x70A8FF, 0x5CE1FF, 0xFFF27A)),
+			// Blossom: soft rose and petal pink to peach, warmer than Blood Moon.
+			Map.entry("blossom", List.of(0xFF7EB6, 0xFFA8CC, 0xFFC9A8, 0xFFA8CC)),
+			// Brass: verdigris teal through sage to brass and copper, like old gears.
+			Map.entry("brass", List.of(0x45D0B8, 0x9CD890, 0xF0C050, 0xE89458)));
 
 	/**
 	 * The least contrast (WCAG ratio) a palette color may have against {@link #CHIP},
@@ -75,6 +85,21 @@ public final class EffectColors {
 	private static final float SWEEP = 0.55f;
 	/** Wave: letters per ripple. */
 	private static final float WAVELENGTH = 7f;
+	/** Comet: the share of the beat the head takes to cross, and the tail's length in letters. */
+	private static final float COMET_SWEEP = 0.6f;
+	private static final float COMET_TAIL = 4f;
+	/** Aurora: the second gradient's period and the blend's, as shares of the beat (6000ms → 3700ms, 11400ms). */
+	private static final float AURORA_SECOND = 0.617f;
+	private static final float AURORA_BLEND = 1.9f;
+	/** Charge: where in the beat filling, the flash and draining end; dim the rest. */
+	private static final float CHARGE_FILL = 0.45f;
+	private static final float CHARGE_FLASH = 0.6f;
+	private static final float CHARGE_DRAIN = 0.8f;
+	/** Ripple: letters between rings. */
+	private static final float RING = 4f;
+	/** Converge: where in the beat the gleams meet and the flash ends; it rests after. */
+	private static final float CONVERGE_MEET = 0.4f;
+	private static final float CONVERGE_FLASH = 0.55f;
 
 	private EffectColors() {}
 
@@ -139,7 +164,109 @@ public final class EffectColors {
 			case WAVE -> wave(ramp, i, phase);
 			case FLICKER -> flicker(ramp, position, i, now, cycle);
 			case SPARKLE -> sparkle(ramp, position, i, now, cycle);
+			case COMET -> comet(ramp.at(position), ramp, i, length, phase);
+			case AURORA -> aurora(ramp, position, now, cycle);
+			case CHARGE -> charge(ramp, position, i, length, phase);
+			case RIPPLE -> ripple(ramp, i, length, phase);
+			case CONVERGE -> converge(ramp.at(position), ramp, i, length, phase);
 		};
+	}
+
+	/**
+	 * A white head streaks across, trailing a bright tail of the palette that
+	 * fades back into the still gradient, then rests until the next pass.
+	 */
+	private static int comet(int base, Ramp ramp, int i, int length, float phase) {
+		float progress = phase / COMET_SWEEP;
+		if (progress > 1f) {
+			return base;
+		}
+		float head = -1f + progress * (length + COMET_TAIL + 1f);
+		float behind = head - i;
+		if (behind < -1f || behind > COMET_TAIL) {
+			return base; // not reached yet, or the tail has passed
+		}
+		if (behind < 0.5f) {
+			return mix(base, WHITE, 0.9f * smooth(1f - Math.abs(behind) / 1.5f));
+		}
+		float k = 1f - (behind - 0.5f) / (COMET_TAIL - 0.5f);
+		return mix(base, mix(ramp.lightest(), WHITE, 0.35f), k * k);
+	}
+
+	/**
+	 * Two looped gradients drift opposite ways at speeds that never line up,
+	 * blended by a slower sine, so the curtains never move the same way twice.
+	 */
+	private static int aurora(Ramp ramp, float position, long now, int cycle) {
+		long slow = Math.max(1, Math.round(cycle * AURORA_SECOND));
+		long blend = Math.max(1, Math.round(cycle * AURORA_BLEND));
+		float a = (now % cycle) / (float) cycle;
+		float b = (now % slow) / (float) slow;
+		float c = (now % blend) / (float) blend;
+		float k = 0.5f + 0.5f * (float) Math.sin(2 * Math.PI * c);
+		return mixHue(ramp.loop(position * 0.8f + a), ramp.loop(position * 0.6f - b + 0.5f), k);
+	}
+
+	/**
+	 * Like mix, but round the hue wheel, so mint and pink meet through blue
+	 * rather than grey; lifted if the hues between are darker than the ends.
+	 */
+	private static int mixHue(int a, int b, float t) {
+		float[] x = Color.RGBtoHSB(a >> 16 & 0xFF, a >> 8 & 0xFF, a & 0xFF, null);
+		float[] y = Color.RGBtoHSB(b >> 16 & 0xFF, b >> 8 & 0xFF, b & 0xFF, null);
+		float turn = y[0] - x[0];
+		turn -= Math.round(turn); // the short way round
+		int mixed = Color.HSBtoRGB(frac(x[0] + turn * t), lerp(x[1], y[1], t), lerp(x[2], y[2], t)) & 0xFFFFFF;
+		return readable(mixed);
+	}
+
+	/**
+	 * The word fills with the palette from a dim grey, left to right behind a
+	 * white tip, flashes when full, drains from the right, then rests dim.
+	 */
+	private static int charge(Ramp ramp, float position, int i, int length, float phase) {
+		int base = ramp.at(position);
+		int dim = readable(mix(ramp.darkest(), 0x5A5A5A, 0.75f));
+		if (phase < CHARGE_FILL) {
+			float front = phase / CHARGE_FILL * (length + 1f);
+			float filled = front - i;
+			int color = mix(dim, base, filled);
+			return filled > 0f ? mix(color, WHITE, 0.8f * Math.max(0f, 1f - Math.abs(filled - 0.5f))) : color;
+		}
+		if (phase < CHARGE_FLASH) {
+			float t = (phase - CHARGE_FILL) / (CHARGE_FLASH - CHARGE_FILL);
+			return mix(base, WHITE, 0.7f * (float) Math.sin(Math.PI * t));
+		}
+		if (phase < CHARGE_DRAIN) {
+			float edge = length - (phase - CHARGE_FLASH) / (CHARGE_DRAIN - CHARGE_FLASH) * (length + 1f);
+			return mix(dim, base, edge - i);
+		}
+		return dim;
+	}
+
+	/** Rings of the palette spread out from the middle letter; crests catch the light. */
+	private static int ripple(Ramp ramp, int i, int length, float phase) {
+		float distance = Math.abs(i - (length - 1) / 2f);
+		float s = 0.5f + 0.5f * (float) Math.sin(2 * Math.PI * (phase - distance / RING));
+		int color = ramp.at(s);
+		return s > 0.8f ? mix(color, WHITE, (s - 0.8f) / 0.2f * 0.3f) : color;
+	}
+
+	/** Gleams start at both ends and meet in the middle, the word flashes, then rests. */
+	private static int converge(int base, Ramp ramp, int i, int length, float phase) {
+		if (phase < CONVERGE_MEET) {
+			float progress = phase / CONVERGE_MEET;
+			float middle = (length - 1) / 2f;
+			float left = -2f + progress * (middle + 2f);
+			float right = length + 1f - progress * (length + 1f - middle);
+			float k = Math.max(0f, 1f - Math.min(Math.abs(i - left), Math.abs(i - right)) / 1.8f);
+			return mix(base, WHITE, 0.85f * smooth(k));
+		}
+		if (phase < CONVERGE_FLASH) {
+			float t = (phase - CONVERGE_MEET) / (CONVERGE_FLASH - CONVERGE_MEET);
+			return mix(base, mix(ramp.lightest(), WHITE, 0.5f), (float) Math.sin(Math.PI * t));
+		}
+		return base;
 	}
 
 	/** A white gleam a few letters wide crosses the word, then rests until the next beat. */

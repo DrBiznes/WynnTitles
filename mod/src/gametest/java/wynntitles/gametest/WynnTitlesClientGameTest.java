@@ -412,7 +412,10 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			wynntitles.titles.Title title = wynntitles.titles.Title.of(
 					catalog.restyle(prefix, style), catalog.restyle(suffix, style));
 			context.runOnClient(client -> WynnTitles.titles().put(dummy, title));
-			context.waitTicks(3);
+			// Shoot 15% into a beat, so animations that rest (comet, converge) are caught moving.
+			int beat = item.motion().defaultCycleMs;
+			long wait = Math.floorMod(beat * 15 / 100 - System.currentTimeMillis() % beat, (long) beat);
+			context.waitTicks(Math.max(3, (int) (wait / 50)));
 			screenshot(context, "wynntitles-nametag-" + item.animation() + "-1");
 			context.waitTicks(8);
 			screenshot(context, "wynntitles-nametag-" + item.animation() + "-2");

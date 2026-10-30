@@ -182,6 +182,41 @@
     "palette": "void"
   },
   {
+    "id": "palette_nebula",
+    "kind": "palette",
+    "name": "Ahmsord",
+    "price": 12,
+    "palette": "nebula"
+  },
+  {
+    "id": "palette_borealis",
+    "kind": "palette",
+    "name": "Nesaak",
+    "price": 12,
+    "palette": "borealis"
+  },
+  {
+    "id": "palette_storm",
+    "kind": "palette",
+    "name": "Thunderborn",
+    "price": 12,
+    "palette": "storm"
+  },
+  {
+    "id": "palette_blossom",
+    "kind": "palette",
+    "name": "Aldorei",
+    "price": 12,
+    "palette": "blossom"
+  },
+  {
+    "id": "palette_brass",
+    "kind": "palette",
+    "name": "Corkian",
+    "price": 12,
+    "palette": "brass"
+  },
+  {
     "id": "animated_red",
     "kind": "animatedPalette",
     "name": "Heartbeat",
@@ -268,6 +303,46 @@
     "price": 20,
     "palette": "void",
     "animation": "sparkle"
+  },
+  {
+    "id": "animated_nebula",
+    "kind": "animatedPalette",
+    "name": "Shooting Star",
+    "price": 20,
+    "palette": "nebula",
+    "animation": "comet"
+  },
+  {
+    "id": "animated_borealis",
+    "kind": "animatedPalette",
+    "name": "Northern Veil",
+    "price": 20,
+    "palette": "borealis",
+    "animation": "aurora"
+  },
+  {
+    "id": "animated_storm",
+    "kind": "animatedPalette",
+    "name": "Stormcaller",
+    "price": 20,
+    "palette": "storm",
+    "animation": "charge"
+  },
+  {
+    "id": "animated_blossom",
+    "kind": "animatedPalette",
+    "name": "Lake Gylia",
+    "price": 20,
+    "palette": "blossom",
+    "animation": "ripple"
+  },
+  {
+    "id": "animated_brass",
+    "kind": "animatedPalette",
+    "name": "Clockwork",
+    "price": 20,
+    "palette": "brass",
+    "animation": "converge"
   },
   {
     "id": "rainbow",

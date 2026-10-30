@@ -106,7 +106,7 @@ func validateShopItem(i *ShopItem) error {
 		if i.Kind == "animatedPalette" {
 			want = append(want, "animation")
 			if !animations[i.Animation] {
-				return fmt.Errorf("animation must be flow, pulse, shimmer, wave, flicker or sparkle")
+				return fmt.Errorf("animation must be flow, pulse, shimmer, wave, flicker, sparkle, comet, aurora, charge, ripple or converge")
 			}
 		}
 	case "rainbow":

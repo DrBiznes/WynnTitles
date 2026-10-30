@@ -13,7 +13,12 @@ public enum TitleAnimation {
 	SHIMMER("Shimmer", "a bright gleam sweeping across", 2600),
 	WAVE("Wave", "rippling letter by letter", 1800),
 	FLICKER("Flicker", "letters wavering and flaring", 110),
-	SPARKLE("Sparkle", "letters twinkling like stars", 1700);
+	SPARKLE("Sparkle", "letters twinkling like stars", 1700),
+	COMET("Comet", "a white-hot comet streaking across", 3200),
+	AURORA("Aurora", "curtains of light that never repeat", 6000),
+	CHARGE("Charge", "filling with power, flashing, draining", 3000),
+	RIPPLE("Ripple", "rings spreading from the middle", 2000),
+	CONVERGE("Converge", "two gleams meeting in a flash", 2800);
 
 	public final String id;
 	public final String label;
