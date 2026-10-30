@@ -218,7 +218,7 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | Hunted | gold | gamemodeLevel hunted 100 | Hunted | Prey |
 | HUICH | gold | gamemodeLevel hunted+ultimate_ironman+craftsman+hardcore 80 | Unyielding ✦ | Masochist |
 
-### secret (16)
+### secret (15)
 
 The libraries are the seven secret discoveries with "Library" in the name, plus The Grand Archive, which the Content Book calls a library. The Grand Archive is bronze because the wiki lists no entry requirement for it, and that also keeps the shop ratio under 85%.
 
@@ -236,7 +236,6 @@ The libraries are the seven secret discoveries with "Library" in the name, plus 
 | Complete Works | gold | territorySet (all 8 libraries) | Lorebound ✦ | Librarian ✦ |
 | Moon Walker | gold | territorySet "The Moon" | | Moon-Walker ✦ |
 | Death's Door | silver | territorySet "Death's Realm" | Departed | Revenant |
-| Rock Bottom | silver | territorySet "Bottomless Pit" | Bottom-Dwelling | Freefaller |
 | Bak'al's Wake | bronze | territorySet (3) | Scorched | Witness |
 | Edge of Nothing | gold | territorySet (4) | Unmoored | Castaway |
 | Sleuth | gold | territorySet (all 121 secret discoveries) | Hidden ✦ | Sleuth |

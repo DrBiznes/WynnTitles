@@ -4846,31 +4846,6 @@
     }
   },
   {
-    "id": "secret_bottomless_pit",
-    "category": "secret",
-    "name": "Rock Bottom",
-    "description": "Reach the Bottomless Pit, at the border of the void.",
-    "tier": "silver",
-    "points": 3,
-    "icon": {
-      "fallback": "minecraft:sculk"
-    },
-    "trigger": {
-      "type": "territorySet",
-      "territoryNames": [
-        "Bottomless Pit"
-      ]
-    },
-    "rewards": {
-      "prefix": {
-        "text": "Bottom-Dwelling"
-      },
-      "suffix": {
-        "text": "Freefaller"
-      }
-    }
-  },
-  {
     "id": "secret_bakal_destruction",
     "category": "secret",
     "name": "Bak'al's Wake",
