@@ -4305,6 +4305,7 @@
         "runs": [
           {
             "text": "Deathless",
+            "bold": true,
             "effect": {
               "type": "gradient",
               "colors": [
@@ -4371,6 +4372,7 @@
         "runs": [
           {
             "text": "Solitary",
+            "bold": true,
             "effect": {
               "type": "gradient",
               "colors": [
@@ -4471,6 +4473,7 @@
         "runs": [
           {
             "text": "Unyielding",
+            "bold": true,
             "effect": {
               "type": "gradient",
               "colors": [

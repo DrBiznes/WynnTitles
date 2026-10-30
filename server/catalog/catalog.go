@@ -172,7 +172,7 @@ var palettes = map[string]bool{
 //   - glitch: still, then bursts of obfuscated cyan and magenta letters
 //   - eclipse: a shadow with a bright rim crosses the word
 //   - strike: a lightning flash, each letter cooling back at its own pace
-//   - heartbeat: a lub-dub double beat that brightens and bolds the word
+//   - heartbeat: a lub-dub double beat that brightens the word
 //   - swell: a bold crest rolls along a flowing gradient
 //   - ascend: each color wipes over the last, and the final one lands and holds bold
 //   - reel: letters spin scrambled, lock in from the left, then a gleam crosses

@@ -231,13 +231,21 @@ class EffectColorsTest {
 	}
 
 	@Test
-	void heartbeatAndSwellBoldOnlyOnTheBeat() {
+	void heartbeatBrightensOnTheBeatWithoutBolding() {
 		TitleEffect heart = animated("red", TitleAnimation.HEARTBEAT);
-		TitleEffect swell = animated("sunset", TitleAnimation.SWELL);
 		int beat = TitleAnimation.HEARTBEAT.defaultCycleMs;
 		long start = T0 - T0 % beat;
-		assertTrue(Arrays.stream(EffectColors.letters(heart, WORD.length(), start + beat * 8 / 100)).allMatch(EffectColors.Letter::bold));
-		assertTrue(Arrays.stream(EffectColors.letters(heart, WORD.length(), start + beat / 2)).noneMatch(EffectColors.Letter::bold));
+		for (int ms = 0; ms < beat; ms += 10) {
+			assertTrue(Arrays.stream(EffectColors.letters(heart, WORD.length(), start + ms)).noneMatch(EffectColors.Letter::bold));
+		}
+		int[] thump = EffectColors.colors(heart, WORD.length(), start + beat * 8 / 100);
+		int[] rest = EffectColors.colors(heart, WORD.length(), start + beat / 2);
+		assertTrue(EffectColors.luma(thump[0]) > EffectColors.luma(rest[0]));
+	}
+
+	@Test
+	void swellBoldsOneLetterAtMost() {
+		TitleEffect swell = animated("sunset", TitleAnimation.SWELL);
 		for (int ms = 0; ms < 2600; ms += 50) {
 			long bold = Arrays.stream(EffectColors.letters(swell, WORD.length(), T0 + ms)).filter(EffectColors.Letter::bold).count();
 			assertTrue(bold <= 1, bold + " letters bold at " + ms + "ms");

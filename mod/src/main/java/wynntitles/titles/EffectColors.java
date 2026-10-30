@@ -228,7 +228,7 @@ public final class EffectColors {
 			case GLITCH -> glitch(ramp, position, i, now, cycle);
 			case ECLIPSE -> Letter.of(eclipse(ramp, ramp.at(position), i, length, phase));
 			case STRIKE -> Letter.of(strike(ramp.at(position), i, now, cycle));
-			case HEARTBEAT -> heartbeat(ramp.at(position), phase);
+			case HEARTBEAT -> Letter.of(heartbeat(ramp.at(position), phase));
 			case SWELL -> swell(ramp, position, i, length, phase);
 			case ASCEND -> ascend(ramp, i, length, phase);
 			case REEL -> reel(ramp, position, i, length, phase);
@@ -458,10 +458,13 @@ public final class EffectColors {
 		return mix(WHITE, base, smooth(Math.min(cool, 1f)));
 	}
 
-	/** Two thumps and a rest; each brightens the whole word and, at its peak, makes it bold. */
-	private static Letter heartbeat(int base, float phase) {
+	/**
+	 * Two thumps and a rest; each brightens the whole word. It never bolds: that
+	 * would widen every letter at once and shake a centered nametag on each beat.
+	 */
+	private static int heartbeat(int base, float phase) {
 		float k = Math.max(thump(phase, LUB), 0.65f * thump(phase, DUB));
-		return new Letter(mix(base, WHITE, 0.6f * k), k > 0.5f, Glyph.PLAIN);
+		return mix(base, WHITE, 0.6f * k);
 	}
 
 	private static float thump(float phase, float at) {
