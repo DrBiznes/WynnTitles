@@ -1012,14 +1012,17 @@
         "text": "Acrobat",
         "runs": [
           {
-            "text": "Acro",
-            "color": "#FFB833",
-            "bold": true
-          },
-          {
-            "text": "bat",
-            "color": "#FFF07A",
-            "italic": true
+            "text": "Acrobat",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#FFB833",
+                "#FFF07A"
+              ],
+              "animated": true,
+              "cycleMs": 4400
+            }
           }
         ]
       }
@@ -1245,10 +1248,10 @@
     }
   },
   {
-    "id": "roster_100",
+    "id": "roster_120",
     "category": "class_level",
     "name": "Pentarch",
-    "description": "Have a level 100 character of every class.",
+    "description": "Have a level 120 character of every class.",
     "tier": "gold",
     "points": 5,
     "icon": {
@@ -1257,7 +1260,7 @@
     },
     "trigger": {
       "type": "characterRoster",
-      "level": 100
+      "level": 120
     },
     "rewards": {
       "prefix": {

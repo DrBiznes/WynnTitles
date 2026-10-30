@@ -72,7 +72,7 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 |---|---|---|---|---|
 | Many Faces | bronze | characterRoster 1 |  | Many-Faced |
 | Versatile | silver | characterRoster 50 | Versatile |  |
-| Pentarch | gold | characterRoster 100 | Five-Sworn ✦ | Pentarch |
+| Pentarch | gold | characterRoster 120 | Five-Sworn ✦ | Pentarch |
 
 ### profession (29)
 
