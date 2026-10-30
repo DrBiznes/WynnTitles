@@ -3088,7 +3088,22 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Ranked"
+        "text": "Ranked",
+        "runs": [
+          {
+            "text": "Ranked",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#D98A4E",
+                "#D0DAE6",
+                "#FFD23C"
+              ],
+              "animated": true,
+              "animation": "ascend"
+            }
+          }
+        ]
       }
     }
   },
@@ -3117,19 +3132,36 @@
             "effect": {
               "type": "gradient",
               "colors": [
-                "#FFD84A",
-                "#FFA64A",
-                "#FFE9A0"
+                "#FFE680",
+                "#FFB938",
+                "#FF9A5C"
               ],
               "animated": true,
-              "cycleMs": 4200,
-              "animation": "shimmer"
+              "animation": "reel"
             }
           }
         ]
       },
       "suffix": {
-        "text": "Apex"
+        "text": "Apex",
+        "runs": [
+          {
+            "text": "Apex",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#DFF6FF",
+                "#C0C8FF",
+                "#F4C4FF",
+                "#FFD0E0",
+                "#C0FFE8"
+              ],
+              "animated": true,
+              "animation": "prism"
+            }
+          }
+        ]
       }
     }
   },

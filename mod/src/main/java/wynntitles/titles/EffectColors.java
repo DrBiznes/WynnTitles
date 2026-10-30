@@ -113,6 +113,12 @@ public final class EffectColors {
 	private static final int FLASH_MS = 70, WARNING_MS = 250;
 	/** Heartbeat: where in the beat the two thumps fall, and how wide each is. */
 	private static final float LUB = 0.08f, DUB = 0.26f, THUMP = 0.045f;
+	/** Ascend: the share of the beat the climb takes, and the flash the last color lands in; it holds after. */
+	private static final float ASCEND_CLIMB = 0.55f, ASCEND_FLASH = 0.07f;
+	/** Reel: the share of the beat the letters take to lock, left to right, and how long each flares. */
+	private static final float REEL_SPIN = 0.4f, REEL_FLARE = 0.06f;
+	/** Prism: the share of the beat the flash takes to scatter to the ends, and the share it gathers over before the next. */
+	private static final float PRISM_SCATTER = 0.3f, PRISM_GATHER = 0.1f;
 
 	/** How a letter is drawn besides its color: as itself, scrambled (obfuscated), or as its Wynnic rune. */
 	public enum Glyph { PLAIN, SCRAMBLED, RUNE }
@@ -224,6 +230,9 @@ public final class EffectColors {
 			case STRIKE -> Letter.of(strike(ramp.at(position), i, now, cycle));
 			case HEARTBEAT -> heartbeat(ramp.at(position), phase);
 			case SWELL -> swell(ramp, position, i, length, phase);
+			case ASCEND -> ascend(ramp, i, length, phase);
+			case REEL -> reel(ramp, position, i, length, phase);
+			case PRISM -> Letter.of(prism(ramp, position, phase));
 		};
 	}
 
@@ -474,6 +483,49 @@ public final class EffectColors {
 		return Letter.of(d == 1 ? mix(base, WHITE, 0.2f) : base);
 	}
 
+	/**
+	 * Climbing the ranks: the word starts on its first color, and each later one
+	 * wipes over it from the left behind a bold, white-hot edge. The last lands in
+	 * a flash and holds, bold, until the next beat drops it back to the bottom.
+	 */
+	private static Letter ascend(Ramp ramp, int i, int length, float phase) {
+		if (phase >= ASCEND_CLIMB) {
+			return new Letter(mix(ramp.at(1), WHITE, 1 - (phase - ASCEND_CLIMB) / ASCEND_FLASH), true, Glyph.PLAIN);
+		}
+		int wipes = Math.max(ramp.stops() - 1, 1);
+		float climb = phase / ASCEND_CLIMB * wipes;
+		int wipe = (int) climb;
+		// Past the edge when negative, ahead of it from 1; it enters and leaves off the word.
+		float d = i + 1 - (climb - wipe) * (length + 1);
+		if (d >= 1) {
+			return Letter.of(ramp.at((float) wipe / wipes));
+		}
+		int reached = ramp.at((wipe + 1f) / wipes);
+		return d > 0 ? new Letter(mix(reached, WHITE, 0.7f), true, Glyph.PLAIN) : Letter.of(mix(reached, WHITE, 0.7f * (1 + d)));
+	}
+
+	/**
+	 * Like a leaderboard's reels: every letter spins, scrambled and running
+	 * through the colors, then each locks in from the left with a white flare.
+	 * Once the word has settled, one gleam crosses it before the next spin.
+	 */
+	private static Letter reel(Ramp ramp, float position, int i, int length, float phase) {
+		float lock = REEL_SPIN * (i + 1) / length;
+		if (phase < lock) {
+			return new Letter(ramp.loop(position + 5 * phase), false, Glyph.SCRAMBLED);
+		}
+		int base = ramp.at(position);
+		float flare = (phase - lock) / REEL_FLARE;
+		return Letter.of(flare < 1 ? mix(base, WHITE, 1 - flare) : shimmer(base, i, length, frac(phase - REEL_SPIN - REEL_FLARE)));
+	}
+
+	/** The word gathers to white and flashes, then the light scatters from the middle into its colors, which drift. */
+	private static int prism(Ramp ramp, float position, float phase) {
+		float scatter = PRISM_SCATTER * (0.5f + Math.abs(position - 0.5f));
+		float blaze = Math.max(1 - phase / scatter, (phase - 1 + PRISM_GATHER) / PRISM_GATHER);
+		return mix(ramp.loop(0.5f * position + phase), WHITE, blaze);
+	}
+
 	/** Colors along 0 to 1, from a palette, explicit colors, or the hue wheel for plain rainbow. */
 	private record Ramp(List<Integer> colors) {
 		static Ramp of(TitleEffect effect) {
@@ -503,6 +555,11 @@ public final class EffectColors {
 			float scaled = t * n;
 			int left = Math.min((int) scaled, n - 1);
 			return mixRgb(colors.get(left), colors.get((left + 1) % n), scaled - left);
+		}
+
+		/** How many colors it has; the hue wheel counts as three. */
+		int stops() {
+			return colors == null ? 3 : colors.size();
 		}
 
 		int lightest() {

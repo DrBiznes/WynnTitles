@@ -25,7 +25,10 @@ public enum TitleAnimation {
 	ECLIPSE("Eclipse", "a shadow crossing the word", 4200, true),
 	STRIKE("Strike", "a lightning flash cooling off", 3200, true),
 	HEARTBEAT("Heartbeat", "a double beat and a rest", 1500, true),
-	SWELL("Swell", "a bold crest rolling along", 2600, true);
+	SWELL("Swell", "a bold crest rolling along", 2600, true),
+	ASCEND("Ascend", "climbing through its colors to a bold finish", 5000, true),
+	REEL("Reel", "spinning letters locking in one by one", 5400, true),
+	PRISM("Prism", "a blinding flash scattering into colored light", 4000, true);
 
 	public final String id;
 	public final String label;

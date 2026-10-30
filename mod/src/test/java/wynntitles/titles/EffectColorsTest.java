@@ -245,6 +245,48 @@ class EffectColorsTest {
 	}
 
 	@Test
+	void ascendClimbsItsColorsThenHoldsBold() {
+		TitleEffect effect = new TitleEffect("gradient", List.of("#D98A4E", "#D0DAE6", "#FFD23C"), null, true, 0, TitleAnimation.ASCEND.id);
+		int beat = TitleAnimation.ASCEND.defaultCycleMs;
+		long start = T0 - T0 % beat;
+		for (EffectColors.Letter letter : EffectColors.letters(effect, WORD.length(), start)) {
+			assertEquals(EffectColors.Letter.of(0xD98A4E), letter);
+		}
+		// Most of the way through the first wipe, the second color has reached all but the end.
+		EffectColors.Letter[] climbing = EffectColors.letters(effect, WORD.length(), start + beat / 5);
+		assertEquals(0xD0DAE6, climbing[0].color());
+		assertEquals(0xD98A4E, climbing[WORD.length() - 1].color());
+		for (EffectColors.Letter letter : EffectColors.letters(effect, WORD.length(), start + beat * 9 / 10)) {
+			assertEquals(new EffectColors.Letter(0xFFD23C, true, EffectColors.Glyph.PLAIN), letter);
+		}
+	}
+
+	@Test
+	void reelLocksLeftToRightThenSettles() {
+		TitleEffect effect = animated("flame", TitleAnimation.REEL);
+		int beat = TitleAnimation.REEL.defaultCycleMs;
+		long start = T0 - T0 % beat;
+		assertTrue(Arrays.stream(EffectColors.letters(effect, WORD.length(), start))
+				.allMatch(l -> l.glyph() == EffectColors.Glyph.SCRAMBLED));
+		EffectColors.Letter[] locking = EffectColors.letters(effect, WORD.length(), start + beat / 5);
+		assertEquals(EffectColors.Glyph.PLAIN, locking[0].glyph());
+		assertEquals(EffectColors.Glyph.SCRAMBLED, locking[WORD.length() - 1].glyph());
+		int[] still = EffectColors.colors(new TitleEffect("gradient", null, "flame", false, 0, null), WORD.length(), start);
+		assertArrayEquals(still, EffectColors.colors(effect, WORD.length(), start + beat * 47 / 100));
+	}
+
+	@Test
+	void prismFlashesWhiteThenScattersFromTheMiddle() {
+		TitleEffect effect = new TitleEffect("gradient", List.of("#DFF6FF", "#C0C8FF", "#F4C4FF", "#FFD0E0", "#C0FFE8"), null, true, 0, TitleAnimation.PRISM.id);
+		int beat = TitleAnimation.PRISM.defaultCycleMs;
+		long start = T0 - T0 % beat;
+		assertEquals(1, Arrays.stream(EffectColors.colors(effect, 9, start)).distinct().count());
+		int[] scattering = EffectColors.colors(effect, 9, start + beat * 20 / 100);
+		assertNotEquals(0xFFFFFF, scattering[4]);
+		assertTrue(EffectColors.luma(scattering[0]) > EffectColors.luma(scattering[4]), "the ends should still be brighter");
+	}
+
+	@Test
 	void heldStillEveryLetterIsPlain() {
 		for (TitleAnimation animation : TitleAnimation.values()) {
 			for (EffectColors.Letter letter : EffectColors.letters(animated("ice", animation).still(), WORD.length(), T0)) {

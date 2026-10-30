@@ -174,16 +174,21 @@ var palettes = map[string]bool{
 //   - strike: a lightning flash, each letter cooling back at its own pace
 //   - heartbeat: a lub-dub double beat that brightens and bolds the word
 //   - swell: a bold crest rolls along a flowing gradient
+//   - ascend: each color wipes over the last, and the final one lands and holds bold
+//   - reel: letters spin scrambled, lock in from the left, then a gleam crosses
+//   - prism: the word flashes white, and the light scatters into its colors
 var animations = map[string]bool{
 	"flow": true, "pulse": true, "shimmer": true, "wave": true, "flicker": true, "sparkle": true,
 	"comet": true, "aurora": true, "charge": true, "ripple": true, "converge": true,
 	"decipher": true, "glitch": true, "eclipse": true, "strike": true, "heartbeat": true, "swell": true,
+	"ascend": true, "reel": true, "prism": true,
 }
 
 // nativeOnly animations belong to achievements' native styles and are never
 // sold, like obfuscated, so the biggest titles have looks nobody can buy.
 var nativeOnly = map[string]bool{
 	"decipher": true, "glitch": true, "eclipse": true, "strike": true, "heartbeat": true, "swell": true,
+	"ascend": true, "reel": true, "prism": true,
 }
 
 var namedColors = map[string]bool{
