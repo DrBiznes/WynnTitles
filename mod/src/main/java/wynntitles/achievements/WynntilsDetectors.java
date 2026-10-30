@@ -4,7 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.text.StyledText;
+import com.wynntils.models.activities.discoveries.DiscoveryInfo;
 import com.wynntils.models.activities.type.ActivityStatus;
+import com.wynntils.models.activities.type.DiscoveryType;
 import com.wynntils.models.character.type.CharacterGamemode;
 import com.wynntils.models.character.type.ClassType;
 import com.wynntils.models.guild.type.GuildRank;
@@ -55,7 +57,7 @@ public final class WynntilsDetectors {
 		return RAIDS;
 	}
 
-	/** Visited territories for territorySet triggers are kept in visitedFile. */
+	/** Each character's visited places for territorySet triggers are kept in visitedFile. */
 	public static Map<String, Detector> create(Path visitedFile) {
 		Map<String, Detector> detectors = new HashMap<>();
 		detectors.put("combatLevel", detector(WynntilsDetectors::combatLevel, WynntilsDetectors::combatLevelProgress));
@@ -277,9 +279,22 @@ public final class WynntilsDetectors {
 		return evidence;
 	}
 
-	/** Records the territory the player stands in, then checks whether every listed one has been visited. */
+	/**
+	 * Every listed place visited on one character. Places come from the Content
+	 * Book's discoveries, which Wynntils only reads when asked, so this asks once
+	 * each time a character joins a world, and only while a set is locked. A
+	 * discovery that is not a territory, like The Moon or a library, therefore
+	 * counts from the next join. Territories count straight away, from where the
+	 * character stands.
+	 */
 	private static final class TerritorySetDetector implements Detector {
+		private static final long SCAN_RETRY_MS = 60_000;
+		private static final int SCAN_ATTEMPTS = 3;
+
 		private final VisitedTerritories visited;
+		private String scannedWorld;
+		private long scannedAt;
+		private int scanAttempts;
 
 		TerritorySetDetector(VisitedTerritories visited) {
 			this.visited = visited;
@@ -287,31 +302,79 @@ public final class WynntilsDetectors {
 
 		@Override
 		public JsonObject check(Trigger trigger) {
-			TerritoryProfile territory = territory();
-			if (territory == null) {
+			String character = character();
+			if (character == null) {
 				return null;
 			}
-			String player = Mc.client().player.getStringUUID();
-			visited.add(player, territory.getName());
+			scanDiscoveries(character);
+			Set<String> discovered = discovered();
+			visited.addAll(character, discovered);
+			TerritoryProfile territory = territory();
+			if (territory != null) {
+				visited.add(character, territory.getName());
+			}
 			for (String name : trigger.territoryNames()) {
-				if (!visited.contains(player, name)) {
+				if (!visited.contains(character, name)) {
 					return null;
 				}
 			}
+			long inContentBook = trigger.territoryNames().stream()
+					.filter(name -> discovered.contains(VisitedTerritories.key(name)))
+					.count();
 			JsonObject evidence = new JsonObject();
+			evidence.addProperty("character", character);
 			evidence.addProperty("territories", trigger.territoryNames().size());
-			evidence.addProperty("last", territory.getName());
+			evidence.addProperty("inContentBook", inContentBook);
 			return evidence;
 		}
 
 		@Override
 		public String progress(Trigger trigger) {
-			if (Mc.client().player == null) {
+			String character = character();
+			if (character == null) {
 				return null;
 			}
-			String player = Mc.client().player.getStringUUID();
-			long done = trigger.territoryNames().stream().filter(name -> visited.contains(player, name)).count();
-			return count(done, trigger.territoryNames().size(), "territories visited");
+			long done = trigger.territoryNames().stream().filter(name -> visited.contains(character, name)).count();
+			return count(done, trigger.territoryNames().size(), "places visited");
+		}
+
+		/** The current character's Wynntils ID; null until the game has reported one, when it reads "-". */
+		private static String character() {
+			if (!Models.WorldState.onWorld() || !Models.Character.hasCharacter()) {
+				return null;
+			}
+			String id = Models.Character.getId();
+			return "-".equals(id) ? null : id;
+		}
+
+		/** A failed scan leaves nothing to read, so that is what is retried; a query fails if a menu is open. */
+		private void scanDiscoveries(String character) {
+			String world = character + "@" + Models.WorldState.getCurrentWorldName();
+			long now = System.currentTimeMillis();
+			if (!world.equals(scannedWorld)) {
+				scanAttempts = 0;
+			} else if (scanAttempts >= SCAN_ATTEMPTS
+					|| now - scannedAt < SCAN_RETRY_MS
+					|| Models.Discovery.getAllDiscoveriesForType(DiscoveryType.TERRITORY).findAny().isPresent()) {
+				return;
+			}
+			if (Mc.screen() == null) {
+				scannedWorld = world;
+				scannedAt = now;
+				scanAttempts++;
+				Models.Discovery.reloadDiscoveries(true, true, true);
+			}
+		}
+
+		/** Discovered places on the current character, as VisitedTerritories keys. Empty until a scan finishes. */
+		private static Set<String> discovered() {
+			Set<String> names = new HashSet<>();
+			for (DiscoveryType type : DiscoveryType.values()) {
+				Models.Discovery.getAllDiscoveriesForType(type)
+						.filter(DiscoveryInfo::discovered)
+						.forEach(discovery -> names.add(VisitedTerritories.key(discovery.name())));
+			}
+			return names;
 		}
 	}
 

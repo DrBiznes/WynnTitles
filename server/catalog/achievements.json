@@ -2036,42 +2036,6 @@
     }
   },
   {
-    "id": "loc_moon",
-    "category": "exploration",
-    "name": "Moon Walker",
-    "description": "Visit the optional moon section of the Recipe For Disaster quest.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/skin/relik/halfmoon_crescent",
-      "fallback": "minecraft:end_stone"
-    },
-    "trigger": {
-      "type": "location",
-      "territoryName": "The Moon"
-    },
-    "rewards": {
-      "suffix": {
-        "text": "Moon-Walker",
-        "runs": [
-          {
-            "text": "Moon-Walker",
-            "effect": {
-              "type": "gradient",
-              "colors": [
-                "#FFFFFF",
-                "#D6E2F0",
-                "#B8C8E0"
-              ],
-              "animated": true,
-              "animation": "eclipse"
-            }
-          }
-        ]
-      }
-    }
-  },
-  {
     "id": "loc_void",
     "category": "exploration",
     "name": "Into the Void",
@@ -2162,7 +2126,7 @@
     "id": "loc_wynn_towns",
     "category": "exploration",
     "name": "Good Neighbour",
-    "description": "Visit every town from Ragni to Relos.",
+    "description": "Visit every town from Ragni to Relos on one character.",
     "tier": "silver",
     "points": 3,
     "icon": {
@@ -2209,7 +2173,7 @@
     "id": "loc_gavel_settlements",
     "category": "exploration",
     "name": "Mapmaker of Gavel",
-    "description": "Visit every settlement in Gavel.",
+    "description": "Visit every settlement in Gavel on one character.",
     "tier": "gold",
     "points": 5,
     "icon": {
@@ -2240,6 +2204,36 @@
       },
       "suffix": {
         "text": "Cartographer"
+      }
+    }
+  },
+  {
+    "id": "loc_fruma_settlements",
+    "category": "exploration",
+    "name": "The Queen's Census",
+    "description": "Visit every city in Fruma on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "fallback": "minecraft:filled_map"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "Fort Torann",
+        "Espren",
+        "Timasca",
+        "Aldwell",
+        "Hyloch",
+        "Aelumia Citadel"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Registered"
+      },
+      "suffix": {
+        "text": "Subject"
       }
     }
   },
@@ -4524,7 +4518,7 @@
     "id": "secret_overdue",
     "category": "secret",
     "name": "Overdue",
-    "description": "Bring a Dusty Key to Llevigar's Secret Library. Bob never returned his book.",
+    "description": "Use a Dusty Key to enter Llevigar's Secret Library. Bob never returned his book.",
     "tier": "silver",
     "points": 3,
     "icon": {
@@ -4532,11 +4526,10 @@
       "fallback": "minecraft:tripwire_hook"
     },
     "trigger": {
-      "type": "itemAtLocation",
-      "itemName": "Dusty Key",
-      "x": -1854,
-      "z": -4503,
-      "radius": 8
+      "type": "territorySet",
+      "territoryNames": [
+        "Llevigar's Secret Library"
+      ]
     },
     "rewards": {
       "prefix": {
@@ -4551,7 +4544,7 @@
     "id": "secret_tears_for_bob",
     "category": "secret",
     "name": "Tears for Bob",
-    "description": "Bring Bob's Tear to Ragni's Secret Library.",
+    "description": "Use Bob's Tear to enter Ragni's Secret Library.",
     "tier": "silver",
     "points": 3,
     "icon": {
@@ -4559,11 +4552,10 @@
       "fallback": "minecraft:ghast_tear"
     },
     "trigger": {
-      "type": "itemAtLocation",
-      "itemName": "Bob's Tear",
-      "x": -933,
-      "z": -1610,
-      "radius": 8
+      "type": "territorySet",
+      "territoryNames": [
+        "Ragni's Secret Library"
+      ]
     },
     "rewards": {
       "prefix": {
@@ -4578,18 +4570,17 @@
     "id": "secret_dynamite",
     "category": "secret",
     "name": "Shh, Library",
-    "description": "Walk into Lusuco's Secret Library carrying Dynamite.",
+    "description": "Blast your way into Lusuco's Secret Library with Dynamite.",
     "tier": "silver",
     "points": 3,
     "icon": {
       "fallback": "minecraft:tnt"
     },
     "trigger": {
-      "type": "itemAtLocation",
-      "itemName": "Dynamite",
-      "x": -200,
-      "z": -281,
-      "radius": 8
+      "type": "territorySet",
+      "territoryNames": [
+        "Lusuco's Secret Library"
+      ]
     },
     "rewards": {
       "prefix": {
@@ -4597,6 +4588,500 @@
       },
       "suffix": {
         "text": "Archivist"
+      }
+    }
+  },
+  {
+    "id": "secret_relos_library",
+    "category": "secret",
+    "name": "Classified",
+    "description": "Find Relos' Secret Library. The government of Corkus would rather you didn't.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:lightning_rod"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "Relos' Secret Library"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Classified"
+      },
+      "suffix": {
+        "text": "Whistleblower"
+      }
+    }
+  },
+  {
+    "id": "secret_gylia_library",
+    "category": "secret",
+    "name": "Written by the Victor",
+    "description": "Read the last records of the Gerten War in Gylia Watch Library.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "model": "wynn/housing/profession/scribing",
+      "fallback": "minecraft:paper"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "Gylia Watch Library"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Revisionist"
+      },
+      "suffix": {
+        "text": "Chronicler"
+      }
+    }
+  },
+  {
+    "id": "secret_grand_archive",
+    "category": "secret",
+    "name": "Not All Scriptures",
+    "description": "Walk the halls of The Grand Archive.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "model": "wynn/economy/woodcutting/paper_redwood",
+      "fallback": "minecraft:writable_book"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "The Grand Archive"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Archival"
+      },
+      "suffix": {
+        "text": "Curator"
+      }
+    }
+  },
+  {
+    "id": "secret_aldwell_library",
+    "category": "secret",
+    "name": "Four Petals",
+    "description": "Gather the four petals and enter Aldwell Library.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:pink_petals"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "Aldwell Library"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Petal-Pressed"
+      },
+      "suffix": {
+        "text": "Bibliophile"
+      }
+    }
+  },
+  {
+    "id": "secret_university_library",
+    "category": "secret",
+    "name": "Permission Slip",
+    "description": "Talk your way into The Royal University's Library.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:written_book"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "The Royal University's Library"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Permitted"
+      },
+      "suffix": {
+        "text": "Scholar"
+      }
+    }
+  },
+  {
+    "id": "secret_all_libraries",
+    "category": "secret",
+    "name": "Complete Works",
+    "description": "Visit all eight libraries on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/gui/content_book/complete",
+      "fallback": "minecraft:enchanted_book"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "Ragni's Secret Library",
+        "Lusuco's Secret Library",
+        "Llevigar's Secret Library",
+        "Relos' Secret Library",
+        "Gylia Watch Library",
+        "The Grand Archive",
+        "Aldwell Library",
+        "The Royal University's Library"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Lorebound",
+        "runs": [
+          {
+            "text": "Lorebound",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#F3E7C4",
+                "#C9A66B",
+                "#7FD6C2"
+              ],
+              "animated": true,
+              "animation": "decipher"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Librarian",
+        "runs": [
+          {
+            "text": "Librarian",
+            "bold": true,
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#F3E7C4",
+                "#7FD6C2",
+                "#6FB3FF"
+              ],
+              "animated": true,
+              "animation": "reel"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "loc_moon",
+    "category": "secret",
+    "name": "Moon Walker",
+    "description": "Visit the optional moon section of the Recipe For Disaster quest.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/skin/relik/halfmoon_crescent",
+      "fallback": "minecraft:end_stone"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "The Moon"
+      ]
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Moon-Walker",
+        "runs": [
+          {
+            "text": "Moon-Walker",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#FFFFFF",
+                "#D6E2F0",
+                "#B8C8E0"
+              ],
+              "animated": true,
+              "animation": "eclipse"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "secret_deaths_realm",
+    "category": "secret",
+    "name": "Death's Door",
+    "description": "Find your way into Death's Realm, where every soul ends up.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:wither_skeleton_skull"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "Death's Realm"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Departed"
+      },
+      "suffix": {
+        "text": "Revenant"
+      }
+    }
+  },
+  {
+    "id": "secret_bottomless_pit",
+    "category": "secret",
+    "name": "Rock Bottom",
+    "description": "Reach the Bottomless Pit, at the border of the void.",
+    "tier": "silver",
+    "points": 3,
+    "icon": {
+      "fallback": "minecraft:sculk"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "Bottomless Pit"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Bottom-Dwelling"
+      },
+      "suffix": {
+        "text": "Freefaller"
+      }
+    }
+  },
+  {
+    "id": "secret_bakal_destruction",
+    "category": "secret",
+    "name": "Bak'al's Wake",
+    "description": "Find all three sites of Bak'al's Destruction on one character.",
+    "tier": "bronze",
+    "points": 1,
+    "icon": {
+      "fallback": "minecraft:fire_charge"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "Bak'al's Destruction 1",
+        "Bak'al's Destruction 2",
+        "Bak'al's Destruction 3"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Scorched"
+      },
+      "suffix": {
+        "text": "Witness"
+      }
+    }
+  },
+  {
+    "id": "secret_edge_of_nothing",
+    "category": "secret",
+    "name": "Edge of Nothing",
+    "description": "Reach The Lonely Abyss, The Outer Void, Void Village and the Space Between Realities on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "fallback": "minecraft:end_portal_frame"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "The Lonely Abyss",
+        "The Outer Void",
+        "Void Village",
+        "Space Between Realities"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Unmoored"
+      },
+      "suffix": {
+        "text": "Castaway"
+      }
+    }
+  },
+  {
+    "id": "secret_sleuth",
+    "category": "secret",
+    "name": "Sleuth",
+    "description": "Find all 121 secret discoveries on one character.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "fallback": "minecraft:spyglass"
+    },
+    "trigger": {
+      "type": "territorySet",
+      "territoryNames": [
+        "A Croaking Cryptid",
+        "A Deathly Warning",
+        "A Dividing Force",
+        "A Hero's Origin",
+        "A House Divided",
+        "A Monument of Hope",
+        "A People's Sovereign",
+        "A Wynnic Excavation",
+        "Abandoned Excavations",
+        "Ahmsord's Origins",
+        "Aldwell Library",
+        "An Unexpected Departure",
+        "At the Edge of Decay",
+        "Bak'al's Destruction 1",
+        "Bak'al's Destruction 2",
+        "Bak'al's Destruction 3",
+        "Beneath the Roots",
+        "Birth of Efilim",
+        "Boulder Breaker",
+        "Boulder Pit",
+        "Buried Records",
+        "Canyon Housing",
+        "Chained Goliaths",
+        "Colossal Ruins",
+        "Cosmic Crystals",
+        "Cracked Canyon",
+        "Crate Crane",
+        "Cultural Artefact",
+        "Decaying Mountains",
+        "Desert Royal Residence",
+        "Desolate Temples",
+        "Empty Vaults",
+        "Explorer's Corruption Study",
+        "Far Above the Clouds",
+        "Far From the Roots",
+        "Fate of the Olm",
+        "First Wicker's Spark",
+        "Fracture in Reality",
+        "Frozen Cave Hideout",
+        "Gavel Excavation",
+        "Gylia Watch Library",
+        "Gylia's Cataclysm",
+        "Hallowed Ground",
+        "Harmless Worms",
+        "Headless, Not Homeless",
+        "Hidden In Plain Sight",
+        "Historical Maltic",
+        "Life Before Technology",
+        "Light Mushrooms",
+        "Light and Shadow",
+        "Llevigar's Last Hope",
+        "Llevigar's Secret Library",
+        "Loot of the Lost",
+        "Lost Avos City",
+        "Lost Farmers",
+        "Lusuco's Secret Library",
+        "Maex Black Market",
+        "Mark of the Meteors",
+        "Messengers From Beyond",
+        "Mining Cessation",
+        "Mining Operation",
+        "Ne du Valeos du Ellach",
+        "Necklace Chamber",
+        "Nilrem's Sealed Letter",
+        "Otherworldly Occurrence",
+        "Otherworldly Origins",
+        "Parasite Cocoon",
+        "Pottery Wheel",
+        "Quicksand",
+        "Ragni's Secret Library",
+        "Relos' Secret Library",
+        "Remains of the Cursed",
+        "Ruins of Detlas",
+        "Rulers of the Skies",
+        "Rymek Thief",
+        "Sealed Away",
+        "Sealed in Ice",
+        "Shadowy Dealings",
+        "Shrouded Lives",
+        "Silent Expanse's Secret",
+        "Solace in Pain",
+        "Somewhere In Between",
+        "Space Between Realities",
+        "Spider Ruins",
+        "Subterranean Creation",
+        "Summoner's Fate",
+        "Sunken Monument",
+        "Teachings of Old",
+        "Temple Ruin",
+        "Temple of Light",
+        "Temple of Swords",
+        "Thanos Armory",
+        "The Ancient Ones",
+        "The Bane of Gavel",
+        "The Broken Protector",
+        "The Doguns' Defeat",
+        "The Fallen Protector",
+        "The Final Moments",
+        "The Forest has Eyes",
+        "The Grand Archive",
+        "The Great Barrier",
+        "The Great Sap Siphon",
+        "The Heart of the Decay",
+        "The Lone Telescope",
+        "The Lonely Abyss",
+        "The Royal University's Library",
+        "The Talor Crypt",
+        "The Twains' Downfall",
+        "Timeless Ruin",
+        "Tomb of the Founders",
+        "Torn in Twain",
+        "Totem Pole",
+        "Toxic Bounce",
+        "Unstable Experiments",
+        "Washed Away",
+        "Watchmen",
+        "Water of the Past",
+        "Ways of the Wicked",
+        "Wolf Temple",
+        "Wrecking Ball",
+        "Wynn Plains Monument"
+      ]
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Hidden",
+        "runs": [
+          {
+            "text": "Hidden",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#D8DEE9",
+                "#A9B7D0",
+                "#F0D98C"
+              ],
+              "animated": true,
+              "animation": "eclipse"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Sleuth"
       }
     }
   }

@@ -1,7 +1,9 @@
 package catalog
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -101,6 +103,36 @@ func TestPlainWordsGetOneRun(t *testing.T) {
 	}
 }
 
+// A misspelled place can never unlock, so every territorySet name must be a
+// discovery. testdata/discoveries.json holds the world, territorial and secret
+// names from Wynntils' content_book_dump.json in its Static-Storage repository.
+func TestTerritorySetNamesAreDiscoveries(t *testing.T) {
+	c, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile("testdata/discoveries.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var names []string
+	if err := json.Unmarshal(data, &names); err != nil {
+		t.Fatal(err)
+	}
+	// VisitedTerritories in the mod treats "Town of Lutho" as this territory.
+	known := map[string]bool{"lutho": true}
+	for _, name := range names {
+		known[strings.ToLower(name)] = true
+	}
+	for _, a := range c.Achievements {
+		for _, name := range a.Trigger.TerritoryNames {
+			if !known[strings.ToLower(name)] {
+				t.Errorf("%s: %q is not a discovery", a.ID, name)
+			}
+		}
+	}
+}
+
 func TestRaidTrigger(t *testing.T) {
 	raid := strings.Replace(valid("a"), `{"type": "quest", "questName": "Q"}`,
 		`{"type": "raid", "raidName": "The Nameless Anomaly", "amount": 1}`, 1)
@@ -130,6 +162,7 @@ func TestTriggerParameters(t *testing.T) {
 		`{"type": "coordinates", "x": 13777, "z": -4042, "radius": 64}`,
 		`{"type": "itemAtLocation", "itemName": "Dynamite", "x": -200, "z": -281, "radius": 8}`,
 		`{"type": "territorySet", "territoryNames": ["Ragni", "Detlas"]}`,
+		`{"type": "territorySet", "territoryNames": ["The Moon"]}`,
 		`{"type": "itemRarityCount", "rarity": "mythic", "amount": 3}`,
 		`{"type": "itemSet", "itemSets": [["A", "B"], ["C", "D"]]}`,
 	}
@@ -148,6 +181,8 @@ func TestTriggerParameters(t *testing.T) {
 		`{"type": "guild", "guildRank": "king"}`,
 		`{"type": "coordinates", "x": 1, "z": 1}`,
 		`{"type": "itemAtLocation", "x": 1, "z": 1, "radius": 8}`,
+		`{"type": "territorySet", "territoryNames": []}`,
+		`{"type": "territorySet", "territoryNames": ["Ragni", ""]}`,
 		`{"type": "itemRarityCount", "rarity": "epic", "amount": 1}`,
 		`{"type": "itemSet", "itemSets": [["A", "B"], ["C"]]}`,
 	}

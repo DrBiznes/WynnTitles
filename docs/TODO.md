@@ -13,7 +13,7 @@ Point at models only. Never copy textures out of the Wynncraft pack.
 
 ## 2. Add more achievements
 
-The catalog now has **164 achievements worth 592 points**, across quests (20), raids (17), professions (31), class levels (24), exploration (11), collection (18), statistics (10), dungeons (16), gamemodes (7), guilds (6) and secrets (4).
+The catalog now has **176 achievements worth 632 points**, across quests (20), raids (17), professions (31), class levels (24), exploration (11), collection (18), statistics (10), dungeons (16), gamemodes (7), guilds (6) and secrets (16).
 
 - [x] Draft the new list, then add it to `server/catalog/achievements.json`
 - [x] For any new trigger type, add a validation case in `server/catalog/catalog.go` and a detector in `WynntilsDetectors.java`
@@ -44,7 +44,7 @@ The unlock toast (`mc/UnlockToast.java`) still draws vanilla's `toast/advancemen
 
 ## 5. Shop pricing scales with achievements
 
-Retuned before launch so completionists can buy most of the shop: it costs **720 points** against **592 earnable**, so all achievements buy **82.2%** of it. `TestFontRulesAndPricing` checks the ratio stays within 80–85%. Ship future achievements and shop items together in batches to stay in that band; roughly 100 new achievement points pays for about 120 points of new items. Purchases keep their price paid, so never lower an existing price after launch; to make the shop cheaper, raise achievement points instead, which lifts every balance. New item kinds (glow, shaders) should cost more than rainbow.
+Retuned before launch so completionists can buy most of the shop: it costs **745 points** against **632 earnable**, so all achievements buy **84.8%** of it. `TestFontRulesAndPricing` checks the ratio stays within 80–85%. Ship future achievements and shop items together in batches to stay in that band; roughly 100 new achievement points pays for about 120 points of new items. Purchases keep their price paid, so never lower an existing price after launch; to make the shop cheaper, raise achievement points instead, which lifts every balance. New item kinds (glow, shaders) should cost more than rainbow.
 
 | Kind | Items | Price |
 | --- | --- | --- |

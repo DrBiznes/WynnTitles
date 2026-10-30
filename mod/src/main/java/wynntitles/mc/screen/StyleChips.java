@@ -196,7 +196,8 @@ final class StyleChips {
 			Map.entry("borealis", "Northern lights, mint to violet and pink"),
 			Map.entry("storm", "Electric blue and cyan to a yellow spark"),
 			Map.entry("blossom", "Soft rose and petal pink to peach"),
-			Map.entry("brass", "Verdigris teal to brass and copper"));
+			Map.entry("brass", "Verdigris teal to brass and copper"),
+			Map.entry("ash", "Ash greys lifting to a bone-white glow"));
 
 	private static final Map<String, String> FORMAT_BLURBS = Map.of(
 			"bold", "Thicker letters",

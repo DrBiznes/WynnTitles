@@ -63,7 +63,9 @@ public final class EffectColors {
 			// Aldorei: soft rose and petal pink to peach, warmer than Blood Moon.
 			Map.entry("blossom", List.of(0xFF7EB6, 0xFFA8CC, 0xFFC9A8, 0xFFA8CC)),
 			// Corkian: verdigris teal through sage to brass and copper, like old gears.
-			Map.entry("brass", List.of(0x45D0B8, 0x9CD890, 0xF0C050, 0xE89458)));
+			Map.entry("brass", List.of(0x45D0B8, 0x9CD890, 0xF0C050, 0xE89458)),
+			// Lutho: ash greys lifting to the bone-white glow of the obelisk.
+			Map.entry("ash", List.of(0xAAA6B2, 0xD4CFC6, 0xF4F0E0, 0xD4CFC6)));
 
 	/**
 	 * The least contrast (WCAG ratio) a palette color may have against {@link #CHIP},

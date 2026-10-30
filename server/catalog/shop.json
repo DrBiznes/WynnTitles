@@ -217,6 +217,13 @@
     "palette": "brass"
   },
   {
+    "id": "palette_ash",
+    "kind": "palette",
+    "name": "Lutho",
+    "price": 10,
+    "palette": "ash"
+  },
+  {
     "id": "animated_red",
     "kind": "animatedPalette",
     "name": "Heart of War",
@@ -343,6 +350,14 @@
     "price": 16,
     "palette": "brass",
     "animation": "converge"
+  },
+  {
+    "id": "animated_ash",
+    "kind": "animatedPalette",
+    "name": "Beacon of Hope",
+    "price": 16,
+    "palette": "ash",
+    "animation": "pulse"
   },
   {
     "id": "rainbow",

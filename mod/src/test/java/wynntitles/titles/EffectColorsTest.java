@@ -170,7 +170,7 @@ class EffectColorsTest {
 			}
 			assertReadable(item.id() + " long", EffectColors.colors(effect, 40, T0));
 		}
-		assertEquals(16, looks.size());
+		assertEquals(17, looks.size());
 	}
 
 	/** Every native effect, in every frame, reads as well as the shop's do. */

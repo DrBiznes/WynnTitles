@@ -16,14 +16,16 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | `professionLevel`, `professionLevelAll` | `Models.Profession` for the current character |
 | `characterRoster`, `gamemodeLevel`, `playtime`, `accountAge`, `guild`, `leaderboard` | the full API profile, shared through `PlayerProfile` and refreshed every 5 minutes |
 | `coordinates`, `itemAtLocation` | player position (a circle of `radius` around `x`, `z`) plus the inventory |
-| `territorySet` | the Wynntils territory model; visits are kept in `config/wynntitles/territories.json` |
+| `territorySet` | every listed place visited on one character: the Content Book's world, territorial and secret discoveries, which Wynntils scans when the mod asks, plus the territory the character stands in. Kept by character in `config/wynntitles/territories.json` |
 | `itemRarityCount`, `shinyItem`, `itemSet` | Wynntils item annotations over every carried and worn stack |
 
 ### Checked against live data
 
 - **Quest names:** every quest name used matches a real player's API quest list, including "???" and "A Hunter's Calling" (the API has no "???" prefix on it).
 - **Dungeon names:** the API keys match, including "Timelost Sanctum" and "Corrupted Lost Sanctuary". The API also still lists a legacy "Lost Sanctuary", which no set requires.
-- **Territory names:** every territory name used is in the API's territory list.
+- **Territory names:** every `location` name used is in the API's territory list.
+- **`territorySet` names:** every name must be a discovery. `TestTerritorySetNamesAreDiscoveries` checks them against a copy of the names in Wynntils' `content_book_dump.json`. A name that is also a territory unlocks on the spot; any other, like The Moon or a library, unlocks at the next world join. "Town of Lutho" is the one discovery named differently from its territory, and the mod treats the two as the same place.
+- **`discoveries` in the API** is the character's world, territorial and secret discoveries added together, so it can't say which places were visited. Fully completed characters read 674 (177 + 376 + 121).
 - **Profession max:** 132 per profession (1584 total). The top players on the professions leaderboard are at exactly that.
 - **`completedQuests`:** the sum over every character, with mini-quests included. Top accounts are near 3,000, so the ladder is 50, 300 and 1,000.
 - **`lootruns`:** reads 7 for every top player, so it counts lootrun camps finished, not runs. It is one achievement for all seven camps instead of a ladder.
@@ -33,13 +35,11 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 
 - **Into the Void** uses the wiki's coordinates for The Lonely Abyss (13777, -4042) with a 64-block radius, because The Void is not a territory.
 - **Little Rocket Mushroom** uses the coordinates of Mehme's NPC (-7112, -12825), and the wiki doesn't say whether his home can be reached outside the ??? quest. Also check that the Talking Mushroom item exists outside the quest.
-- **Library coordinates** for the Overdue, Tears for Bob and Shh, Library achievements come from the Secret Discoveries page, each with an 8-block radius.
 - **Hardcore:** gamemodeLevel assumes a dead Hardcore character drops the `hardcore` mode in the API.
 - **Item names** in the item sets (Morph pieces, Hive armour) come from the wiki's set and Hive Shop pages.
 
 ### Problems in shipped achievements
 
-- `loc_moon` triggers on the territory "The Moon", which is not in the API territory list, so it may never unlock. It probably needs a `coordinates` trigger.
 - `item_li_token` checks for "Legendary Island Token", but the wiki lists only Bronze, Silver, Gold and Diamond Tokens.
 
 ### quest (19)
@@ -108,7 +108,7 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | Bountiful Gatherer | gold | professionLevelAll (4) 125 | Bountiful | Gatherer |
 | Master Tradesman | gold | professionLevelAll (8) 117 | Craft-Honed | Tradesman |
 
-### exploration (9)
+### exploration (11)
 
 | Achievement | Tier | Trigger | Prefix | Suffix |
 |---|---|---|---|---|
@@ -117,6 +117,7 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | Gone to Travel | bronze | location "Time Valley" |  | Wanderer |
 | Good Neighbour | silver | territorySet (22) | Well-Travelled | Neighbour |
 | Mapmaker of Gavel | gold | territorySet (13) | Worldly | Cartographer |
+| The Queen's Census | gold | territorySet (6) | Registered | Subject |
 | Spelunker | bronze | statistic caves 25 |  | Spelunker |
 | Cave-Warden | silver | statistic caves 250 | Deepdelving | Cave-Warden |
 | Stormchaser | silver | statistic worldEvents 100 |  | Stormchaser |
@@ -217,14 +218,29 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | Hunted | gold | gamemodeLevel hunted 100 | Hunted | Prey |
 | HUICH | gold | gamemodeLevel hunted+ultimate_ironman+craftsman+hardcore 80 | Unyielding ✦ | Masochist |
 
-### secret (4)
+### secret (16)
+
+The libraries are the seven secret discoveries with "Library" in the name, plus The Grand Archive, which the Content Book calls a library. The Grand Archive is bronze because the wiki lists no entry requirement for it, and that also keeps the shop ratio under 85%.
 
 | Achievement | Tier | Trigger | Prefix | Suffix |
 |---|---|---|---|---|
 | Little Rocket Mushroom | gold | itemAtLocation "Talking Mushroom" | Unwelcome | Mycophile |
-| Overdue | silver | itemAtLocation "Dusty Key" | Overdue | Borrower |
-| Tears for Bob | silver | itemAtLocation "Bob's Tear" | Tearful | Bookworm |
-| Shh, Library | silver | itemAtLocation "Dynamite" | Explosive | Archivist |
+| Overdue | silver | territorySet "Llevigar's Secret Library" | Overdue | Borrower |
+| Tears for Bob | silver | territorySet "Ragni's Secret Library" | Tearful | Bookworm |
+| Shh, Library | silver | territorySet "Lusuco's Secret Library" | Explosive | Archivist |
+| Classified | silver | territorySet "Relos' Secret Library" | Classified | Whistleblower |
+| Written by the Victor | silver | territorySet "Gylia Watch Library" | Revisionist | Chronicler |
+| Not All Scriptures | bronze | territorySet "The Grand Archive" | Archival | Curator |
+| Four Petals | silver | territorySet "Aldwell Library" | Petal-Pressed | Bibliophile |
+| Permission Slip | silver | territorySet "The Royal University's Library" | Permitted | Scholar |
+| Complete Works | gold | territorySet (all 8 libraries) | Lorebound ✦ | Librarian ✦ |
+| Moon Walker | gold | territorySet "The Moon" | | Moon-Walker ✦ |
+| Death's Door | silver | territorySet "Death's Realm" | Departed | Revenant |
+| Rock Bottom | silver | territorySet "Bottomless Pit" | Bottom-Dwelling | Freefaller |
+| Bak'al's Wake | bronze | territorySet (3) | Scorched | Witness |
+| Edge of Nothing | gold | territorySet (4) | Unmoored | Castaway |
+| Sleuth | gold | territorySet (all 121 secret discoveries) | Hidden ✦ | Sleuth |
+
 ## Later: possible additions (chat parsing and other low-confidence triggers)
 
 These depend on exact chat text, festival menus or boss messages that still need to be captured in game.
@@ -237,7 +253,6 @@ These depend on exact chat text, festival menus or boss messages that still need
 | All In | gold | raidGambits ≥ 3 in one clear | Reckless | Gambler | |
 | Prelude Survivor | gold | worldEventNamed "Prelude to Annihilation" | | Survivor | |
 | Keen-Eyed | silver | secretDiscoveryCount 40 | Keen-Eyed | | |
-| Sleuth | gold | secretDiscoveryCount, all (the wiki says 117 in one place and 121 in another) | Hidden ✦ | Sleuth | |
 | Pathfinder | silver | discoveryCount territorial 200 | Far-Roaming | Pathfinder | |
 | Bombardier | silver | bombUsed 25 | Blasting | Bombardier | |
 | Freshly Forged | bronze | professionCraft x1 | Freshly | Forged | |
@@ -249,7 +264,7 @@ These depend on exact chat text, festival menus or boss messages that still need
 
 - Quests: The Olmic Rune, Journey Beyond, Point of No Return, The Dark Descent, and single-step Fruma quests beyond Apotheosis and Overture to Despair.
 - Collection: Warp, Neon Seawater, Charm Bracelet, Clockwork, Boundless.
-- Exploration: Nesaak Forest, Pirate Cove, Dead Island, Eltom, Thanos, Light Peninsula. Death's Realm is cut too: it is not a territory and the wiki gives no coordinates.
+- Exploration: Nesaak Forest, Pirate Cove, Dead Island, Eltom, Thanos, Light Peninsula.
 - Statistics: PvP kills and deaths, and the lootrun count ladder (the API only counts camps).
 - Position: Pink Toll, Two Emeralds of Regret, Waterfall Stash, Lonely Snowman, Edge of the World, Cloudwalker, Squeaky Clean, Third-Floor Vault, Lunar Casualty.
 - Earlier: support rank, veteran flag, trade market, Party Finder, duels, Realm of Light, and unverified items (Corkian Amplifier, Tomes of Allegiance, Diamond Token).

@@ -152,6 +152,7 @@ var palettes = map[string]bool{
 	"rainbow": true, "red": true, "red_purple": true, "flame": true, "ember": true, "sunset": true,
 	"ocean": true, "ice": true, "toxic": true, "forest": true, "royal": true, "void": true,
 	"nebula": true, "borealis": true, "storm": true, "blossom": true, "brass": true,
+	"ash": true,
 }
 
 // Animations are how an animated effect moves; the mod draws them (titles/TitleAnimation.java):
@@ -373,7 +374,7 @@ func validateTrigger(t *Trigger) error {
 		need("itemName", t.ItemName != "")
 		need("radius", t.Radius > 0)
 	case "territorySet":
-		need("territoryNames", allSet(t.TerritoryNames))
+		need("territoryNames", allNamed(t.TerritoryNames))
 	case "itemRarityCount":
 		need("amount", t.Amount > 0)
 		if !rarities[t.Rarity] {
@@ -397,7 +398,11 @@ func validateTrigger(t *Trigger) error {
 
 // allSet reports whether names is a list of at least two names, none empty.
 func allSet(names []string) bool {
-	if len(names) < 2 {
+	return len(names) >= 2 && allNamed(names)
+}
+
+func allNamed(names []string) bool {
+	if len(names) == 0 {
 		return false
 	}
 	for _, name := range names {
