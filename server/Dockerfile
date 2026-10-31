@@ -5,7 +5,8 @@ RUN go mod download
 COPY catalog ./catalog
 COPY internal ./internal
 COPY cmd ./cmd
-RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/wynntitles ./cmd/wynntitles
+ARG VERSION=dev
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w -X main.version=${VERSION}" -o /out/wynntitles ./cmd/wynntitles
 
 FROM debian:bookworm-slim
 RUN apt-get update \

@@ -9,8 +9,11 @@ import (
 	"log/slog"
 	"net/http"
 	"regexp"
+	"slices"
+	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/DrBzines/WynnTitles/server/catalog"
@@ -25,6 +28,8 @@ const (
 	maxEvidenceBytes  = 4 << 10
 	maxBatchUUIDs     = 500
 	maxBatchClaims    = 200
+	// How stale last_seen_at may get, so most requests don't write to the database.
+	lastSeenPrecision = time.Hour
 )
 
 var usernamePattern = regexp.MustCompile(`^[A-Za-z0-9_]{1,16}$`)
@@ -41,7 +46,13 @@ type Server struct {
 	StatsTTL time.Duration
 	Log      *slog.Logger
 	Now      func() time.Time
+	// Version is the build shown on the dashboard.
+	Version string
+	// AppealURL is where the suspension message sends players, if set.
+	AppealURL string
 
+	// errors counts internal errors since startup, for the dashboard.
+	errors  atomic.Int64
 	statsMu sync.Mutex
 	stats   *statsResponse
 	statsAt time.Time
@@ -79,12 +90,19 @@ func (s *Server) LoadTitles(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		s.Titles.Set(p.UUID, me.Title)
+		s.Titles.Set(p.UUID, me.PublicTitle())
 	}
 	return nil
 }
 
 func (s *Server) health(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+	if err := s.Store.Ping(ctx); err != nil {
+		s.Log.Error("health check", "err", err)
+		writeJSON(w, http.StatusServiceUnavailable, map[string]any{"ok": false})
+		return
+	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true, "titles": s.Titles.Len()})
 }
 
@@ -234,6 +252,18 @@ type meResponse struct {
 	Equipped equippedView  `json:"equipped"`
 	Styles   stylesView    `json:"styles"`
 	Title    *titles.Title `json:"title"`
+
+	suspended bool
+}
+
+// PublicTitle is what other players may see. Every write to the title cache goes
+// through it, so a suspended player's title stays hidden across restarts and
+// in-flight requests.
+func (m *meResponse) PublicTitle() *titles.Title {
+	if m.suspended {
+		return nil
+	}
+	return m.Title
 }
 
 type unlockView struct {
@@ -276,7 +306,7 @@ func (s *Server) me(ctx context.Context, uuid string) (*meResponse, error) {
 		return nil, err
 	}
 
-	me := &meResponse{UUID: player.UUID, Username: player.Username, Unlocked: []unlockView{}, Owned: []string{}}
+	me := &meResponse{UUID: player.UUID, Username: player.Username, Unlocked: []unlockView{}, Owned: []string{}, suspended: player.Suspended}
 	var ids []string
 	for _, u := range unlocks {
 		a, ok := s.Catalog.Get(u.AchievementID)
@@ -343,7 +373,7 @@ func (s *Server) writeMe(w http.ResponseWriter, r *http.Request, uuid string) {
 		s.internalError(w, err)
 		return
 	}
-	s.Titles.Set(uuid, me.Title)
+	s.Titles.Set(uuid, me.PublicTitle())
 	writeJSON(w, http.StatusOK, me)
 }
 
@@ -519,7 +549,8 @@ func (s *Server) buy(w http.ResponseWriter, r *http.Request, uuid string) {
 
 // claimResult is one claim's outcome: "unlocked", "alreadyUnlocked", or one that
 // records nothing and does not fail the others: "unknown", "outdated" (the mod's
-// catalog is older than the server's) or "tooLarge".
+// catalog is older than the server's), "tooLarge", "updateRequired" (below the
+// dashboard's minimum mod version) or "paused". The mod retries all of these later.
 type claimResult struct {
 	AchievementID string `json:"achievementId"`
 	Status        string `json:"status"`
@@ -552,6 +583,13 @@ func (s *Server) claim(w http.ResponseWriter, r *http.Request, uuid string) {
 	s.mutationMu.Lock()
 	defer s.mutationMu.Unlock()
 
+	controls, err := s.Store.ClaimControls(r.Context())
+	if err != nil {
+		s.internalError(w, err)
+		return
+	}
+	updateRequired := controls.MinModVersion != "" && compareVersions(req.ModVersion, controls.MinModVersion) < 0
+
 	results := make([]claimResult, len(req.Claims))
 	var unlocks []store.Unlock
 	var valid []int
@@ -566,6 +604,10 @@ func (s *Server) claim(w http.ResponseWriter, r *http.Request, uuid string) {
 			results[i].Status = "outdated"
 		case len(c.Evidence) > maxEvidenceBytes:
 			results[i].Status = "tooLarge"
+		case updateRequired:
+			results[i].Status = "updateRequired"
+		case controls.Paused || controls.AchievementPaused(a.ID):
+			results[i].Status = "paused"
 		default:
 			valid = append(valid, i)
 			unlocks = append(unlocks, store.Unlock{
@@ -642,7 +684,8 @@ func (s *Server) authed(next authedHandler) http.HandlerFunc {
 			writeError(w, http.StatusUnauthorized, "missing session token")
 			return
 		}
-		uuid, err := s.Store.SessionUUID(r.Context(), auth.HashToken(token), s.Now())
+		now := s.Now()
+		session, err := s.Store.Session(r.Context(), auth.HashToken(token), now)
 		if errors.Is(err, store.ErrNotFound) {
 			writeError(w, http.StatusUnauthorized, "session expired, log in again")
 			return
@@ -651,8 +694,56 @@ func (s *Server) authed(next authedHandler) http.HandlerFunc {
 			s.internalError(w, err)
 			return
 		}
-		next(w, r, uuid)
+		if now.Sub(session.LastSeenAt) > lastSeenPrecision {
+			if err := s.Store.TouchPlayer(r.Context(), session.UUID, now); err != nil {
+				s.Log.Error("touch player", "err", err)
+			}
+		}
+		// 403, not 401: the mod answers a 401 with a fresh Mojang login.
+		if session.Suspended {
+			message := "this WynnTitles account is suspended"
+			if s.AppealURL != "" {
+				message += "; appeal at " + s.AppealURL
+			}
+			writeError(w, http.StatusForbidden, message)
+			return
+		}
+		next(w, r, session.UUID)
 	}
+}
+
+// compareVersions orders dotted version numbers, ignoring any suffix after - or
+// +. A version that doesn't parse sorts below every real one.
+func compareVersions(a, b string) int {
+	x, okX := parseVersion(a)
+	y, okY := parseVersion(b)
+	switch {
+	case !okX && !okY:
+		return 0
+	case !okX:
+		return -1
+	case !okY:
+		return 1
+	}
+	return slices.Compare(x, y)
+}
+
+func parseVersion(version string) ([]int, bool) {
+	version, _, _ = strings.Cut(version, "+")
+	version, _, _ = strings.Cut(version, "-")
+	parts := strings.Split(version, ".")
+	if len(parts) != 3 {
+		return nil, false
+	}
+	numbers := make([]int, len(parts))
+	for i, part := range parts {
+		n, err := strconv.Atoi(part)
+		if err != nil || n < 0 {
+			return nil, false
+		}
+		numbers[i] = n
+	}
+	return numbers, true
 }
 
 func (s *Server) recoverer(next http.Handler) http.Handler {
@@ -681,6 +772,7 @@ func (s *Server) decodeLimit(w http.ResponseWriter, r *http.Request, v any, maxB
 }
 
 func (s *Server) internalError(w http.ResponseWriter, err error) {
+	s.errors.Add(1)
 	s.Log.Error("request failed", "err", err)
 	writeError(w, http.StatusInternalServerError, "internal error")
 }

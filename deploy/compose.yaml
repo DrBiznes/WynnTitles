@@ -21,6 +21,7 @@ services:
       # The dashboard sees connections from Docker's gateway on this network.
       WT_ADMIN_ALLOWED_CIDRS: "${WT_ADMIN_ALLOWED_CIDRS:-172.30.80.0/24}"
       WT_DEV_UUID: "${WT_DEV_UUID:-}"
+      WT_APPEAL_URL: "${WT_APPEAL_URL:-}"
     volumes:
       - ${WT_DATA_DIR:-./data}:/data
     # Both stay on this machine. Put HTTPS in front of 8080, and never expose

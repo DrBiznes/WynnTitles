@@ -18,7 +18,7 @@ server/   Go API server with SQLite; also the home of the achievement catalog
 - **Claims are trusted.** The mod detects triggers with Wynntils data, only while on a Wynncraft world, and claims them in batches, and the server records every claim with its evidence in the `unlocks` table. Moderation can revoke a row later by setting `revoked_at`.
 - **Achievement icons** are the achievement's Wynncraft item inside a hexagonal bronze, silver or gold frame. The catalog names an item model from the Wynncraft resource pack (for example `wynn/prop/quest_scroll`) and a vanilla fallback. Whenever resource packs load, the mod indexes the loaded item definitions to find which item and damage or custom model data show that model, so nothing from the pack is copied, and renumbering in a pack update is picked up automatically. Off Wynncraft, or if a model disappears, the fallback item shows.
 - **The screens** (`mod/.../mc/screen`) are built on a small UI kit of our own (`mc/screen/ui`), laid out like Wynncraft's raid start screen, in our own regal purple and gold: a field between two stone pillars with a skull on the bottom ledge, a wine-red ribbon for the title, a stone tab bar with the Wynncraft eye carved into it, dark stone wells and stone buttons. Achievements are a trophy list: categories with their progress, then each achievement with its reward, unlock date and rarity. The sprites are drawn by `scripts/draw-ui-sprites.py`. The panel is pixel art drawn at a whole number of window pixels per pixel: as big as the player's GUI scale, and smaller when that would not fit the window. Tabs switch with a gliding gold frame and the page slides in; lists glide when scrolled. Text uses the Wynncraft pack's fonts by id (`language/wynncraft` and the small-caps `language/five`) when the loaded packs define them, and the vanilla font otherwise (`mc/WynnFonts.java`); like icons, nothing is copied from the pack.
-- **Rarity** (`GET /v1/stats/achievements`) is the share of WynnTitles players (everyone who has logged in with the mod) holding each achievement, not counting revoked unlocks. The mod names it after Wynncraft's item tiers, from Normal down to Mythic below 1%. The server counts every unlock to answer, so it reuses the result for `WT_STATS_TTL`.
+- **Rarity** (`GET /v1/stats/achievements`) is the share of WynnTitles players (everyone who has logged in with the mod) holding each achievement, not counting revoked unlocks or suspended players. The mod names it after Wynncraft's item tiers, from Normal down to Mythic below 1%. The server counts every unlock to answer, so it reuses the result for `WT_STATS_TTL`.
 - **Title lookups** (`POST /v1/titles/batch`) are served from an in-memory map rebuilt from SQLite at startup, so crowded world events never touch the database.
 
 ## Running locally
@@ -44,7 +44,7 @@ The dev client points at `http://localhost:8080`; release builds default to `htt
 Guilds and friend groups can run their own private server with their own achievements. See [Running your own WynnTitles server](deploy/README.md).
 The Go binary includes an optional server-rendered moderation console on `WT_ADMIN_ADDR`.
 It never mounts dashboard routes on the public API. The console supports player search,
-reported claim evidence, confirmed revoke/restore actions, purchase resets (one player or everyone), and an append-only audit history.
+reported claim evidence, confirmed revoke/restore actions (one claim or all of them), account suspension, per-achievement holder lists and bulk clears, live claim pauses and mod version limits, purchase resets (one player or everyone), and an append-only audit history.
 Developer grants of catalog achievements and free shop styles are limited to `WT_DEV_UUID`.
 Minecraft authentication and the mod's API response shapes are unchanged.
 
@@ -79,7 +79,7 @@ Wynntils only fires nametag events on Wynncraft, so a test-only mixin forwards t
 
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
-| GET | `/healthz` | | Liveness |
+| GET | `/healthz` | | Liveness, including a database query (503 if it fails) |
 | GET | `/v1/catalog` | | Achievements, title words and the style shop (ETag cached) |
 | GET | `/v1/stats/achievements` | | `{players, unlocks: {achievementId: count}}` for rarity (cached for `WT_STATS_TTL`) |
 | POST | `/v1/auth/challenge` | | `{username}` → `{serverId}` |
@@ -89,5 +89,5 @@ Wynntils only fires nametag events on Wynncraft, so a test-only mixin forwards t
 | PUT | `/v1/me/title` | Bearer | `{prefix, suffix}` (null unequips) |
 | PUT | `/v1/me/style` | Bearer | `{prefix, suffix}`, each `{source, formats, font, color, letterColor}` or null for native style; source/formats/font are owned item ids, color is a solid fallback when a font replaces an effect, and letterColor is a banner color |
 | POST | `/v1/shop/buy` | Bearer | `{itemIds: [...]}`, all or nothing |
-| POST | `/v1/claims` | Bearer | `{claims: [{achievementId, triggerType, evidence}], modVersion}` (max 200) → `{results: [{achievementId, status}]}` in one transaction; status is `unlocked`, `alreadyUnlocked`, `unknown`, `outdated` or `tooLarge` |
+| POST | `/v1/claims` | Bearer | `{claims: [{achievementId, triggerType, evidence}], modVersion}` (max 200) → `{results: [{achievementId, status}]}` in one transaction; status is `unlocked`, `alreadyUnlocked`, `unknown`, `outdated`, `tooLarge`, `updateRequired` or `paused` |
 | POST | `/v1/titles/batch` | | `{uuids: [...]}` (max 500) → `{titles: {uuid: title or null}}` |

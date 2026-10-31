@@ -74,6 +74,35 @@ var migrations = []string{
 		created_at INTEGER NOT NULL
 	);
 	CREATE INDEX moderation_by_player ON moderation_log(uuid, id);`,
+
+	`-- A suspended player keeps their rows but has no title, cannot use the API and
+	-- is left out of rarity.
+	ALTER TABLE players ADD COLUMN suspended_at INTEGER;
+	ALTER TABLE players ADD COLUMN suspend_reason TEXT;
+
+	-- One row of ClaimControls JSON, so a pause survives restarts and needs no deploy.
+	CREATE TABLE claim_controls (
+		id    INTEGER PRIMARY KEY CHECK (id = 1),
+		value TEXT NOT NULL
+	);
+
+	CREATE INDEX unlocks_by_achievement ON unlocks(achievement_id);
+	CREATE INDEX unlocks_by_time ON unlocks(claimed_at);
+
+	-- Server-wide actions have no player, so uuid becomes nullable.
+	CREATE TABLE moderation_log_new (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		actor TEXT NOT NULL,
+		uuid TEXT REFERENCES players(uuid),
+		action TEXT NOT NULL,
+		reason TEXT NOT NULL,
+		details TEXT NOT NULL,
+		created_at INTEGER NOT NULL
+	);
+	INSERT INTO moderation_log_new SELECT id, actor, uuid, action, reason, details, created_at FROM moderation_log;
+	DROP TABLE moderation_log;
+	ALTER TABLE moderation_log_new RENAME TO moderation_log;
+	CREATE INDEX moderation_by_player ON moderation_log(uuid, id);`,
 }
 
 type Store struct {
@@ -89,6 +118,11 @@ type Player struct {
 	// word's native style.
 	PrefixStyle string
 	SuffixStyle string
+	CreatedAt   time.Time
+	LastSeenAt  time.Time
+	// Suspended players keep their rows but are shut out of the API.
+	Suspended     bool
+	SuspendReason string
 }
 
 type Purchase struct {
@@ -176,7 +210,8 @@ func (s *Store) UpsertPlayer(ctx context.Context, uuid, username string, now tim
 }
 
 const playerColumns = `uuid, username, COALESCE(equipped_prefix, ''), COALESCE(equipped_suffix, ''),
-	COALESCE(prefix_style, ''), COALESCE(suffix_style, '')`
+	COALESCE(prefix_style, ''), COALESCE(suffix_style, ''), created_at, last_seen_at,
+	suspended_at IS NOT NULL, COALESCE(suspend_reason, '')`
 
 type scanner interface {
 	Scan(dest ...any) error
@@ -184,7 +219,10 @@ type scanner interface {
 
 func scanPlayer(row scanner) (Player, error) {
 	var p Player
-	err := row.Scan(&p.UUID, &p.Username, &p.EquippedPrefix, &p.EquippedSuffix, &p.PrefixStyle, &p.SuffixStyle)
+	var created, seen int64
+	err := row.Scan(&p.UUID, &p.Username, &p.EquippedPrefix, &p.EquippedSuffix, &p.PrefixStyle, &p.SuffixStyle,
+		&created, &seen, &p.Suspended, &p.SuspendReason)
+	p.CreatedAt, p.LastSeenAt = time.UnixMilli(created), time.UnixMilli(seen)
 	return p, err
 }
 
@@ -241,17 +279,40 @@ func (s *Store) CreateSession(ctx context.Context, tokenHash, uuid string, now, 
 	return err
 }
 
-// SessionUUID returns the player a session token belongs to, or ErrNotFound if
-// the token is unknown or expired.
-func (s *Store) SessionUUID(ctx context.Context, tokenHash string, now time.Time) (string, error) {
-	var uuid string
-	err := s.db.QueryRowContext(ctx,
-		`SELECT uuid FROM sessions WHERE token_hash = ? AND expires_at > ?`, tokenHash, now.UnixMilli()).
-		Scan(&uuid)
+// Session is who a token belongs to.
+type Session struct {
+	UUID       string
+	Suspended  bool
+	LastSeenAt time.Time
+}
+
+// Session looks up a token, or returns ErrNotFound if it is unknown or expired.
+func (s *Store) Session(ctx context.Context, tokenHash string, now time.Time) (Session, error) {
+	var session Session
+	var seen int64
+	err := s.db.QueryRowContext(ctx, `
+		SELECT p.uuid, p.suspended_at IS NOT NULL, p.last_seen_at
+		FROM sessions s JOIN players p ON p.uuid = s.uuid
+		WHERE s.token_hash = ? AND s.expires_at > ?`, tokenHash, now.UnixMilli()).
+		Scan(&session.UUID, &session.Suspended, &seen)
 	if errors.Is(err, sql.ErrNoRows) {
-		return "", ErrNotFound
+		return Session{}, ErrNotFound
 	}
-	return uuid, err
+	session.LastSeenAt = time.UnixMilli(seen)
+	return session, err
+}
+
+// TouchPlayer records that a player used the API. Tokens last for weeks, so
+// logins alone would make active players look gone.
+func (s *Store) TouchPlayer(ctx context.Context, uuid string, now time.Time) error {
+	_, err := s.db.ExecContext(ctx, `UPDATE players SET last_seen_at = ? WHERE uuid = ?`, now.UnixMilli(), uuid)
+	return err
+}
+
+// Ping proves the database answers a real query.
+func (s *Store) Ping(ctx context.Context) error {
+	var n int
+	return s.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM sqlite_master`).Scan(&n)
 }
 
 func (s *Store) DeleteSession(ctx context.Context, tokenHash string) error {
@@ -322,14 +383,15 @@ func (s *Store) InsertUnlocks(ctx context.Context, unlocks []Unlock) ([]bool, er
 }
 
 // UnlockCounts returns how many players exist and how many of them hold each
-// achievement, ignoring revoked unlocks.
+// achievement, ignoring revoked unlocks and suspended players.
 func (s *Store) UnlockCounts(ctx context.Context) (int, map[string]int, error) {
 	var players int
-	if err := s.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM players`).Scan(&players); err != nil {
+	if err := s.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM players WHERE suspended_at IS NULL`).Scan(&players); err != nil {
 		return 0, nil, err
 	}
 	rows, err := s.db.QueryContext(ctx, `
-		SELECT achievement_id, COUNT(*) FROM unlocks WHERE revoked_at IS NULL GROUP BY achievement_id`)
+		SELECT u.achievement_id, COUNT(*) FROM unlocks u JOIN players p ON p.uuid = u.uuid
+		WHERE u.revoked_at IS NULL AND p.suspended_at IS NULL GROUP BY u.achievement_id`)
 	if err != nil {
 		return 0, nil, err
 	}

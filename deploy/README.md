@@ -117,8 +117,21 @@ password. From there you can:
 
 - Search players, and see each one's title, points, styles and every claim with
   the evidence the mod reported. That evidence is context, not proof.
-- **Revoke or restore** a claim. A revoked claim can't be claimed again from the
-  mod.
+- See players, active counts, claims, mod versions, errors and the running build
+  on the overview. **Flagged** lists claims with missing evidence or a mod version
+  outside your limits. Evidence comes from the client, so a flag is only a reason
+  to look.
+- **Revoke or restore** a claim, or all of a player's claims at once. A revoked
+  claim can't be claimed again from the mod.
+- **Suspend** a player, optionally revoking everything. Their title disappears,
+  the mod shows them a suspension message, and they leave the rarity numbers.
+  Set `WT_APPEAL_URL` to tell them where to appeal.
+- **Pause** all claims or one achievement, and set a minimum mod version. These
+  apply at once with no deploy. The mod keeps retrying, so paused claims land
+  once you resume.
+- **Clear** an achievement for everyone after a detector mistake: open it under
+  **Achievements**, pause it, then clear it. Unlike revoking, clearing lets honest
+  players earn it again. Claims that were revoked stay blocked.
 - **Reset purchases** for one player or for everyone, which refunds every price
   paid.
 - Grant achievements and styles to one developer account, set with `WT_DEV_UUID`.
@@ -127,6 +140,10 @@ password. From there you can:
 
 Every change writes an audit entry. Players see changes after `/titles reload`
 or their next launch.
+
+Point an uptime monitor at `https://titles.example.com/healthz`. It returns 503
+if the database stops answering, and the dashboard can't warn you when you're
+away.
 
 ## 6. Make your own achievements
 
@@ -207,6 +224,7 @@ Set these under `environment:` in `compose.yaml`.
 | `WT_ADMIN_PASSWORD_FILE` | | Read the password from a file instead |
 | `WT_ADMIN_ALLOWED_CIDRS` | loopback | Source networks allowed to open the dashboard |
 | `WT_DEV_UUID` | unset | The only account that can receive grants |
+| `WT_APPEAL_URL` | unset | Where the suspension message sends players |
 | `WT_SESSION_TTL` | `720h` | How long a login lasts |
 | `WT_STATS_TTL` | `1m` | How long achievement rarity is cached |
 

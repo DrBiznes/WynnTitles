@@ -46,7 +46,7 @@ jobs:
           REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: |
           image="ghcr.io/${REPOSITORY_OWNER,,}/wynntitles-server"
-          docker build --pull --file server/Dockerfile --tag "$image:sha-$GITHUB_SHA" server
+          docker build --pull --file server/Dockerfile --build-arg VERSION="$GITHUB_SHA" --tag "$image:sha-$GITHUB_SHA" server
       - name: Verify container listeners and persistence
         env:
           REPOSITORY_OWNER: ${{ github.repository_owner }}

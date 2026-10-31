@@ -11,6 +11,19 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.16.0 · 2026-10-31
+**Launch moderation tools**
+
+- Suspend a player, optionally revoking every claim. The API answers 403 with an optional appeal link from `WT_APPEAL_URL`, the title stays hidden across restarts, and suspended players leave rarity.
+- Revoke or restore all of a player's claims in one action.
+- New Achievements pages list holders, and an achievement's claims can be cleared for everyone so honest players can earn it again. Each cleared claim is copied into the audit history.
+- New Claims and Flagged pages. Flags cover invalid, old or unreleased mod versions and missing or malformed evidence.
+- Live claim controls with no deploy: pause all claims, pause one achievement, and set a minimum mod version. Claims get a new `paused` or `updateRequired` status, which the mod retries.
+- The dashboard overview shows player, claim and error counts, mod versions, the build and the database size. The player list shows points, claims, join date and last seen.
+- `last_seen_at` now follows API use instead of logins, and `/healthz` queries the database.
+- `moderation_log.uuid` is nullable so server-wide actions can be audited.
+- `mod_version` goes from 0.15.1 to 0.16.0.
+
 ## 0.15.1 · 2026-10-31
 **Mod icon and banner**
 

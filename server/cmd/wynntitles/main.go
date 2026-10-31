@@ -9,6 +9,7 @@
 //	WT_ADMIN_PASSWORD dashboard password (24+ characters), or WT_ADMIN_PASSWORD_FILE
 //	WT_ADMIN_ALLOWED_CIDRS comma-separated source networks (default loopback)
 //	WT_DEV_UUID     only account allowed developer grants (unset disables grants)
+//	WT_APPEAL_URL   where the suspension message sends players (unset omits it)
 //	WT_SESSION_TTL  how long a login lasts (default "720h")
 //	WT_STATS_TTL    how long achievement rarity is cached (default "1m")
 //	WT_MOJANG_URL   Mojang session server (default "https://sessionserver.mojang.com")
@@ -35,6 +36,9 @@ import (
 	"github.com/DrBzines/WynnTitles/server/internal/store"
 	"github.com/DrBzines/WynnTitles/server/internal/titles"
 )
+
+// version is set at build time; see server/Dockerfile.
+var version = "dev"
 
 func main() {
 	if len(os.Args) == 2 && os.Args[1] == "healthcheck" {
@@ -103,6 +107,8 @@ func run(log *slog.Logger) error {
 		StatsTTL:   statsTTL,
 		Log:        log,
 		Now:        time.Now,
+		Version:    version,
+		AppealURL:  os.Getenv("WT_APPEAL_URL"),
 	}
 	if err := srv.LoadTitles(ctx); err != nil {
 		return err
