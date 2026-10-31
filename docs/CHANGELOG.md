@@ -11,6 +11,14 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.17.1 · 2026-10-31
+**Config menu fix**
+
+- The options screen no longer lists `DEFAULT_SERVER_URL` and `lastServerUrl` as raw `text.autoconfig` rows. Cloth lists every declared field, statics included, so they are no longer fields of `WynnTitlesConfig`.
+- Save & Quit no longer crashes the game. It tried to write to the `DEFAULT_SERVER_URL` constant.
+- The client game test now opens the options screen, checks every row is translated and saves it.
+- `mod_version` goes from 0.17.0 to 0.17.1.
+
 ## 0.17.0 · 2026-10-31
 **Fewer profession achievements and a retuned catalog**
 

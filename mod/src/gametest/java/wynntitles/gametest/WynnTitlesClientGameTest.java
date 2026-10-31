@@ -11,6 +11,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import me.shedaniel.autoconfig.AutoConfigClient;
+import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
+import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -54,6 +57,8 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		checkConfigScreen(context);
+
 		ApiClient api = new ApiClient(WynnTitlesConfig::resolvedServerUrl, "gametest");
 		Catalog catalog = join(api.catalog(null)).catalog();
 		List<Catalog.Achievement> twoWord = catalog.achievements().stream()
@@ -331,6 +336,24 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			screenshot(context, "wynntitles-titles-tab-" + window[0] + "x" + window[1]);
 		}
 		context.getInput().resizeWindow(size[0], size[1]);
+	}
+
+	/** The options screen shows only translated options, and Save & Quit gets through all of them. */
+	private static void checkConfigScreen(ClientGameTestContext context) {
+		context.setScreen(() -> AutoConfigClient.getConfigScreen(WynnTitlesConfig.class, null).get());
+		context.waitTicks(5);
+		screenshot(context, "wynntitles-config");
+		context.runOnClient(client -> {
+			AbstractConfigScreen screen = (AbstractConfigScreen) client.screen;
+			for (List<AbstractConfigEntry<?>> entries : screen.getCategorizedEntries().values()) {
+				for (AbstractConfigEntry<?> entry : entries) {
+					String name = entry.getFieldName().getString();
+					check(!name.startsWith("text.autoconfig."), "the options screen lists a raw field: " + name);
+				}
+			}
+			screen.saveAll(false);
+		});
+		context.setScreen(() -> null);
 	}
 
 	/** Writes the unlock line and a command reply to an otherwise empty chat, to show the badge. */

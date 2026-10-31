@@ -1,5 +1,6 @@
 package wynntitles.config;
 
+import java.util.concurrent.atomic.AtomicReference;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
@@ -10,8 +11,6 @@ import net.minecraft.world.InteractionResult;
 /** Player-facing options, edited through Mod Menu with a Cloth Config screen. */
 @Config(name = "wynntitles")
 public class WynnTitlesConfig implements ConfigData {
-	public static final String DEFAULT_SERVER_URL = "https://wynntitles.jamino.me";
-
 	@ConfigEntry.Gui.Tooltip
 	public boolean showTitles = true;
 
@@ -41,16 +40,13 @@ public class WynnTitlesConfig implements ConfigData {
 	@ConfigEntry.Gui.Tooltip
 	public boolean previewOwnTitleOnEveryone = false;
 
-	private static String lastServerUrl;
-
 	/** {@code onServerChange} runs when a save points the mod at a different server. */
 	public static void register(Runnable onServerChange) {
 		AutoConfig.register(WynnTitlesConfig.class, GsonConfigSerializer::new);
-		lastServerUrl = resolvedServerUrl();
+		AtomicReference<String> lastServerUrl = new AtomicReference<>(resolvedServerUrl());
 		AutoConfig.getConfigHolder(WynnTitlesConfig.class).registerSaveListener((holder, config) -> {
 			String url = resolve(config.serverUrl);
-			if (!url.equals(lastServerUrl)) {
-				lastServerUrl = url;
+			if (!url.equals(lastServerUrl.getAndSet(url))) {
 				onServerChange.run();
 			}
 			return InteractionResult.PASS;
@@ -70,7 +66,7 @@ public class WynnTitlesConfig implements ConfigData {
 		if (configured != null && !configured.isBlank()) {
 			return configured.trim();
 		}
-		return System.getProperty("wynntitles.serverUrl", DEFAULT_SERVER_URL);
+		return System.getProperty("wynntitles.serverUrl", "https://wynntitles.jamino.me");
 	}
 
 	@Override
