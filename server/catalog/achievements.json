@@ -5038,25 +5038,40 @@
     },
     "rewards": {
       "prefix": {
-        "text": "Hidden",
+        "text": "Omniscient",
         "runs": [
           {
-            "text": "Hidden",
+            "text": "Omniscient",
             "effect": {
               "type": "gradient",
               "colors": [
-                "#D8DEE9",
-                "#A9B7D0",
-                "#F0D98C"
+                "#C9A2FF",
+                "#E8D0FF",
+                "#7CE8E0"
               ],
               "animated": true,
-              "animation": "eclipse"
+              "animation": "oculus"
             }
           }
         ]
       },
       "suffix": {
-        "text": "Sleuth"
+        "text": "Pupil",
+        "runs": [
+          {
+            "text": "Pupil",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#7CE8E0",
+                "#D0F4FF",
+                "#C9A2FF"
+              ],
+              "animated": true,
+              "animation": "oculus"
+            }
+          }
+        ]
       }
     }
   }

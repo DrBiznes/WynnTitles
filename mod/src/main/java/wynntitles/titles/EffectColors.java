@@ -65,7 +65,9 @@ public final class EffectColors {
 			// Corkian: verdigris teal through sage to brass and copper, like old gears.
 			Map.entry("brass", List.of(0x45D0B8, 0x9CD890, 0xF0C050, 0xE89458)),
 			// Lutho: ash greys lifting to the bone-white glow of the obelisk.
-			Map.entry("ash", List.of(0xAAA6B2, 0xD4CFC6, 0xF4F0E0, 0xD4CFC6)));
+			Map.entry("ash", List.of(0xAAA6B2, 0xD4CFC6, 0xF4F0E0, 0xD4CFC6)),
+			// The Eye's Gaze: a crimson rim through amber to a pale iris. Sold animated only.
+			Map.entry("gaze", List.of(0xFF5A6E, 0xFFB454, 0xFFE9A8)));
 
 	/**
 	 * The least contrast (WCAG ratio) a palette color may have against {@link #CHIP},
@@ -121,6 +123,9 @@ public final class EffectColors {
 	private static final float REEL_SPIN = 0.4f, REEL_FLARE = 0.06f;
 	/** Prism: the share of the beat the flash takes to scatter to the ends, and the share it gathers over before the next. */
 	private static final float PRISM_SCATTER = 0.3f, PRISM_GATHER = 0.1f;
+	/** Oculus: when in the beat the lids finish opening and start closing, the share they take to shut, and the iris's glances per beat. */
+	private static final float OCULUS_OPEN = 0.14f, OCULUS_CLOSE = 0.82f, OCULUS_SHUT = 0.1f;
+	private static final int OCULUS_GLANCES = 4;
 
 	/** How a letter is drawn besides its color: as itself, scrambled (obfuscated), or as its Wynnic rune. */
 	public enum Glyph { PLAIN, SCRAMBLED, RUNE }
@@ -235,6 +240,7 @@ public final class EffectColors {
 			case ASCEND -> ascend(ramp, i, length, phase);
 			case REEL -> reel(ramp, position, i, length, phase);
 			case PRISM -> Letter.of(prism(ramp, position, phase));
+			case OCULUS -> oculus(ramp, position, i, length, phase, now / cycle);
 		};
 	}
 
@@ -529,6 +535,32 @@ public final class EffectColors {
 		float scatter = PRISM_SCATTER * (0.5f + Math.abs(position - 0.5f));
 		float blaze = Math.max(1 - phase / scatter, (phase - 1 + PRISM_GATHER) / PRISM_GATHER);
 		return mix(ramp.loop(0.5f * position + phase), WHITE, blaze);
+	}
+
+	/**
+	 * An eye: scrambled lids open from the middle behind a bright edge, and a bold
+	 * iris glances somewhere new each beat before they shut. Only the iris is ever
+	 * bold, so the word barely changes width.
+	 */
+	private static Letter oculus(Ramp ramp, float position, int i, int length, float phase, long beat) {
+		int base = ramp.at(position);
+		float open = phase < OCULUS_OPEN ? phase / OCULUS_OPEN : 1 - (phase - OCULUS_CLOSE) / OCULUS_SHUT;
+		open = Math.min(open, 1f);
+		float distance = Math.abs(position - 0.5f) * 2;
+		if (distance > open + 0.02f) {
+			return new Letter(shade(ramp.darkest()), false, Glyph.SCRAMBLED);
+		}
+		if (open < 1f && distance > open - 0.15f) {
+			return Letter.of(mix(base, WHITE, 0.8f));
+		}
+		float look = (phase - OCULUS_OPEN) / (OCULUS_CLOSE - OCULUS_OPEN) * OCULUS_GLANCES;
+		int glance = Math.clamp((long) Math.floor(look), 0, OCULUS_GLANCES - 1);
+		float from = hash01(beat, glance) * (length - 1), to = hash01(beat, glance + 1) * (length - 1);
+		int d = Math.abs(i - Math.round(lerp(from, to, smooth(Math.clamp((look - glance) * 3, 0f, 1f)))));
+		if (d == 0) {
+			return new Letter(mix(base, WHITE, 0.8f), true, Glyph.PLAIN);
+		}
+		return Letter.of(d == 1 ? mix(base, WHITE, 0.25f) : base);
 	}
 
 	/** Colors along 0 to 1, from a palette, explicit colors, or the hue wheel for plain rainbow. */

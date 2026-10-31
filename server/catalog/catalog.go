@@ -152,7 +152,7 @@ var palettes = map[string]bool{
 	"rainbow": true, "red": true, "red_purple": true, "flame": true, "ember": true, "sunset": true,
 	"ocean": true, "ice": true, "toxic": true, "forest": true, "royal": true, "void": true,
 	"nebula": true, "borealis": true, "storm": true, "blossom": true, "brass": true,
-	"ash": true,
+	"ash": true, "gaze": true,
 }
 
 // Animations are how an animated effect moves; the mod draws them (titles/TitleAnimation.java):
@@ -167,6 +167,7 @@ var palettes = map[string]bool{
 //   - charge: the word fills from dim grey, flashes, drains and rests dim
 //   - ripple: rings of color spread out from the middle letter
 //   - converge: gleams from both ends meet in the middle and flash
+//   - oculus: scrambled lids open from the middle, a bold iris glances, they shut
 //
 // The rest are native only (see nativeOnly):
 //   - decipher: letters scramble, show as Wynnic, then resolve one by one
@@ -180,7 +181,7 @@ var palettes = map[string]bool{
 //   - prism: the word flashes white, and the light scatters into its colors
 var animations = map[string]bool{
 	"flow": true, "pulse": true, "shimmer": true, "wave": true, "flicker": true, "sparkle": true,
-	"comet": true, "aurora": true, "charge": true, "ripple": true, "converge": true,
+	"comet": true, "aurora": true, "charge": true, "ripple": true, "converge": true, "oculus": true,
 	"decipher": true, "glitch": true, "eclipse": true, "strike": true, "heartbeat": true, "swell": true,
 	"ascend": true, "reel": true, "prism": true,
 }

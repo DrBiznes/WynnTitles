@@ -170,7 +170,7 @@ class EffectColorsTest {
 			}
 			assertReadable(item.id() + " long", EffectColors.colors(effect, 40, T0));
 		}
-		assertEquals(17, looks.size());
+		assertEquals(18, looks.size());
 	}
 
 	/** Every native effect, in every frame, reads as well as the shop's do. */
@@ -292,6 +292,26 @@ class EffectColorsTest {
 		int[] scattering = EffectColors.colors(effect, 9, start + beat * 20 / 100);
 		assertNotEquals(0xFFFFFF, scattering[4]);
 		assertTrue(EffectColors.luma(scattering[0]) > EffectColors.luma(scattering[4]), "the ends should still be brighter");
+	}
+
+	@Test
+	void oculusOpensFromTheMiddleGlancesThenShuts() {
+		TitleEffect effect = new TitleEffect("gradient", List.of("#C9A2FF", "#E8D0FF", "#7CE8E0"), null, true, 0, TitleAnimation.OCULUS.id);
+		int beat = TitleAnimation.OCULUS.defaultCycleMs;
+		long start = T0 - T0 % beat;
+		EffectColors.Letter[] opening = EffectColors.letters(effect, 9, start + beat / 20);
+		assertEquals(EffectColors.Glyph.SCRAMBLED, opening[0].glyph());
+		assertEquals(EffectColors.Glyph.PLAIN, opening[4].glyph());
+		Set<Integer> irises = new HashSet<>();
+		for (int ms = beat * 20 / 100; ms < beat * 80 / 100; ms += 50) {
+			EffectColors.Letter[] letters = EffectColors.letters(effect, 9, start + ms);
+			assertTrue(Arrays.stream(letters).allMatch(l -> l.glyph() == EffectColors.Glyph.PLAIN));
+			assertEquals(1, Arrays.stream(letters).filter(EffectColors.Letter::bold).count(), "one bold iris");
+			irises.add(Arrays.asList(letters).indexOf(Arrays.stream(letters).filter(EffectColors.Letter::bold).findFirst().orElseThrow()));
+		}
+		assertTrue(irises.size() > 1, "the iris should move");
+		assertTrue(Arrays.stream(EffectColors.letters(effect, 9, start + beat * 95 / 100))
+				.allMatch(l -> l.glyph() == EffectColors.Glyph.SCRAMBLED && !l.bold()));
 	}
 
 	@Test

@@ -109,7 +109,7 @@ func validateShopItem(i *ShopItem) error {
 				return fmt.Errorf("animation %q is reserved for native styles", i.Animation)
 			}
 			if !animations[i.Animation] {
-				return fmt.Errorf("animation must be flow, pulse, shimmer, wave, flicker, sparkle, comet, aurora, charge, ripple or converge")
+				return fmt.Errorf("animation must be flow, pulse, shimmer, wave, flicker, sparkle, comet, aurora, charge, ripple, converge or oculus")
 			}
 		}
 	case "rainbow":

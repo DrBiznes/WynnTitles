@@ -44,7 +44,7 @@ The unlock toast (`mc/UnlockToast.java`) still draws vanilla's `toast/advancemen
 
 ## 5. Shop pricing scales with achievements
 
-Retuned before launch so completionists can buy most of the shop: it costs **745 points** against **629 earnable**, so all achievements buy **84.4%** of it. `TestFontRulesAndPricing` checks the ratio stays within 80–85%. Ship future achievements and shop items together in batches to stay in that band; roughly 100 new achievement points pays for about 120 points of new items. Purchases keep their price paid, so never lower an existing price after launch; to make the shop cheaper, raise achievement points instead, which lifts every balance. New item kinds (glow, shaders) should cost more than rainbow.
+Retuned before launch so completionists can buy most of the shop: it costs **761 points** against **629 earnable**, so all achievements buy **82.7%** of it. `TestFontRulesAndPricing` checks the ratio stays within 80–85%. Ship future achievements and shop items together in batches to stay in that band; roughly 100 new achievement points pays for about 120 points of new items. Purchases keep their price paid, so never lower an existing price after launch; to make the shop cheaper, raise achievement points instead, which lifts every balance. New item kinds (glow, shaders) should cost more than rainbow.
 
 | Kind | Items | Price |
 | --- | --- | --- |

@@ -360,6 +360,14 @@
     "animation": "pulse"
   },
   {
+    "id": "animated_gaze",
+    "kind": "animatedPalette",
+    "name": "The Eye's Gaze",
+    "price": 16,
+    "palette": "gaze",
+    "animation": "oculus"
+  },
+  {
     "id": "rainbow",
     "kind": "rainbow",
     "name": "Rainbow",

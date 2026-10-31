@@ -19,6 +19,7 @@ public enum TitleAnimation {
 	CHARGE("Charge", "filling with power, flashing, draining", 3000),
 	RIPPLE("Ripple", "rings spreading from the middle", 2000),
 	CONVERGE("Converge", "two gleams meeting in a flash", 2800),
+	OCULUS("Oculus", "an eye opening, glancing around, then shutting", 7000),
 	// Native only: never sold, so only achievements' own styles move this way.
 	DECIPHER("Decipher", "runes resolving into the word", 9000, true),
 	GLITCH("Glitch", "bursts of scrambled letters", 1900, true),

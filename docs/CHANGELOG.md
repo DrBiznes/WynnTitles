@@ -11,6 +11,16 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.15.0 · 2026-10-31
+**Native style for Sleuth**
+
+- New animation: **oculus**. Scrambled lids open from the middle, a bold iris glances around, then the lids shut.
+- The shop sells it too, as **The Eye's Gaze**: crimson through amber to a pale iris, for 16 points. Its palette is sold animated only, so there are now more animated palettes than plain ones.
+- Sleuth's title goes from Hidden Sleuth to **Omniscient Pupil**, in the Eye's honor. Both words wear oculus in their own colors, which the shop can't buy.
+- The catalog validation knows the new animation id. README, `AGENTS.md` and the achievement list updated.
+- `mod_version` goes from 0.14.0 to 0.15.0.
+- Catalog unchanged: **175 achievements / 629 pts**; shop 64 → **65 items / 761**, which keeps it 82.7% earnable.
+
 ## 0.14.0 · 2026-10-31
 **Release hardening: batch claims, connection retries, safer Wynntils hook, self-hosting guide**
 

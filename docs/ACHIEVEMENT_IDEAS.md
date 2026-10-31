@@ -238,7 +238,7 @@ The libraries are the seven secret discoveries with "Library" in the name, plus 
 | Death's Door | silver | territorySet "Death's Realm" | Departed | Revenant |
 | Bak'al's Wake | bronze | territorySet (3) | Scorched | Witness |
 | Edge of Nothing | gold | territorySet (4) | Unmoored | Castaway |
-| Sleuth | gold | territorySet (all 121 secret discoveries) | Hidden ✦ | Sleuth |
+| Sleuth | gold | territorySet (all 121 secret discoveries) | Omniscient ✦ | Pupil ✦ |
 
 ## Later: possible additions (chat parsing and other low-confidence triggers)
 
