@@ -26,7 +26,7 @@ class AchievementTrackerTest {
 		};
 		// canDetect only reads the detectors, so the rest can be null.
 		AchievementTracker tracker = new AchievementTracker(
-				null, null, null, Map.of("quest", questsOnlyA, "location", NEVER), a -> {}, "test");
+				null, null, null, Map.of("quest", questsOnlyA, "location", NEVER), a -> {}, "test", () -> true);
 
 		assertTrue(tracker.canDetect(achievement(trigger("quest", "A"))));
 		assertFalse(tracker.canDetect(achievement(trigger("quest", "B"))), "detector said it cannot check B");

@@ -307,6 +307,35 @@ func (s *Store) InsertUnlock(ctx context.Context, u Unlock) (bool, error) {
 	return n == 1, err
 }
 
+// InsertUnlocks records several claims in one transaction, so a burst of claims
+// costs one disk sync. It reports which were new, in order; rows that already
+// exist (claimed or revoked) are left alone.
+func (s *Store) InsertUnlocks(ctx context.Context, unlocks []Unlock) ([]bool, error) {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	inserted := make([]bool, len(unlocks))
+	for i, u := range unlocks {
+		res, err := tx.ExecContext(ctx, `
+			INSERT INTO unlocks (uuid, achievement_id, trigger_type, evidence, mod_version, claimed_at)
+			VALUES (?, ?, ?, NULLIF(?, ''), NULLIF(?, ''), ?)
+			ON CONFLICT (uuid, achievement_id) DO NOTHING`,
+			u.UUID, u.AchievementID, u.TriggerType, u.Evidence, u.ModVersion, u.ClaimedAt.UnixMilli())
+		if err != nil {
+			return nil, err
+		}
+		n, err := res.RowsAffected()
+		if err != nil {
+			return nil, err
+		}
+		inserted[i] = n == 1
+	}
+	return inserted, tx.Commit()
+}
+
 // UnlockCounts returns how many players exist and how many of them hold each
 // achievement, ignoring revoked unlocks.
 func (s *Store) UnlockCounts(ctx context.Context) (int, map[string]int, error) {

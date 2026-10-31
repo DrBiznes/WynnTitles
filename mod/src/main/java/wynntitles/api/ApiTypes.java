@@ -1,12 +1,13 @@
 package wynntitles.api;
 
+import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
 import wynntitles.titles.Title;
 import wynntitles.titles.TitleStyle;
 import wynntitles.titles.TitleWord;
 
-/** Response bodies from the WynnTitles server. Field names match the JSON. */
+/** Bodies exchanged with the WynnTitles server. Field names match the JSON. */
 public final class ApiTypes {
 	private ApiTypes() {}
 
@@ -63,9 +64,27 @@ public final class ApiTypes {
 		}
 	}
 
+	public record Claim(String achievementId, String triggerType, JsonObject evidence) {}
+
 	public record ClaimResult(String status, String achievementId) {
 		public boolean newlyUnlocked() {
 			return "unlocked".equals(status);
+		}
+
+		/** The server holds this achievement for the player, whether new or not. */
+		public boolean recorded() {
+			return newlyUnlocked() || "alreadyUnlocked".equals(status);
+		}
+
+		/** The server's catalog disagrees with ours, so ours is out of date. */
+		public boolean outdated() {
+			return "outdated".equals(status) || "unknown".equals(status);
+		}
+	}
+
+	public record ClaimResults(List<ClaimResult> results) {
+		public ClaimResults {
+			results = results == null ? List.of() : List.copyOf(results);
 		}
 	}
 }

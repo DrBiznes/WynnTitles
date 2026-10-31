@@ -2,10 +2,12 @@ package wynntitles;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.wynntils.core.components.Managers;
+import com.wynntils.core.components.Models;
 import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.mod.event.WynncraftConnectionEvent;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -21,11 +23,11 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wynntitles.account.Account;
+import wynntitles.account.StartupLoader;
 import wynntitles.achievements.AchievementTracker;
 import wynntitles.achievements.UnlockBatcher;
 import wynntitles.achievements.WynntilsDetectors;
 import wynntitles.api.ApiClient;
-import wynntitles.api.ApiException;
 import wynntitles.catalog.Catalog;
 import wynntitles.catalog.CatalogStore;
 import wynntitles.catalog.StatsStore;
@@ -34,6 +36,7 @@ import wynntitles.mc.Commands;
 import wynntitles.mc.Icons;
 import wynntitles.mc.Mc;
 import wynntitles.mc.MojangSession;
+import wynntitles.mc.Nametags;
 import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.UnlockToast;
 import wynntitles.mc.WynnFonts;
@@ -52,9 +55,9 @@ public class WynnTitles implements ClientModInitializer {
 	private static TitleCache titles;
 	private static AchievementTracker tracker;
 	private static UnlockBatcher unlocks;
+	private static StartupLoader startup;
 
 	private static KeyMapping openKey;
-	private static boolean loadedThisSession;
 
 	public static Account account() {
 		return account;
@@ -92,7 +95,12 @@ public class WynnTitles implements ClientModInitializer {
 		titles = new TitleCache(api);
 		unlocks = new UnlockBatcher(WynnTitles::announceUnlocks);
 		tracker = new AchievementTracker(api, account, catalogs,
-				WynntilsDetectors.create(dir.resolve("territories.json")), unlocks::add, version);
+				WynntilsDetectors.create(dir.resolve("territories.json")), unlocks::add, version,
+				WynnTitles::onWynncraftWorld);
+		startup = new StartupLoader(
+				() -> CompletableFuture.allOf(catalogs.refresh(), account.refresh()),
+				WynnTitles::onWynncraft,
+				WynnTitles::announceStartup);
 
 		// Show our own new title right away instead of waiting for the cache to expire.
 		account.onChange(me -> titles.put(Mc.client().getUser().getProfileId(), me.title()));
@@ -109,12 +117,18 @@ public class WynnTitles implements ClientModInitializer {
 		// Only contact the WynnTitles server on Wynncraft, not on every world or server.
 		// Wynntils creates its event bus in its own entrypoint, which may run after ours.
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-			WynntilsMod.registerEventListener(this);
-			WynntilsMod.registerEventListener(WynntilsDetectors.eventListener());
+			try {
+				WynntilsMod.registerEventListener(this);
+				WynntilsMod.registerEventListener(WynntilsDetectors.eventListener());
+				Nametags.hookPresent();
+			} catch (Throwable t) {
+				LOGGER.error("Wynntils changed its events; WynnTitles will not load on Wynncraft", t);
+			}
 		});
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			titles.tick();
+			startup.tick();
 			tracker.tick();
 			unlocks.tick();
 			while (openKey.consumeClick()) {
@@ -130,21 +144,38 @@ public class WynnTitles implements ClientModInitializer {
 		onWynncraftJoin();
 	}
 
-	/** Loads the catalog and logs in, once per launch (retried on the next join if login fails). */
+	/** Loads the catalog and logs in, once per launch; StartupLoader retries a failure. */
 	public static void onWynncraftJoin() {
-		if (loadedThisSession) {
-			return;
+		startup.start();
+	}
+
+	private static boolean onWynncraft() {
+		try {
+			return Managers.Connection.onServer();
+		} catch (Throwable t) {
+			return false;
 		}
-		loadedThisSession = true;
-		catalogs.refresh().exceptionally(t -> {
-			LOGGER.warn("Could not load catalog: {}", ApiException.describe(t));
-			return null;
-		});
-		account.refresh().exceptionally(t -> {
-			LOGGER.warn("Could not log in to WynnTitles: {}", ApiException.describe(t));
-			loadedThisSession = false;
-			return null;
-		});
+	}
+
+	/** On Wynncraft with a character in a world, not in the hub, on another server or in singleplayer. */
+	private static boolean onWynncraftWorld() {
+		try {
+			return Managers.Connection.onServer() && Models.WorldState.onWorld();
+		} catch (Throwable t) {
+			return false;
+		}
+	}
+
+	private static void announceStartup(StartupLoader.Status status) {
+		Mc.chat(Mc.tagged(switch (status) {
+			case RETRYING -> Component.literal("Could not connect to the WynnTitles server. Trying again automatically.")
+					.withStyle(ChatFormatting.YELLOW);
+			case RECOVERED -> Component.literal("Connected to the WynnTitles server.")
+					.withStyle(ChatFormatting.GREEN);
+			case GAVE_UP -> Component.literal("Still could not connect to the WynnTitles server, so achievements "
+							+ "are not being tracked. Rejoin Wynncraft or run /titles reload to try again.")
+					.withStyle(ChatFormatting.RED);
+		}));
 	}
 
 	/** Forgets everything from the old server and, when on Wynncraft, loads from the new one. */
@@ -152,8 +183,8 @@ public class WynnTitles implements ClientModInitializer {
 		LOGGER.info("Server changed to {}", WynnTitlesConfig.resolvedServerUrl());
 		titles.clear();
 		account.forgetSession();
-		loadedThisSession = false;
-		if (Managers.Connection.onServer()) {
+		startup.reset();
+		if (onWynncraft()) {
 			onWynncraftJoin();
 		}
 	}

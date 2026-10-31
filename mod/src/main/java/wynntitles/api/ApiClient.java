@@ -17,7 +17,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import wynntitles.api.ApiTypes.AchievementStats;
+import wynntitles.api.ApiTypes.Claim;
 import wynntitles.api.ApiTypes.ClaimResult;
+import wynntitles.api.ApiTypes.ClaimResults;
 import wynntitles.api.ApiTypes.Me;
 import wynntitles.api.ApiTypes.Session;
 import wynntitles.catalog.Catalog;
@@ -125,6 +127,14 @@ public final class ApiClient {
 			body.add("evidence", evidence);
 		}
 		return post("/v1/claims", token, body).thenApply(resp -> parse(resp, ClaimResult.class));
+	}
+
+	/** Claims up to 200 achievements in one request. Returns a result for each, in order. */
+	public CompletableFuture<List<ClaimResult>> claims(String token, List<Claim> claims, String modVersion) {
+		JsonObject body = new JsonObject();
+		body.add("claims", GSON.toJsonTree(claims));
+		body.addProperty("modVersion", modVersion);
+		return post("/v1/claims/batch", token, body).thenApply(resp -> parse(resp, ClaimResults.class).results());
 	}
 
 	/** Looks up titles for up to 500 players. Every requested UUID is present; null means no title. */

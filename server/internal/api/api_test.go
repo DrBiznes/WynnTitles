@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -383,5 +384,103 @@ func TestShopStyles(t *testing.T) {
 	h.do("GET", "/v1/me", token, nil, fresh())
 	if len(me.Owned) != 2 || me.Styles.Prefix == nil {
 		t.Fatalf("player reset changed owned %v, style %+v", me.Owned, me.Styles.Prefix)
+	}
+}
+
+func TestClaimBatch(t *testing.T) {
+	h := newHarness(t)
+	token := h.login()
+	first, second := h.cat.Achievements[0], h.cat.Achievements[1]
+
+	h.do("POST", "/v1/claims", token, map[string]any{"achievementId": first.ID, "triggerType": first.Trigger.Type}, nil)
+
+	var got struct {
+		Results []struct{ AchievementID, Status string }
+	}
+	body := map[string]any{"modVersion": "test", "claims": []map[string]any{
+		{"achievementId": first.ID, "triggerType": first.Trigger.Type},
+		{"achievementId": second.ID, "triggerType": second.Trigger.Type, "evidence": map[string]any{"x": 1}},
+		{"achievementId": "nope", "triggerType": "quest"},
+		{"achievementId": second.ID, "triggerType": "nope"},
+		{"achievementId": second.ID, "triggerType": second.Trigger.Type, "evidence": strings.Repeat("x", maxEvidenceBytes)},
+	}}
+	if code := h.do("POST", "/v1/claims/batch", token, body, &got); code != 200 {
+		t.Fatalf("batch status = %d", code)
+	}
+	want := []string{"alreadyUnlocked", "unlocked", "unknown", "outdated", "tooLarge"}
+	if len(got.Results) != len(want) {
+		t.Fatalf("results = %+v", got.Results)
+	}
+	for i, status := range want {
+		if got.Results[i].Status != status {
+			t.Errorf("result %d = %q, want %q", i, got.Results[i].Status, status)
+		}
+	}
+
+	var me meResponse
+	h.do("GET", "/v1/me", token, nil, &me)
+	if len(me.Unlocked) != 2 {
+		t.Fatalf("unlocked = %+v", me.Unlocked)
+	}
+
+	tooMany := make([]map[string]any, maxBatchClaims+1)
+	if code := h.do("POST", "/v1/claims/batch", token, map[string]any{"claims": tooMany}, nil); code != 400 {
+		t.Fatalf("oversized batch status = %d", code)
+	}
+	if code := h.do("POST", "/v1/claims/batch", "", body, nil); code != 401 {
+		t.Fatalf("anonymous batch status = %d", code)
+	}
+}
+
+// A whole catalog of claims must fit in one request, even at the evidence limit.
+func TestClaimBatchFitsTheCatalog(t *testing.T) {
+	h := newHarness(t)
+	token := h.login()
+	if len(h.cat.Achievements) > maxBatchClaims {
+		t.Fatalf("catalog has %d achievements, more than the %d a batch allows", len(h.cat.Achievements), maxBatchClaims)
+	}
+	claims := []map[string]any{}
+	for _, a := range h.cat.Achievements {
+		claims = append(claims, map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type,
+			"evidence": strings.Repeat("x", maxEvidenceBytes-2)})
+	}
+	if code := h.do("POST", "/v1/claims/batch", token, map[string]any{"claims": claims}, nil); code != 200 {
+		t.Fatalf("batch status = %d", code)
+	}
+	var me meResponse
+	h.do("GET", "/v1/me", token, nil, &me)
+	if len(me.Unlocked) != len(h.cat.Achievements) {
+		t.Fatalf("unlocked %d of %d", len(me.Unlocked), len(h.cat.Achievements))
+	}
+}
+
+// A revoked claim stays revoked when a batch claims it again.
+func TestClaimBatchKeepsRevocations(t *testing.T) {
+	h := newHarness(t)
+	token := h.login()
+	a := h.cat.Achievements[0]
+	claim := map[string]any{"claims": []map[string]any{{"achievementId": a.ID, "triggerType": a.Trigger.Type}}}
+	h.do("POST", "/v1/claims/batch", token, claim, nil)
+
+	db, err := store.Open(h.dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if err := db.Moderate(context.Background(), "test", testUUID, "revoke", "cheating", []store.ModerationItem{{ID: a.ID}}, time.Now()); err != nil {
+		t.Fatal(err)
+	}
+
+	var result struct {
+		Results []struct{ Status string }
+	}
+	h.do("POST", "/v1/claims/batch", token, claim, &result)
+	if len(result.Results) != 1 || result.Results[0].Status != "alreadyUnlocked" {
+		t.Fatalf("results = %+v", result.Results)
+	}
+	var me meResponse
+	h.do("GET", "/v1/me", token, nil, &me)
+	if len(me.Unlocked) != 0 {
+		t.Fatalf("revoked claim came back: %+v", me.Unlocked)
 	}
 }

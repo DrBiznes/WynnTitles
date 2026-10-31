@@ -1,16 +1,22 @@
 package wynntitles.achievements;
 
 import com.google.gson.JsonObject;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import wynntitles.WynnTitles;
 import wynntitles.account.Account;
 import wynntitles.api.ApiClient;
 import wynntitles.api.ApiException;
+import wynntitles.api.ApiTypes.Claim;
+import wynntitles.api.ApiTypes.ClaimResult;
 import wynntitles.api.ApiTypes.Me;
 import wynntitles.api.ApiTypes.Unlock;
 import wynntitles.catalog.Catalog;
@@ -20,6 +26,8 @@ import wynntitles.catalog.CatalogStore;
 public final class AchievementTracker {
 	private static final int CHECK_EVERY_TICKS = 20;
 	private static final long RETRY_AFTER_ERROR_MS = 60_000;
+	/** The server's limit on one request. */
+	private static final int MAX_BATCH = 200;
 
 	private final ApiClient api;
 	private final Account account;
@@ -27,6 +35,7 @@ public final class AchievementTracker {
 	private final Map<String, Detector> detectors;
 	private final Consumer<Catalog.Achievement> onUnlocked;
 	private final String modVersion;
+	private final BooleanSupplier inGame;
 
 	/** Claimed this session; the profile catches up after the next refresh. */
 	private final Set<String> claimed = ConcurrentHashMap.newKeySet();
@@ -43,13 +52,15 @@ public final class AchievementTracker {
 			CatalogStore catalogs,
 			Map<String, Detector> detectors,
 			Consumer<Catalog.Achievement> onUnlocked,
-			String modVersion) {
+			String modVersion,
+			BooleanSupplier inGame) {
 		this.api = api;
 		this.account = account;
 		this.catalogs = catalogs;
 		this.detectors = detectors;
 		this.onUnlocked = onUnlocked;
 		this.modVersion = modVersion;
+		this.inGame = inGame;
 	}
 
 	/** Call once per client tick, on the client thread. */
@@ -64,14 +75,18 @@ public final class AchievementTracker {
 			account.refresh();
 		}
 
+		// Detectors read positions and items, which mean nothing anywhere else: a
+		// singleplayer world has the same coordinates as a Wynncraft territory.
 		Catalog catalog = catalogs.catalog();
 		Me me = account.me();
-		if (catalog == null || me == null) {
+		if (catalog == null || me == null || !inGame.getAsBoolean()) {
 			return;
 		}
 
 		Set<String> unlocked = me.unlocked().stream().map(Unlock::achievementId).collect(Collectors.toSet());
 		long now = System.currentTimeMillis();
+		Map<String, Catalog.Achievement> met = new LinkedHashMap<>();
+		List<Claim> claims = new ArrayList<>();
 
 		for (Catalog.Achievement achievement : catalog.achievements()) {
 			String id = achievement.id();
@@ -94,9 +109,13 @@ public final class AchievementTracker {
 				}
 				continue;
 			}
-			if (evidence != null) {
-				claim(achievement, evidence);
+			if (evidence != null && claims.size() < MAX_BATCH) {
+				met.put(id, achievement);
+				claims.add(new Claim(id, achievement.trigger().type(), evidence));
 			}
+		}
+		if (!claims.isEmpty()) {
+			claim(met, claims);
 		}
 	}
 
@@ -108,7 +127,7 @@ public final class AchievementTracker {
 
 	/** The detector's progress line for a locked achievement, or null when it has none. */
 	public String progress(Catalog.Achievement achievement) {
-		if (!canDetect(achievement)) {
+		if (!canDetect(achievement) || !inGame.getAsBoolean()) {
 			return null;
 		}
 		try {
@@ -119,33 +138,35 @@ public final class AchievementTracker {
 		}
 	}
 
-	private void claim(Catalog.Achievement achievement, JsonObject evidence) {
-		String id = achievement.id();
-		inFlight.add(id);
-		account.withToken(token -> api.claim(token, id, achievement.trigger().type(), evidence, modVersion))
-				.whenComplete((result, error) -> {
-					inFlight.remove(id);
-					if (error != null) {
-						retryAt.put(id, System.currentTimeMillis() + RETRY_AFTER_ERROR_MS);
-						if (unwrap(error) instanceof ApiException e && e.status() == 409) {
-							// Our catalog is older than the server's.
-							catalogs.refresh();
-						}
-						WynnTitles.LOGGER.warn("Claim for {} failed: {}", id, ApiException.describe(error));
-						return;
-					}
-					claimed.add(id);
-					if (result.newlyUnlocked()) {
-						onUnlocked.accept(achievement);
-					}
-					refreshPending.set(true);
-				});
-	}
-
-	private static Throwable unwrap(Throwable t) {
-		while (t.getCause() != null && !(t instanceof ApiException)) {
-			t = t.getCause();
-		}
-		return t;
+	/** Sends everything met this check in one request, so a first login is one transaction on the server. */
+	private void claim(Map<String, Catalog.Achievement> met, List<Claim> claims) {
+		inFlight.addAll(met.keySet());
+		account.withToken(token -> api.claims(token, claims, modVersion)).whenComplete((results, error) -> {
+			inFlight.removeAll(met.keySet());
+			long retry = System.currentTimeMillis() + RETRY_AFTER_ERROR_MS;
+			if (error != null) {
+				met.keySet().forEach(id -> retryAt.put(id, retry));
+				WynnTitles.LOGGER.warn("Claiming {} achievements failed: {}", met.size(), ApiException.describe(error));
+				return;
+			}
+			boolean outdated = false;
+			for (ClaimResult result : results) {
+				String id = result.achievementId();
+				if (!result.recorded()) {
+					retryAt.put(id, retry);
+					outdated |= result.outdated();
+					WynnTitles.LOGGER.warn("Claim for {} failed: {}", id, result.status());
+					continue;
+				}
+				claimed.add(id);
+				refreshPending.set(true);
+				if (result.newlyUnlocked()) {
+					onUnlocked.accept(met.get(id));
+				}
+			}
+			if (outdated) {
+				catalogs.refresh();
+			}
+		});
 	}
 }

@@ -20,9 +20,11 @@ import (
 )
 
 const (
-	maxBodyBytes     = 64 << 10
-	maxEvidenceBytes = 4 << 10
-	maxBatchUUIDs    = 500
+	maxBodyBytes      = 64 << 10
+	maxClaimBodyBytes = 1 << 20
+	maxEvidenceBytes  = 4 << 10
+	maxBatchUUIDs     = 500
+	maxBatchClaims    = 200
 )
 
 var usernamePattern = regexp.MustCompile(`^[A-Za-z0-9_]{1,16}$`)
@@ -61,6 +63,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("PUT /v1/me/style", s.authed(s.putStyle))
 	mux.HandleFunc("POST /v1/shop/buy", s.authed(s.buy))
 	mux.HandleFunc("POST /v1/claims", s.authed(s.claim))
+	mux.HandleFunc("POST /v1/claims/batch", s.authed(s.claimBatch))
 	mux.HandleFunc("POST /v1/titles/batch", s.batchTitles)
 	return s.recoverer(mux)
 }
@@ -566,6 +569,83 @@ func (s *Server) claim(w http.ResponseWriter, r *http.Request, uuid string) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": status, "achievementId": a.ID})
 }
 
+// claimResult is one claim's outcome in a batch. Besides a single claim's
+// statuses, it can be "unknown", "outdated" (the mod's catalog is older than the
+// server's) or "tooLarge"; those record nothing and do not fail the others.
+type claimResult struct {
+	AchievementID string `json:"achievementId"`
+	Status        string `json:"status"`
+}
+
+// claimBatch records many claims in one transaction. A first login meets dozens
+// of achievements at once, and one transaction per claim would hold up everyone
+// else's writes behind the mutation lock.
+func (s *Server) claimBatch(w http.ResponseWriter, r *http.Request, uuid string) {
+	var req struct {
+		Claims []struct {
+			AchievementID string          `json:"achievementId"`
+			TriggerType   string          `json:"triggerType"`
+			Evidence      json.RawMessage `json:"evidence"`
+		} `json:"claims"`
+		ModVersion string `json:"modVersion"`
+	}
+	if !s.decodeLimit(w, r, &req, maxClaimBodyBytes) {
+		return
+	}
+	if len(req.Claims) > maxBatchClaims {
+		writeError(w, http.StatusBadRequest, fmt.Sprintf("at most %d claims per request", maxBatchClaims))
+		return
+	}
+
+	s.mutationMu.Lock()
+	defer s.mutationMu.Unlock()
+
+	results := make([]claimResult, len(req.Claims))
+	var unlocks []store.Unlock
+	var valid []int
+	now := s.Now()
+	for i, c := range req.Claims {
+		results[i].AchievementID = c.AchievementID
+		a, ok := s.Catalog.Get(c.AchievementID)
+		switch {
+		case !ok:
+			results[i].Status = "unknown"
+		case c.TriggerType != a.Trigger.Type:
+			results[i].Status = "outdated"
+		case len(c.Evidence) > maxEvidenceBytes:
+			results[i].Status = "tooLarge"
+		default:
+			valid = append(valid, i)
+			unlocks = append(unlocks, store.Unlock{
+				UUID:          uuid,
+				AchievementID: a.ID,
+				TriggerType:   c.TriggerType,
+				Evidence:      string(c.Evidence),
+				ModVersion:    limit(req.ModVersion, 64),
+				ClaimedAt:     now,
+			})
+		}
+	}
+
+	inserted, err := s.Store.InsertUnlocks(r.Context(), unlocks)
+	if err != nil {
+		s.internalError(w, err)
+		return
+	}
+	newly := 0
+	for n, i := range valid {
+		results[i].Status = "alreadyUnlocked"
+		if inserted[n] {
+			results[i].Status = "unlocked"
+			newly++
+		}
+	}
+	if newly > 0 {
+		s.Log.Info("achievements unlocked", "uuid", uuid, "count", newly)
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"results": results})
+}
+
 func (s *Server) batchTitles(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		UUIDs []string `json:"uuids"`
@@ -636,7 +716,11 @@ func (s *Server) recoverer(next http.Handler) http.Handler {
 }
 
 func (s *Server) decode(w http.ResponseWriter, r *http.Request, v any) bool {
-	r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+	return s.decodeLimit(w, r, v, maxBodyBytes)
+}
+
+func (s *Server) decodeLimit(w http.ResponseWriter, r *http.Request, v any, maxBytes int64) bool {
+	r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
 		writeError(w, http.StatusBadRequest, "invalid JSON body")
 		return false

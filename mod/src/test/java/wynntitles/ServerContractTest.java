@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 import wynntitles.account.Account;
 import wynntitles.achievements.AchievementTracker;
@@ -184,9 +185,18 @@ class ServerContractTest {
 			return evidence;
 		};
 		List<String> announced = new CopyOnWriteArrayList<>();
+		AtomicBoolean inGame = new AtomicBoolean(false);
 		AchievementTracker tracker = new AchievementTracker(
-				api, account, catalogs, Map.of(target.trigger().type(), fake), a -> announced.add(a.id()), "test");
+				api, account, catalogs, Map.of(target.trigger().type(), fake), a -> announced.add(a.id()), "test", inGame::get);
 
+		// Off a Wynncraft world nothing is checked, even when the trigger is met.
+		for (int i = 0; i < 100; i++) {
+			tracker.tick();
+		}
+		Thread.sleep(200);
+		assertTrue(account.refresh().get().unlocked().isEmpty(), "claimed outside the game");
+
+		inGame.set(true);
 		long deadline = System.currentTimeMillis() + 10_000;
 		while (!hasUnlock(account.me(), target.id()) && System.currentTimeMillis() < deadline) {
 			tracker.tick();

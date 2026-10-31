@@ -18,7 +18,7 @@
 		"minecraft": "~${minecraft_version}",
 		"java": ">=${java_version}",
 		"fabric-api": "*",
-		"wynntils": ">=4.2.0",
+		"wynntils": ">=4.2.16",
 		"cloth-config": "*"
 	},
 	"suggests": {
