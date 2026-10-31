@@ -22,6 +22,7 @@ import wynntitles.achievements.AchievementTracker;
 import wynntitles.achievements.Detector;
 import wynntitles.api.ApiClient;
 import wynntitles.api.ApiTypes.AchievementStats;
+import wynntitles.api.ApiTypes.Claim;
 import wynntitles.api.ApiTypes.ClaimResult;
 import wynntitles.api.ApiTypes.Me;
 import wynntitles.catalog.Catalog;
@@ -62,7 +63,7 @@ class ServerContractTest {
 
 		JsonObject evidence = new JsonObject();
 		evidence.addProperty("test", true);
-		ClaimResult claim = account.withToken(t -> api.claim(t, first.id(), first.trigger().type(), evidence, "test")).get();
+		ClaimResult claim = account.withToken(t -> api.claims(t, List.of(new Claim(first.id(), first.trigger().type(), evidence)), "test")).get().get(0);
 		assertTrue(claim.newlyUnlocked());
 
 		// Other tests share the server, so only check what this player's claim guarantees.
@@ -91,14 +92,14 @@ class ServerContractTest {
 		assertTrue(catalog.shop().stream().allMatch(Catalog.ShopItem::supported), "this mod should know every shop item");
 		Catalog.Achievement greg = catalog.get("raid_tna").orElseThrow();
 		assertTrue(greg.rewards().prefix().runs().get(0).obfuscated());
-		account.withToken(t -> api.claim(t, greg.id(), greg.trigger().type(), evidence, "test")).get();
+		account.withToken(t -> api.claims(t, List.of(new Claim(greg.id(), greg.trigger().type(), evidence)), "test")).get();
 		me = account.setTitle("Greg", null).get();
 		assertEquals(first.points() + greg.points(), me.balance());
 		assertEquals(greg.rewards().prefix().runs(), me.title().runs());
 
 		// Pricing follows all 164 achievements; earn the full test budget.
 		for (Catalog.Achievement a : catalog.achievements()) {
-			account.withToken(t -> api.claim(t, a.id(), a.trigger().type(), evidence, "test")).get();
+			account.withToken(t -> api.claims(t, List.of(new Claim(a.id(), a.trigger().type(), evidence)), "test")).get();
 		}
 		int earned = catalog.achievements().stream().mapToInt(Catalog.Achievement::points).sum();
 
@@ -116,7 +117,7 @@ class ServerContractTest {
 		// An animated palette carries its animation through the server to the nametag.
 		// Purchases are final, so each step below buys only pieces it does not own yet.
 		Catalog.Achievement palace = catalog.get("raid_twp").orElseThrow();
-		account.withToken(t -> api.claim(t, palace.id(), palace.trigger().type(), evidence, "test")).get();
+		account.withToken(t -> api.claims(t, List.of(new Claim(palace.id(), palace.trigger().type(), evidence)), "test")).get();
 		Catalog.ShopItem animated = catalog.shopItem("animated_ocean").orElseThrow();
 		account.buy(List.of(animated.id())).get();
 		TitleStyle wave = new TitleStyle(animated.id(), List.of());

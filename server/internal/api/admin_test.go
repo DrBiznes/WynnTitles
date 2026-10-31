@@ -146,7 +146,7 @@ func TestModerationRevokeRestoreAndRestart(t *testing.T) {
 	s, h := adminFixture(t)
 	ctx := context.Background()
 	achievement := s.Catalog.Achievements[0]
-	_, err := s.Store.InsertUnlock(ctx, store.Unlock{UUID: testUUID, AchievementID: achievement.ID, TriggerType: achievement.Trigger.Type, Evidence: `{"reported":"<script>alert(1)</script>"}`, ModVersion: "test", ClaimedAt: time.Now()})
+	_, err := s.Store.InsertUnlocks(ctx, []store.Unlock{{UUID: testUUID, AchievementID: achievement.ID, TriggerType: achievement.Trigger.Type, Evidence: `{"reported":"<script>alert(1)</script>"}`, ModVersion: "test", ClaimedAt: time.Now()}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -182,7 +182,7 @@ func TestModerationRevokeRestoreAndRestart(t *testing.T) {
 	if stats.Unlocks[achievement.ID] != 0 {
 		t.Fatal("rarity not invalidated")
 	}
-	if inserted, err := s.Store.InsertUnlock(ctx, store.Unlock{UUID: testUUID, AchievementID: achievement.ID, ClaimedAt: time.Now()}); err != nil || inserted {
+	if inserted, err := s.Store.InsertUnlocks(ctx, []store.Unlock{{UUID: testUUID, AchievementID: achievement.ID, ClaimedAt: time.Now()}}); err != nil || inserted[0] {
 		t.Fatal("revoked claim was reclaimed")
 	}
 	if code := adminAction(t, h, testUUID, "revoke", achievement.ID, "Duplicate revoke attempt"); code != 400 {

@@ -14,7 +14,7 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 ## 0.14.0 · 2026-10-31
 **Release hardening: batch claims, connection retries, safer Wynntils hook, self-hosting guide**
 
-- New `POST /v1/claims/batch` records up to 200 claims in one transaction. The mod sends everything met in a check as one request, so a first login no longer queues one write per achievement behind the mutation lock. **Deploy this server before releasing this mod**: the mod no longer uses `/v1/claims`.
+- `POST /v1/claims` now takes a list and records up to 200 claims in one transaction, replacing the single-claim format. The mod sends everything met in a check as one request, so a first login no longer queues one write per achievement behind the mutation lock. **Deploy this server and this mod together**: neither works with the old version of the other, and an old mod's claims now get a 400.
 - Achievements are only checked on a Wynncraft world. Before, the tracker kept running after leaving, so position triggers could fire in singleplayer or on another server, and the Wynncraft API kept being polled.
 - If the server can't be reached at join, the mod says so in chat and retries after 30 seconds, 1 minute and 2 minutes, then tells the player how to try again. Before, it stayed silently offline.
 - A Wynntils update that moves the private nametag method now loses titles instead of crashing the game. The hook is optional and matched by exact signature, the render path catches everything, and the log says when the hook is gone. Requires Wynntils 4.2.16 or newer, the version the mod is built against.

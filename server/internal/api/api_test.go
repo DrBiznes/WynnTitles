@@ -159,6 +159,15 @@ func TestLoginRequiresMojangJoin(t *testing.T) {
 	}
 }
 
+// claims builds a POST /v1/claims body.
+func claims(c ...map[string]any) map[string]any {
+	return map[string]any{"claims": c}
+}
+
+type claimResults struct {
+	Results []struct{ AchievementID, Status string }
+}
+
 func TestClaimEquipAndLookup(t *testing.T) {
 	h := newHarness(t)
 	token := h.login()
@@ -167,24 +176,21 @@ func TestClaimEquipAndLookup(t *testing.T) {
 	if a.Rewards.Prefix == nil || a.Rewards.Suffix == nil {
 		t.Fatal("test expects the first achievement to reward a prefix and a suffix")
 	}
-	claim := map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type, "evidence": map[string]any{"x": 1}}
+	claim := claims(map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type, "evidence": map[string]any{"x": 1}})
 
 	// Equipping before unlocking is rejected.
 	if code := h.do("PUT", "/v1/me/title", token, map[string]string{"prefix": a.Rewards.Prefix.Text}, nil); code != 400 {
 		t.Fatalf("equip locked word: got %d, want 400", code)
 	}
 
-	var result struct{ Status string }
+	var result claimResults
 	h.do("POST", "/v1/claims", token, claim, &result)
-	if result.Status != "unlocked" {
-		t.Fatalf("first claim status = %q", result.Status)
+	if result.Results[0].Status != "unlocked" {
+		t.Fatalf("first claim status = %q", result.Results[0].Status)
 	}
 	h.do("POST", "/v1/claims", token, claim, &result)
-	if result.Status != "alreadyUnlocked" {
-		t.Fatalf("second claim status = %q", result.Status)
-	}
-	if code := h.do("POST", "/v1/claims", token, map[string]any{"achievementId": a.ID, "triggerType": "nope"}, nil); code != 409 {
-		t.Fatalf("wrong trigger type: got %d, want 409", code)
+	if result.Results[0].Status != "alreadyUnlocked" {
+		t.Fatalf("second claim status = %q", result.Results[0].Status)
 	}
 
 	var me meResponse
@@ -250,7 +256,7 @@ func TestAchievementStats(t *testing.T) {
 	token := h.login()
 
 	a := h.cat.Achievements[0]
-	h.do("POST", "/v1/claims", token, map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type}, nil)
+	h.do("POST", "/v1/claims", token, claims(map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type}), nil)
 
 	var stats statsResponse
 	if code := h.do("GET", "/v1/stats/achievements", "", nil, &stats); code != 200 {
@@ -302,7 +308,7 @@ func TestShopStyles(t *testing.T) {
 	if !ok || greg.Rewards.Prefix == nil || !greg.Rewards.Prefix.Runs[0].Obfuscated {
 		t.Fatal("test expects raid_tna to reward an obfuscated prefix")
 	}
-	h.do("POST", "/v1/claims", token, map[string]any{"achievementId": greg.ID, "triggerType": greg.Trigger.Type}, nil)
+	h.do("POST", "/v1/claims", token, claims(map[string]any{"achievementId": greg.ID, "triggerType": greg.Trigger.Type}), nil)
 	// JSON leaves out false flags, so decode each response into a fresh value.
 	var me meResponse
 	fresh := func() *meResponse {
@@ -342,7 +348,7 @@ func TestShopStyles(t *testing.T) {
 	// Earn enough for the newly priced pieces after checking insufficient funds.
 	earned := 0
 	for _, a := range h.cat.Achievements {
-		h.do("POST", "/v1/claims", token, map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type}, nil)
+		h.do("POST", "/v1/claims", token, claims(map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type}), nil)
 		earned += a.Points
 	}
 	red, _ := h.cat.ShopItem("color_red")
@@ -392,11 +398,9 @@ func TestClaimBatch(t *testing.T) {
 	token := h.login()
 	first, second := h.cat.Achievements[0], h.cat.Achievements[1]
 
-	h.do("POST", "/v1/claims", token, map[string]any{"achievementId": first.ID, "triggerType": first.Trigger.Type}, nil)
+	h.do("POST", "/v1/claims", token, claims(map[string]any{"achievementId": first.ID, "triggerType": first.Trigger.Type}), nil)
 
-	var got struct {
-		Results []struct{ AchievementID, Status string }
-	}
+	var got claimResults
 	body := map[string]any{"modVersion": "test", "claims": []map[string]any{
 		{"achievementId": first.ID, "triggerType": first.Trigger.Type},
 		{"achievementId": second.ID, "triggerType": second.Trigger.Type, "evidence": map[string]any{"x": 1}},
@@ -404,7 +408,7 @@ func TestClaimBatch(t *testing.T) {
 		{"achievementId": second.ID, "triggerType": "nope"},
 		{"achievementId": second.ID, "triggerType": second.Trigger.Type, "evidence": strings.Repeat("x", maxEvidenceBytes)},
 	}}
-	if code := h.do("POST", "/v1/claims/batch", token, body, &got); code != 200 {
+	if code := h.do("POST", "/v1/claims", token, body, &got); code != 200 {
 		t.Fatalf("batch status = %d", code)
 	}
 	want := []string{"alreadyUnlocked", "unlocked", "unknown", "outdated", "tooLarge"}
@@ -424,10 +428,14 @@ func TestClaimBatch(t *testing.T) {
 	}
 
 	tooMany := make([]map[string]any, maxBatchClaims+1)
-	if code := h.do("POST", "/v1/claims/batch", token, map[string]any{"claims": tooMany}, nil); code != 400 {
+	if code := h.do("POST", "/v1/claims", token, claims(tooMany...), nil); code != 400 {
 		t.Fatalf("oversized batch status = %d", code)
 	}
-	if code := h.do("POST", "/v1/claims/batch", "", body, nil); code != 401 {
+	// An old mod's single-claim body must fail visibly, not record nothing as a success.
+	if code := h.do("POST", "/v1/claims", token, map[string]any{"achievementId": first.ID, "triggerType": first.Trigger.Type}, nil); code != 400 {
+		t.Fatalf("empty batch status = %d", code)
+	}
+	if code := h.do("POST", "/v1/claims", "", body, nil); code != 401 {
 		t.Fatalf("anonymous batch status = %d", code)
 	}
 }
@@ -439,12 +447,12 @@ func TestClaimBatchFitsTheCatalog(t *testing.T) {
 	if len(h.cat.Achievements) > maxBatchClaims {
 		t.Fatalf("catalog has %d achievements, more than the %d a batch allows", len(h.cat.Achievements), maxBatchClaims)
 	}
-	claims := []map[string]any{}
+	all := []map[string]any{}
 	for _, a := range h.cat.Achievements {
-		claims = append(claims, map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type,
+		all = append(all, map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type,
 			"evidence": strings.Repeat("x", maxEvidenceBytes-2)})
 	}
-	if code := h.do("POST", "/v1/claims/batch", token, map[string]any{"claims": claims}, nil); code != 200 {
+	if code := h.do("POST", "/v1/claims", token, claims(all...), nil); code != 200 {
 		t.Fatalf("batch status = %d", code)
 	}
 	var me meResponse
@@ -459,8 +467,8 @@ func TestClaimBatchKeepsRevocations(t *testing.T) {
 	h := newHarness(t)
 	token := h.login()
 	a := h.cat.Achievements[0]
-	claim := map[string]any{"claims": []map[string]any{{"achievementId": a.ID, "triggerType": a.Trigger.Type}}}
-	h.do("POST", "/v1/claims/batch", token, claim, nil)
+	claim := claims(map[string]any{"achievementId": a.ID, "triggerType": a.Trigger.Type})
+	h.do("POST", "/v1/claims", token, claim, nil)
 
 	db, err := store.Open(h.dbPath)
 	if err != nil {
@@ -471,10 +479,8 @@ func TestClaimBatchKeepsRevocations(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var result struct {
-		Results []struct{ Status string }
-	}
-	h.do("POST", "/v1/claims/batch", token, claim, &result)
+	var result claimResults
+	h.do("POST", "/v1/claims", token, claim, &result)
 	if len(result.Results) != 1 || result.Results[0].Status != "alreadyUnlocked" {
 		t.Fatalf("results = %+v", result.Results)
 	}

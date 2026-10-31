@@ -87,6 +87,5 @@ Wynntils only fires nametag events on Wynncraft, so a test-only mixin forwards t
 | PUT | `/v1/me/title` | Bearer | `{prefix, suffix}` (null unequips) |
 | PUT | `/v1/me/style` | Bearer | `{prefix, suffix}`, each `{source, formats, font, color, letterColor}` or null for native style; source/formats/font are owned item ids, color is a solid fallback when a font replaces an effect, and letterColor is a banner color |
 | POST | `/v1/shop/buy` | Bearer | `{itemIds: [...]}`, all or nothing |
-| POST | `/v1/claims` | Bearer | `{achievementId, triggerType, evidence, modVersion}` |
-| POST | `/v1/claims/batch` | Bearer | `{claims: [{achievementId, triggerType, evidence}], modVersion}` (max 200) → `{results: [{achievementId, status}]}` in one transaction; status is `unlocked`, `alreadyUnlocked`, `unknown`, `outdated` or `tooLarge` |
+| POST | `/v1/claims` | Bearer | `{claims: [{achievementId, triggerType, evidence}], modVersion}` (max 200) → `{results: [{achievementId, status}]}` in one transaction; status is `unlocked`, `alreadyUnlocked`, `unknown`, `outdated` or `tooLarge` |
 | POST | `/v1/titles/batch` | | `{uuids: [...]}` (max 500) → `{titles: {uuid: title or null}}` |

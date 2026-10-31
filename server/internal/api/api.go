@@ -63,7 +63,6 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("PUT /v1/me/style", s.authed(s.putStyle))
 	mux.HandleFunc("POST /v1/shop/buy", s.authed(s.buy))
 	mux.HandleFunc("POST /v1/claims", s.authed(s.claim))
-	mux.HandleFunc("POST /v1/claims/batch", s.authed(s.claimBatch))
 	mux.HandleFunc("POST /v1/titles/batch", s.batchTitles)
 	return s.recoverer(mux)
 }
@@ -518,69 +517,18 @@ func (s *Server) buy(w http.ResponseWriter, r *http.Request, uuid string) {
 	s.writeMe(w, r, uuid)
 }
 
-func (s *Server) claim(w http.ResponseWriter, r *http.Request, uuid string) {
-	var req struct {
-		AchievementID string          `json:"achievementId"`
-		TriggerType   string          `json:"triggerType"`
-		Evidence      json.RawMessage `json:"evidence"`
-		ModVersion    string          `json:"modVersion"`
-	}
-	if !s.decode(w, r, &req) {
-		return
-	}
-
-	s.mutationMu.Lock()
-	defer s.mutationMu.Unlock()
-
-	a, ok := s.Catalog.Get(req.AchievementID)
-	if !ok {
-		writeError(w, http.StatusNotFound, "unknown achievement")
-		return
-	}
-	// A mismatch means the mod is running an outdated catalog.
-	if req.TriggerType != a.Trigger.Type {
-		writeError(w, http.StatusConflict, "trigger type does not match the catalog, update the mod")
-		return
-	}
-	if len(req.Evidence) > maxEvidenceBytes {
-		writeError(w, http.StatusRequestEntityTooLarge, "evidence is too large")
-		return
-	}
-
-	inserted, err := s.Store.InsertUnlock(r.Context(), store.Unlock{
-		UUID:          uuid,
-		AchievementID: a.ID,
-		TriggerType:   req.TriggerType,
-		Evidence:      string(req.Evidence),
-		ModVersion:    limit(req.ModVersion, 64),
-		ClaimedAt:     s.Now(),
-	})
-	if err != nil {
-		s.internalError(w, err)
-		return
-	}
-
-	status := "unlocked"
-	if !inserted {
-		status = "alreadyUnlocked"
-	} else {
-		s.Log.Info("achievement unlocked", "uuid", uuid, "achievement", a.ID)
-	}
-	writeJSON(w, http.StatusOK, map[string]string{"status": status, "achievementId": a.ID})
-}
-
-// claimResult is one claim's outcome in a batch. Besides a single claim's
-// statuses, it can be "unknown", "outdated" (the mod's catalog is older than the
-// server's) or "tooLarge"; those record nothing and do not fail the others.
+// claimResult is one claim's outcome: "unlocked", "alreadyUnlocked", or one that
+// records nothing and does not fail the others: "unknown", "outdated" (the mod's
+// catalog is older than the server's) or "tooLarge".
 type claimResult struct {
 	AchievementID string `json:"achievementId"`
 	Status        string `json:"status"`
 }
 
-// claimBatch records many claims in one transaction. A first login meets dozens
+// claim records any number of claims in one transaction. A first login meets dozens
 // of achievements at once, and one transaction per claim would hold up everyone
 // else's writes behind the mutation lock.
-func (s *Server) claimBatch(w http.ResponseWriter, r *http.Request, uuid string) {
+func (s *Server) claim(w http.ResponseWriter, r *http.Request, uuid string) {
 	var req struct {
 		Claims []struct {
 			AchievementID string          `json:"achievementId"`
@@ -590,6 +538,10 @@ func (s *Server) claimBatch(w http.ResponseWriter, r *http.Request, uuid string)
 		ModVersion string `json:"modVersion"`
 	}
 	if !s.decodeLimit(w, r, &req, maxClaimBodyBytes) {
+		return
+	}
+	if len(req.Claims) == 0 {
+		writeError(w, http.StatusBadRequest, "nothing to claim, update the mod")
 		return
 	}
 	if len(req.Claims) > maxBatchClaims {

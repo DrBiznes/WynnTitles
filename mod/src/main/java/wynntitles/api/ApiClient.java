@@ -117,24 +117,12 @@ public final class ApiClient {
 		return post("/v1/shop/buy", token, body).thenApply(resp -> parse(resp, Me.class));
 	}
 
-	public CompletableFuture<ClaimResult> claim(
-			String token, String achievementId, String triggerType, JsonObject evidence, String modVersion) {
-		JsonObject body = new JsonObject();
-		body.addProperty("achievementId", achievementId);
-		body.addProperty("triggerType", triggerType);
-		body.addProperty("modVersion", modVersion);
-		if (evidence != null) {
-			body.add("evidence", evidence);
-		}
-		return post("/v1/claims", token, body).thenApply(resp -> parse(resp, ClaimResult.class));
-	}
-
 	/** Claims up to 200 achievements in one request. Returns a result for each, in order. */
 	public CompletableFuture<List<ClaimResult>> claims(String token, List<Claim> claims, String modVersion) {
 		JsonObject body = new JsonObject();
 		body.add("claims", GSON.toJsonTree(claims));
 		body.addProperty("modVersion", modVersion);
-		return post("/v1/claims/batch", token, body).thenApply(resp -> parse(resp, ClaimResults.class).results());
+		return post("/v1/claims", token, body).thenApply(resp -> parse(resp, ClaimResults.class).results());
 	}
 
 	/** Looks up titles for up to 500 players. Every requested UUID is present; null means no title. */

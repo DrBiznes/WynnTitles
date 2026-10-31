@@ -292,21 +292,6 @@ func (s *Store) Unlocks(ctx context.Context, uuid string) ([]Unlock, error) {
 	return unlocks, rows.Err()
 }
 
-// InsertUnlock records a claim. It returns false without changing anything if
-// the player already has a row for that achievement (claimed or revoked).
-func (s *Store) InsertUnlock(ctx context.Context, u Unlock) (bool, error) {
-	res, err := s.db.ExecContext(ctx, `
-		INSERT INTO unlocks (uuid, achievement_id, trigger_type, evidence, mod_version, claimed_at)
-		VALUES (?, ?, ?, NULLIF(?, ''), NULLIF(?, ''), ?)
-		ON CONFLICT (uuid, achievement_id) DO NOTHING`,
-		u.UUID, u.AchievementID, u.TriggerType, u.Evidence, u.ModVersion, u.ClaimedAt.UnixMilli())
-	if err != nil {
-		return false, err
-	}
-	n, err := res.RowsAffected()
-	return n == 1, err
-}
-
 // InsertUnlocks records several claims in one transaction, so a burst of claims
 // costs one disk sync. It reports which were new, in order; rows that already
 // exist (claimed or revoked) are left alone.

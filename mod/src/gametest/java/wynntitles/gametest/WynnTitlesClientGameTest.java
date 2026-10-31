@@ -25,6 +25,7 @@ import net.minecraft.world.phys.Vec3;
 import wynntitles.WynnTitles;
 import wynntitles.account.Account;
 import wynntitles.api.ApiClient;
+import wynntitles.api.ApiTypes.Claim;
 import wynntitles.api.ApiTypes.Me;
 import wynntitles.catalog.Catalog;
 import wynntitles.config.WynnTitlesConfig;
@@ -82,8 +83,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 
 			// Earn and equip a title for ourselves, the way the tracker and screen would.
 			// Account calls read the Minecraft session, so start them on the client thread.
-			join(context.computeOnClient(client -> WynnTitles.account().withToken(token -> api.claim(
-					token, ownAchievement.id(), ownAchievement.trigger().type(), null, "gametest"))));
+			join(context.computeOnClient(client -> WynnTitles.account().withToken(token -> api.claims(token, List.of(new Claim(ownAchievement.id(), ownAchievement.trigger().type(), null)), "gametest"))));
 			me = join(context.computeOnClient(client -> WynnTitles.account().setTitle(
 					ownAchievement.rewards().prefix().text(), ownAchievement.rewards().suffix().text())));
 			check(me.title() != null, "equipping should produce a title");
@@ -110,8 +110,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			// style next to a bought one, so the styles tab has both to show.
 			for (Catalog.Achievement raid : catalog.achievements().stream()
 					.filter(a -> List.of("raid_tna", "raid_twp").contains(a.id()) || a.points() >= 5 && a.category().equals("quest")).toList()) {
-				join(context.computeOnClient(client -> WynnTitles.account().withToken(token -> api.claim(
-						token, raid.id(), raid.trigger().type(), null, "gametest"))));
+				join(context.computeOnClient(client -> WynnTitles.account().withToken(token -> api.claims(token, List.of(new Claim(raid.id(), raid.trigger().type(), null)), "gametest"))));
 			}
 			join(context.computeOnClient(client -> WynnTitles.account().setTitle(
 					"Greg", ownAchievement.rewards().suffix().text())));
@@ -260,7 +259,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		Me before = WynnTitles.account().me();
 		for (Catalog.Achievement a : catalog.achievements()) {
 			join(context.computeOnClient(client -> WynnTitles.account().withToken(token ->
-					new ApiClient(WynnTitlesConfig::resolvedServerUrl, "gametest").claim(token, a.id(), a.trigger().type(), null, "gametest"))));
+					new ApiClient(WynnTitlesConfig::resolvedServerUrl, "gametest").claims(token, List.of(new Claim(a.id(), a.trigger().type(), null)), "gametest"))));
 		}
 		List<String> purchase = catalog.shop().stream()
 				.filter(i -> Catalog.ShopItem.FONT.equals(i.kind()) || List.of("color_gold", "palette_ice", "animated_ice", "rainbow").contains(i.id()))
@@ -522,7 +521,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			throw new AssertionError(e);
 		}
 		Account dummy = new Account(api, new OfflineSession(offlineUuid(DUMMY_NAME), DUMMY_NAME), dir.resolve("s.json"));
-		join(dummy.withToken(token -> api.claim(token, achievement.id(), achievement.trigger().type(), null, "gametest")));
+		join(dummy.withToken(token -> api.claims(token, List.of(new Claim(achievement.id(), achievement.trigger().type(), null)), "gametest")));
 		Me me = join(dummy.setTitle(achievement.rewards().prefix().text(), achievement.rewards().suffix().text()));
 		check(me.title() != null, "dummy should have a title");
 		return me.title().plain();
