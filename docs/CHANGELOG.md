@@ -11,6 +11,22 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.17.0 · 2026-10-31
+**Fewer profession achievements and a retuned catalog**
+
+- Each profession now has one achievement at level 100 instead of one at 100 and one at 132. It awards both title words, such as Timbered Lumberjack, and Perfectionist still needs all twelve at 132.
+- Harvest-Blessed becomes **Sun-Blessed**, so the Farming title doesn't repeat itself.
+- The shop is repriced to match: palettes 10 → 9, animated palettes 16 → 14, and the Pill, Box, Flag and Ribbon fonts 27 → 22.
+- The rule against lowering prices after launch is gone. Prices will change often during the beta, and purchases keep their price paid.
+- New trigger: `territoryAny`, met by any one of the listed places.
+- New exploration achievements Mind the Gap and Port of Call replace Old Man Martyn's Cabin and Gone to Travel.
+- Into the Void and the Moon achievement move to secrets.
+- The raid ladder moves up: Seasoned Raider at 100 raids and Raid Syndicate at 1,000.
+- Hardcore achievements no longer say "living", because the API can't tell whether a character is alive.
+- `mod/MODRINTH.md` is removed.
+- Catalog: 175 → **163 achievements / 569 pts**; shop stays at **65 items**, 761 → **688**, which keeps it 82.7% earnable.
+- `mod_version` goes from 0.16.0 to 0.17.0.
+
 ## 0.16.0 · 2026-10-31
 **Launch moderation tools**
 

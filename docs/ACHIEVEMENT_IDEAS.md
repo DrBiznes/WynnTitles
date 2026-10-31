@@ -17,6 +17,7 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | `characterRoster`, `gamemodeLevel`, `playtime`, `accountAge`, `guild`, `leaderboard` | the full API profile, shared through `PlayerProfile` and refreshed every 5 minutes |
 | `coordinates`, `itemAtLocation` | player position (a circle of `radius` around `x`, `z`) plus the inventory |
 | `territorySet` | every listed place visited on one character: the Content Book's world, territorial and secret discoveries, which Wynntils scans when the mod asks, plus the territory the character stands in. Kept by character in `config/wynntitles/territories.json` |
+| `territoryAny` | any one of the listed places, read the same way as `territorySet` |
 | `itemRarityCount`, `shinyItem`, `itemSet` | Wynntils item annotations over every carried and worn stack |
 
 ### Checked against live data
@@ -35,7 +36,6 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 
 - **Into the Void** uses the wiki's coordinates for The Lonely Abyss (13777, -4042) with a 64-block radius, because The Void is not a territory.
 - **Little Rocket Mushroom** uses the coordinates of Mehme's NPC (-7112, -12825), and the wiki doesn't say whether his home can be reached outside the ??? quest. Also check that the Talking Mushroom item exists outside the quest.
-- **Hardcore:** gamemodeLevel assumes a dead Hardcore character drops the `hardcore` mode in the API.
 - **Item names** in the item sets (Morph pieces, Hive armour) come from the wiki's set and Hive Shop pages.
 
 ### Problems in shipped achievements
@@ -74,47 +74,34 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | Versatile | silver | characterRoster 50 | Versatile |  |
 | Pentarch | gold | characterRoster 120 | Five-Sworn ✦ | Pentarch |
 
-### profession (29)
+### profession (19)
 
 | Achievement | Tier | Trigger | Prefix | Suffix |
 |---|---|---|---|---|
 | Diligent Journeyman | silver | totalProfessionLevel 250 | Diligent | Journeyman |
 | Renaissance | gold | totalProfessionLevel 1000 | Renaissance | Polymath |
 | Perfectionist | gold | totalProfessionLevel 1584 |  | Perfectionist ✦ |
-| Woodcutting 100 | silver | professionLevel 100 |  | Lumberjack |
-| Woodcutting 132 | gold | professionLevel 132 | Timbered |  |
-| Mining 100 | silver | professionLevel 100 |  | Prospector |
-| Mining 132 | gold | professionLevel 132 | Obsidian |  |
-| Farming 100 | silver | professionLevel 100 |  | Harvester |
-| Farming 132 | gold | professionLevel 132 | Harvest-Blessed |  |
-| Fishing 100 | silver | professionLevel 100 |  | Angler |
-| Fishing 132 | gold | professionLevel 132 | Tidal |  |
-| Alchemism 100 | silver | professionLevel 100 |  | Alchemist |
-| Alchemism 132 | gold | professionLevel 132 | Transmuting |  |
-| Armouring 100 | silver | professionLevel 100 |  | Armourer |
-| Armouring 132 | gold | professionLevel 132 | Unbreachable |  |
-| Cooking 100 | silver | professionLevel 100 |  | Gourmand |
-| Cooking 132 | gold | professionLevel 132 | Savoury |  |
-| Jeweling 100 | silver | professionLevel 100 |  | Lapidary |
-| Jeweling 132 | gold | professionLevel 132 | Gem-Cut |  |
-| Scribing 100 | silver | professionLevel 100 |  | Lorekeeper |
-| Scribing 132 | gold | professionLevel 132 | Ink-Stained |  |
-| Tailoring 100 | silver | professionLevel 100 |  | Weaver |
-| Tailoring 132 | gold | professionLevel 132 | Silk-Spun |  |
-| Weaponsmithing 100 | silver | professionLevel 100 |  | Bladesmith |
-| Weaponsmithing 132 | gold | professionLevel 132 | Anvil-Forged |  |
-| Woodworking 100 | silver | professionLevel 100 |  | Bowyer |
-| Woodworking 132 | gold | professionLevel 132 | Fletched |  |
+| Woodcutting 100 | silver | professionLevel 100 | Timbered | Lumberjack |
+| Mining 100 | silver | professionLevel 100 | Obsidian | Prospector |
+| Farming 100 | silver | professionLevel 100 | Sun-Blessed | Harvester |
+| Fishing 100 | silver | professionLevel 100 | Tidal | Angler |
+| Alchemism 100 | silver | professionLevel 100 | Transmuting | Alchemist |
+| Armouring 100 | silver | professionLevel 100 | Unbreachable | Armourer |
+| Cooking 100 | silver | professionLevel 100 | Savoury | Gourmand |
+| Jeweling 100 | silver | professionLevel 100 | Gem-Cut | Lapidary |
+| Scribing 100 | silver | professionLevel 100 | Ink-Stained | Lorekeeper |
+| Tailoring 100 | silver | professionLevel 100 | Silk-Spun | Weaver |
+| Weaponsmithing 100 | silver | professionLevel 100 | Anvil-Forged | Bladesmith |
+| Woodworking 100 | silver | professionLevel 100 | Fletched | Bowyer |
 | Bountiful Gatherer | gold | professionLevelAll (4) 125 | Bountiful | Gatherer |
 | Master Tradesman | gold | professionLevelAll (8) 117 | Craft-Honed | Tradesman |
 
-### exploration (11)
+### exploration (10)
 
 | Achievement | Tier | Trigger | Prefix | Suffix |
 |---|---|---|---|---|
-| Into the Void | gold | coordinates | Void-Touched ✦ | Voidwalker |
-| Old Man Martyn's Cabin | bronze | location "Little Wood" | Little | Woodsman |
-| Gone to Travel | bronze | location "Time Valley" |  | Wanderer |
+| Mind the Gap | bronze | territoryAny "Jofash Tunnel" or "Entrance to Gavel" | | Emissary |
+| Port of Call | bronze | territorySet "Corkus City" |  | Wavebreaker |
 | Good Neighbour | silver | territorySet (22) | Well-Travelled | Neighbour |
 | Mapmaker of Gavel | gold | territorySet (13) | Worldly | Cartographer |
 | The Queen's Census | gold | territorySet (6) | Registered | Subject |
@@ -171,8 +158,8 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | Nameless No More | gold | raid x50 | Nameless ✦ |  |
 | Anathema's End | silver | raid x10 | Anathema's |  |
 | Scourge of the Palace | gold | raid x50 |  | Scourge |
-| Seasoned Raider | silver | statistic raidsCompleted 25 | Seasoned |  |
-| Raid Syndicate | gold | statistic raidsCompleted 100 | Syndicate | Raidmaster |
+| Seasoned Raider | silver | statistic raidsCompleted 100 | Seasoned |  |
+| Raid Syndicate | gold | statistic raidsCompleted 1000 | Syndicate | Raidmaster |
 
 ### dungeon (16)
 
@@ -218,7 +205,7 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | Hunted | gold | gamemodeLevel hunted 100 | Hunted | Prey |
 | HUICH | gold | gamemodeLevel hunted+ultimate_ironman+craftsman+hardcore 80 | Unyielding ✦ | Masochist |
 
-### secret (15)
+### secret (16)
 
 The libraries are the seven secret discoveries with "Library" in the name, plus The Grand Archive, which the Content Book calls a library. The Grand Archive is bronze because the wiki lists no entry requirement for it, and that also keeps the shop ratio under 85%.
 
@@ -235,6 +222,7 @@ The libraries are the seven secret discoveries with "Library" in the name, plus 
 | Permission Slip | silver | territorySet "The Royal University's Library" | Permitted | Scholar |
 | Complete Works | gold | territorySet (all 8 libraries) | Lorebound ✦ | Librarian ✦ |
 | Moon Walker | gold | territorySet "The Moon" | | Moon-Walker ✦ |
+| Into the Void | gold | coordinates | Void-Touched ✦ | Voidwalker |
 | Death's Door | silver | territorySet "Death's Realm" | Departed | Revenant |
 | Bak'al's Wake | bronze | territorySet (3) | Scorched | Witness |
 | Edge of Nothing | gold | territorySet (4) | Unmoored | Castaway |

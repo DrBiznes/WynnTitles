@@ -67,12 +67,8 @@ class progression symbols; they do not imply owning a specific weapon is require
 | Assassin | Wooden Sword → Iron Sword → Diamond Sword → Netherite Sword |
 | Shaman | Torch → Soul Torch → Amethyst Shard → Totem of Undying |
 
-Profession level-100 icons retain their profession emblems. Level-132 icons use
-higher-tier tools, materials, or products: titanium gathering tools, wisdom potion,
-titanium chestplate, spicy meal, cinnabar gem/ingot, redwood paper/plank and heather
-string. [Gathering Tools](https://wynncraft.wiki.gg/wiki/Gathering_tools) lists
-Titanium T13 above Dernic T12. The total-professions cap uses the profession-info
-emblem instead of an empty trophy base.
+Profession level-100 icons use their profession emblems. The total-professions cap
+uses the profession-info emblem instead of an empty trophy base.
 
 The pack's `wynn/housing/profession/trophy/<profession>` files are **not selected
 by an inventory item**. File existence alone is insufficient: the pack test
@@ -94,7 +90,7 @@ not exact quest items or earned rewards. Alternatives can be swapped in the cata
 | Legendary Island token | Golden Coin silhouette; diamond fallback | Vanilla diamond only; [the token tiers use different vanilla carriers](https://wynncraft.wiki.gg/wiki/Legendary_Tokens) |
 | Great Bridge | Troll Hair ingredient | Wooden plank or map |
 | Moon | Existing Halfmoon Crescent cosmetic | Moonlight Essence ingredient |
-| Time Valley | Time-trial hourglass | Vanilla clock only |
+| Corkus City | Seaskipper sign, for the Wavebreaker crossing; oak boat fallback | Vanilla boat only |
 | Playtime | Elapsed-time icon → Luxury Timepiece → character history | Same timepiece at all tiers |
 | Account age | Green present → red present | Vanilla cake at both tiers |
 | Leaderboard placements | Medallion → Honoured Commander's Medal | Crown imagery |

@@ -179,9 +179,8 @@ If you fork on GitHub, the included workflow also publishes your image to your
 own GitHub packages on every push to `main`.
 
 Be careful changing things after people have started playing. Renaming a title
-word unequips it, removing an achievement removes its points, and lowering a
-price is unfair to anyone who paid the old one. Purchases keep the price paid, so
-raising points is the safe way to make the shop cheaper.
+word unequips it, and removing an achievement removes its points. Prices can
+change freely: purchases keep the price paid, so repricing never changes a balance.
 
 ## Updates
 

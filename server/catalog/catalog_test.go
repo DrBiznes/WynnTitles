@@ -192,6 +192,7 @@ func TestTriggerParameters(t *testing.T) {
 		`{"type": "itemAtLocation", "itemName": "Dynamite", "x": -200, "z": -281, "radius": 8}`,
 		`{"type": "territorySet", "territoryNames": ["Ragni", "Detlas"]}`,
 		`{"type": "territorySet", "territoryNames": ["The Moon"]}`,
+		`{"type": "territoryAny", "territoryNames": ["Jofash Tunnel", "Entrance to Gavel"]}`,
 		`{"type": "itemRarityCount", "rarity": "mythic", "amount": 3}`,
 		`{"type": "itemSet", "itemSets": [["A", "B"], ["C", "D"]]}`,
 	}
@@ -212,6 +213,7 @@ func TestTriggerParameters(t *testing.T) {
 		`{"type": "itemAtLocation", "x": 1, "z": 1, "radius": 8}`,
 		`{"type": "territorySet", "territoryNames": []}`,
 		`{"type": "territorySet", "territoryNames": ["Ragni", ""]}`,
+		`{"type": "territoryAny", "territoryNames": ["Ragni"]}`,
 		`{"type": "itemRarityCount", "rarity": "epic", "amount": 1}`,
 		`{"type": "itemSet", "itemSets": [["A", "B"], ["C"]]}`,
 	}

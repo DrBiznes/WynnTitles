@@ -1436,30 +1436,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Lumberjack"
-      }
-    }
-  },
-  {
-    "id": "prof_woodcutting_132",
-    "category": "profession",
-    "name": "Woodcutting 132",
-    "description": "Max Woodcutting at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/tool/titanium_axe",
-      "fallback": "minecraft:netherite_axe"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Woodcutting",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Timbered"
+      },
+      "suffix": {
+        "text": "Lumberjack"
       }
     }
   },
@@ -1480,30 +1461,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Prospector"
-      }
-    }
-  },
-  {
-    "id": "prof_mining_132",
-    "category": "profession",
-    "name": "Mining 132",
-    "description": "Max Mining at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/tool/titanium_pickaxe",
-      "fallback": "minecraft:netherite_pickaxe"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Mining",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Obsidian"
+      },
+      "suffix": {
+        "text": "Prospector"
       }
     }
   },
@@ -1524,30 +1486,11 @@
       "level": 100
     },
     "rewards": {
+      "prefix": {
+        "text": "Sun-Blessed"
+      },
       "suffix": {
         "text": "Harvester"
-      }
-    }
-  },
-  {
-    "id": "prof_farming_132",
-    "category": "profession",
-    "name": "Farming 132",
-    "description": "Max Farming at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/tool/titanium_scythe",
-      "fallback": "minecraft:golden_hoe"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Farming",
-      "level": 132
-    },
-    "rewards": {
-      "prefix": {
-        "text": "Harvest-Blessed"
       }
     }
   },
@@ -1568,30 +1511,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Angler"
-      }
-    }
-  },
-  {
-    "id": "prof_fishing_132",
-    "category": "profession",
-    "name": "Fishing 132",
-    "description": "Max Fishing at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/tool/titanium_rod",
-      "fallback": "minecraft:tropical_fish"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Fishing",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Tidal"
+      },
+      "suffix": {
+        "text": "Angler"
       }
     }
   },
@@ -1612,30 +1536,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Alchemist"
-      }
-    }
-  },
-  {
-    "id": "prof_alchemism_132",
-    "category": "profession",
-    "name": "Alchemism 132",
-    "description": "Max Alchemism at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/potion/wisdom_full",
-      "fallback": "minecraft:dragon_breath"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Alchemism",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Transmuting"
+      },
+      "suffix": {
+        "text": "Alchemist"
       }
     }
   },
@@ -1656,30 +1561,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Armourer"
-      }
-    }
-  },
-  {
-    "id": "prof_armouring_132",
-    "category": "profession",
-    "name": "Armouring 132",
-    "description": "Max Armouring at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/armor/chestplate/titanium_chestplate",
-      "fallback": "minecraft:netherite_chestplate"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Armouring",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Unbreachable"
+      },
+      "suffix": {
+        "text": "Armourer"
       }
     }
   },
@@ -1700,30 +1586,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Gourmand"
-      }
-    }
-  },
-  {
-    "id": "prof_cooking_132",
-    "category": "profession",
-    "name": "Cooking 132",
-    "description": "Max Cooking at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/economy/meals/spicy",
-      "fallback": "minecraft:golden_carrot"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Cooking",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Savoury"
+      },
+      "suffix": {
+        "text": "Gourmand"
       }
     }
   },
@@ -1744,30 +1611,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Lapidary"
-      }
-    }
-  },
-  {
-    "id": "prof_jeweling_132",
-    "category": "profession",
-    "name": "Jeweling 132",
-    "description": "Max Jeweling at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/economy/mining/gem_cinnabar",
-      "fallback": "minecraft:emerald"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Jeweling",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Gem-Cut"
+      },
+      "suffix": {
+        "text": "Lapidary"
       }
     }
   },
@@ -1788,30 +1636,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Lorekeeper"
-      }
-    }
-  },
-  {
-    "id": "prof_scribing_132",
-    "category": "profession",
-    "name": "Scribing 132",
-    "description": "Max Scribing at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/economy/woodcutting/paper_redwood",
-      "fallback": "minecraft:writable_book"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Scribing",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Ink-Stained"
+      },
+      "suffix": {
+        "text": "Lorekeeper"
       }
     }
   },
@@ -1832,30 +1661,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Weaver"
-      }
-    }
-  },
-  {
-    "id": "prof_tailoring_132",
-    "category": "profession",
-    "name": "Tailoring 132",
-    "description": "Max Tailoring at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/economy/farming/string_heather",
-      "fallback": "minecraft:leather"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Tailoring",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Silk-Spun"
+      },
+      "suffix": {
+        "text": "Weaver"
       }
     }
   },
@@ -1876,30 +1686,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Bladesmith"
-      }
-    }
-  },
-  {
-    "id": "prof_weaponsmithing_132",
-    "category": "profession",
-    "name": "Weaponsmithing 132",
-    "description": "Max Weaponsmithing at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/economy/mining/ingot_cinnabar",
-      "fallback": "minecraft:netherite_sword"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Weaponsmithing",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Anvil-Forged"
+      },
+      "suffix": {
+        "text": "Bladesmith"
       }
     }
   },
@@ -1920,30 +1711,11 @@
       "level": 100
     },
     "rewards": {
-      "suffix": {
-        "text": "Bowyer"
-      }
-    }
-  },
-  {
-    "id": "prof_woodworking_132",
-    "category": "profession",
-    "name": "Woodworking 132",
-    "description": "Max Woodworking at level 132 on one character.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/economy/woodcutting/plank_redwood",
-      "fallback": "minecraft:crossbow"
-    },
-    "trigger": {
-      "type": "professionLevel",
-      "professionName": "Woodworking",
-      "level": 132
-    },
-    "rewards": {
       "prefix": {
         "text": "Fletched"
+      },
+      "suffix": {
+        "text": "Bowyer"
       }
     }
   },
@@ -2036,89 +1808,64 @@
     }
   },
   {
-    "id": "loc_void",
+    "id": "loc_enter_gavel",
     "category": "exploration",
-    "name": "Into the Void",
-    "description": "Find The Lonely Abyss, far out in The Void.",
-    "tier": "gold",
-    "points": 5,
+    "name": "Mind the Gap",
+    "description": "Enter Gavel for the first time, through the Jofash Tunnel or the Entrance to Gavel.",
+    "tier": "bronze",
+    "points": 1,
     "icon": {
-      "model": "wynn/outer_void/drop/tangible_intangibility",
-      "fallback": "minecraft:ender_pearl"
+      "model": "wynn/signage/dungeon",
+      "fallback": "minecraft:iron_door"
     },
     "trigger": {
-      "type": "coordinates",
-      "x": 13777,
-      "z": -4042,
-      "radius": 64
+      "type": "territoryAny",
+      "territoryNames": [
+        "Jofash Tunnel",
+        "Entrance to Gavel"
+      ]
     },
     "rewards": {
-      "prefix": {
-        "text": "Void-Touched",
+      "suffix": {
+        "text": "Emissary",
         "runs": [
           {
-            "text": "Void-Touched",
+            "text": "Emissary",
             "effect": {
               "type": "gradient",
               "colors": [
-                "#F0EAFF",
-                "#C9B8FF",
-                "#9FB0FF"
+                "#5B6FA8",
+                "#3FC6B8",
+                "#F4E3A1"
               ],
               "animated": true,
-              "cycleMs": 5200,
-              "animation": "eclipse"
+              "animation": "ascend"
             }
           }
         ]
-      },
-      "suffix": {
-        "text": "Voidwalker"
       }
     }
   },
   {
-    "id": "loc_little_wood",
+    "id": "loc_enter_corkus",
     "category": "exploration",
-    "name": "Old Man Martyn's Cabin",
-    "description": "Visit Little Wood.",
+    "name": "Port of Call",
+    "description": "Set foot in Corkus City for the first time. The C.S.S. Wavebreaker sails from Selchar once you have begun The Envoy.",
     "tier": "bronze",
     "points": 1,
     "icon": {
-      "model": "wynn/economy/woodcutting/plank_oak",
-      "fallback": "minecraft:oak_sapling"
+      "model": "wynn/signage/seaskipper",
+      "fallback": "minecraft:oak_boat"
     },
     "trigger": {
-      "type": "location",
-      "territoryName": "Little Wood"
-    },
-    "rewards": {
-      "prefix": {
-        "text": "Little"
-      },
-      "suffix": {
-        "text": "Woodsman"
-      }
-    }
-  },
-  {
-    "id": "loc_time_valley",
-    "category": "exploration",
-    "name": "Gone to Travel",
-    "description": "Visit Time Valley, where Old Man Martyn's cabin sign waits.",
-    "tier": "bronze",
-    "points": 1,
-    "icon": {
-      "model": "wynn/gui/content_book/time_trial_active",
-      "fallback": "minecraft:clock"
-    },
-    "trigger": {
-      "type": "location",
-      "territoryName": "Time Valley"
+      "type": "territorySet",
+      "territoryNames": [
+        "Corkus City"
+      ]
     },
     "rewards": {
       "suffix": {
-        "text": "Wanderer"
+        "text": "Wavebreaker"
       }
     }
   },
@@ -3611,10 +3358,10 @@
     }
   },
   {
-    "id": "stat_raids_25",
+    "id": "stat_raids_100",
     "category": "raid",
     "name": "Seasoned Raider",
-    "description": "Complete 25 raids of any kind.",
+    "description": "Complete 100 raids of any kind.",
     "tier": "silver",
     "points": 3,
     "icon": {
@@ -3624,7 +3371,7 @@
     "trigger": {
       "type": "statistic",
       "statistic": "raidsCompleted",
-      "amount": 25
+      "amount": 100
     },
     "rewards": {
       "prefix": {
@@ -3633,10 +3380,10 @@
     }
   },
   {
-    "id": "stat_raids_100",
+    "id": "stat_raids_1000",
     "category": "raid",
     "name": "Raid Syndicate",
-    "description": "Complete 100 raids of any kind.",
+    "description": "Complete 1000 raids of any kind.",
     "tier": "gold",
     "points": 5,
     "icon": {
@@ -3646,7 +3393,7 @@
     "trigger": {
       "type": "statistic",
       "statistic": "raidsCompleted",
-      "amount": 100
+      "amount": 1000
     },
     "rewards": {
       "prefix": {
@@ -4255,7 +4002,7 @@
     "id": "gm_hardcore_50",
     "category": "gamemode",
     "name": "Hardened",
-    "description": "Reach level 50 on a living Hardcore character.",
+    "description": "Reach level 50 on a Hardcore character.",
     "tier": "silver",
     "points": 3,
     "icon": {
@@ -4279,7 +4026,7 @@
     "id": "gm_hardcore_100",
     "category": "gamemode",
     "name": "Deathless",
-    "description": "Reach level 100 on a living Hardcore character.",
+    "description": "Reach level 100 on a Hardcore character.",
     "tier": "gold",
     "points": 5,
     "icon": {
@@ -4444,7 +4191,7 @@
     "id": "gm_huich_80",
     "category": "gamemode",
     "name": "HUICH",
-    "description": "Reach level 80 on a living Hunted, Ultimate Ironman, Craftsman and Hardcore character.",
+    "description": "Reach level 80 on a Hunted, Ultimate Ironman, Craftsman and Hardcore character.",
     "tier": "gold",
     "points": 5,
     "icon": {
@@ -4783,7 +4530,7 @@
     }
   },
   {
-    "id": "loc_moon",
+    "id": "secret_moon",
     "category": "secret",
     "name": "Moon Walker",
     "description": "Visit the optional moon section of the Recipe For Disaster quest.",
@@ -4817,6 +4564,48 @@
             }
           }
         ]
+      }
+    }
+  },
+  {
+    "id": "secret_void",
+    "category": "secret",
+    "name": "Into the Void",
+    "description": "Find The Lonely Abyss, far out in The Void.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/outer_void/drop/tangible_intangibility",
+      "fallback": "minecraft:ender_pearl"
+    },
+    "trigger": {
+      "type": "coordinates",
+      "x": 13777,
+      "z": -4042,
+      "radius": 64
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Void-Touched",
+        "runs": [
+          {
+            "text": "Void-Touched",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#F0EAFF",
+                "#C9B8FF",
+                "#9FB0FF"
+              ],
+              "animated": true,
+              "cycleMs": 5200,
+              "animation": "eclipse"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Voidwalker"
       }
     }
   },

@@ -376,6 +376,8 @@ func validateTrigger(t *Trigger) error {
 		need("radius", t.Radius > 0)
 	case "territorySet":
 		need("territoryNames", allNamed(t.TerritoryNames))
+	case "territoryAny":
+		need("territoryNames", allSet(t.TerritoryNames))
 	case "itemRarityCount":
 		need("amount", t.Amount > 0)
 		if !rarities[t.Rarity] {

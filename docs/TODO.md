@@ -13,7 +13,7 @@ Point at models only. Never copy textures out of the Wynncraft pack.
 
 ## 2. Add more achievements
 
-The catalog now has **175 achievements worth 629 points**, across quests (20), raids (17), professions (31), class levels (24), exploration (11), collection (18), statistics (10), dungeons (16), gamemodes (7), guilds (6) and secrets (15).
+The catalog now has **163 achievements worth 569 points**, across quests (20), raids (17), professions (19), class levels (24), exploration (11), collection (18), statistics (10), dungeons (16), gamemodes (7), guilds (6) and secrets (15).
 
 - [x] Draft the new list, then add it to `server/catalog/achievements.json`
 - [x] For any new trigger type, add a validation case in `server/catalog/catalog.go` and a detector in `WynntilsDetectors.java`
@@ -44,7 +44,7 @@ The unlock toast (`mc/UnlockToast.java`) still draws vanilla's `toast/advancemen
 
 ## 5. Shop pricing scales with achievements
 
-Retuned before launch so completionists can buy most of the shop: it costs **761 points** against **629 earnable**, so all achievements buy **82.7%** of it. `TestFontRulesAndPricing` checks the ratio stays within 80–85%. Ship future achievements and shop items together in batches to stay in that band; roughly 100 new achievement points pays for about 120 points of new items. Purchases keep their price paid, so never lower an existing price after launch; to make the shop cheaper, raise achievement points instead, which lifts every balance. New item kinds (glow, shaders) should cost more than rainbow.
+Retuned before launch so completionists can buy most of the shop: it costs **688 points** against **569 earnable**, so all achievements buy **82.7%** of it. `TestFontRulesAndPricing` checks the ratio stays within 80–85%. Ship future achievements and shop items together in batches to stay in that band; roughly 100 new achievement points pays for about 120 points of new items. Prices will change often during the beta as items and achievements are added, up or down; purchases keep their price paid, so repricing never changes a balance. New item kinds (glow, shaders) should cost more than rainbow.
 
 | Kind | Items | Price |
 | --- | --- | --- |

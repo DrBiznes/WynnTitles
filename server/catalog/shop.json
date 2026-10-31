@@ -108,126 +108,126 @@
     "id": "palette_red",
     "kind": "palette",
     "name": "Corrupted",
-    "price": 10,
+    "price": 9,
     "palette": "red"
   },
   {
     "id": "palette_red_purple",
     "kind": "palette",
     "name": "Blood Moon",
-    "price": 10,
+    "price": 9,
     "palette": "red_purple"
   },
   {
     "id": "palette_flame",
     "kind": "palette",
     "name": "Molten",
-    "price": 10,
+    "price": 9,
     "palette": "flame"
   },
   {
     "id": "palette_ember",
     "kind": "palette",
     "name": "Dwarven",
-    "price": 10,
+    "price": 9,
     "palette": "ember"
   },
   {
     "id": "palette_sunset",
     "kind": "palette",
     "name": "Sun-Stained",
-    "price": 10,
+    "price": 9,
     "palette": "sunset"
   },
   {
     "id": "palette_ocean",
     "kind": "palette",
     "name": "Seaskipper",
-    "price": 10,
+    "price": 9,
     "palette": "ocean"
   },
   {
     "id": "palette_ice",
     "kind": "palette",
     "name": "Underice",
-    "price": 10,
+    "price": 9,
     "palette": "ice"
   },
   {
     "id": "palette_toxic",
     "kind": "palette",
     "name": "Grootslang",
-    "price": 10,
+    "price": 9,
     "palette": "toxic"
   },
   {
     "id": "palette_forest",
     "kind": "palette",
     "name": "Taproot",
-    "price": 10,
+    "price": 9,
     "palette": "forest"
   },
   {
     "id": "palette_royal",
     "kind": "palette",
     "name": "Fruman",
-    "price": 10,
+    "price": 9,
     "palette": "royal"
   },
   {
     "id": "palette_void",
     "kind": "palette",
     "name": "Dernic",
-    "price": 10,
+    "price": 9,
     "palette": "void"
   },
   {
     "id": "palette_nebula",
     "kind": "palette",
     "name": "Ahmsord",
-    "price": 10,
+    "price": 9,
     "palette": "nebula"
   },
   {
     "id": "palette_borealis",
     "kind": "palette",
     "name": "Nesaak",
-    "price": 10,
+    "price": 9,
     "palette": "borealis"
   },
   {
     "id": "palette_storm",
     "kind": "palette",
     "name": "Thunderborn",
-    "price": 10,
+    "price": 9,
     "palette": "storm"
   },
   {
     "id": "palette_blossom",
     "kind": "palette",
     "name": "Aldorei",
-    "price": 10,
+    "price": 9,
     "palette": "blossom"
   },
   {
     "id": "palette_brass",
     "kind": "palette",
     "name": "Corkian",
-    "price": 10,
+    "price": 9,
     "palette": "brass"
   },
   {
     "id": "palette_ash",
     "kind": "palette",
     "name": "Lutho",
-    "price": 10,
+    "price": 9,
     "palette": "ash"
   },
   {
     "id": "animated_red",
     "kind": "animatedPalette",
     "name": "Heart of War",
-    "price": 16,
+    "price": 14,
     "palette": "red",
     "animation": "pulse"
   },
@@ -235,7 +235,7 @@
     "id": "animated_red_purple",
     "kind": "animatedPalette",
     "name": "Anathemic",
-    "price": 16,
+    "price": 14,
     "palette": "red_purple",
     "animation": "flow"
   },
@@ -243,7 +243,7 @@
     "id": "animated_flame",
     "kind": "animatedPalette",
     "name": "Eternal Flame",
-    "price": 16,
+    "price": 14,
     "palette": "flame",
     "animation": "flicker"
   },
@@ -251,7 +251,7 @@
     "id": "animated_ember",
     "kind": "animatedPalette",
     "name": "Dogun Cinders",
-    "price": 16,
+    "price": 14,
     "palette": "ember",
     "animation": "sparkle"
   },
@@ -259,7 +259,7 @@
     "id": "animated_sunset",
     "kind": "animatedPalette",
     "name": "Kingdom of Sand",
-    "price": 16,
+    "price": 14,
     "palette": "sunset",
     "animation": "flow"
   },
@@ -267,7 +267,7 @@
     "id": "animated_ocean",
     "kind": "animatedPalette",
     "name": "Wavebreaker",
-    "price": 16,
+    "price": 14,
     "palette": "ocean",
     "animation": "wave"
   },
@@ -275,7 +275,7 @@
     "id": "animated_ice",
     "kind": "animatedPalette",
     "name": "Theorick's Shard",
-    "price": 16,
+    "price": 14,
     "palette": "ice",
     "animation": "shimmer"
   },
@@ -283,7 +283,7 @@
     "id": "animated_toxic",
     "kind": "animatedPalette",
     "name": "Slime Symphony",
-    "price": 16,
+    "price": 14,
     "palette": "toxic",
     "animation": "flicker"
   },
@@ -291,7 +291,7 @@
     "id": "animated_forest",
     "kind": "animatedPalette",
     "name": "Amongst the Canopy",
-    "price": 16,
+    "price": 14,
     "palette": "forest",
     "animation": "wave"
   },
@@ -299,7 +299,7 @@
     "id": "animated_royal",
     "kind": "animatedPalette",
     "name": "Aelumian Crown",
-    "price": 16,
+    "price": 14,
     "palette": "royal",
     "animation": "shimmer"
   },
@@ -307,7 +307,7 @@
     "id": "animated_void",
     "kind": "animatedPalette",
     "name": "Eldritch",
-    "price": 16,
+    "price": 14,
     "palette": "void",
     "animation": "sparkle"
   },
@@ -315,7 +315,7 @@
     "id": "animated_nebula",
     "kind": "animatedPalette",
     "name": "Shooting Star",
-    "price": 16,
+    "price": 14,
     "palette": "nebula",
     "animation": "comet"
   },
@@ -323,7 +323,7 @@
     "id": "animated_borealis",
     "kind": "animatedPalette",
     "name": "Northern Veil",
-    "price": 16,
+    "price": 14,
     "palette": "borealis",
     "animation": "aurora"
   },
@@ -331,7 +331,7 @@
     "id": "animated_storm",
     "kind": "animatedPalette",
     "name": "Stormcaller",
-    "price": 16,
+    "price": 14,
     "palette": "storm",
     "animation": "charge"
   },
@@ -339,7 +339,7 @@
     "id": "animated_blossom",
     "kind": "animatedPalette",
     "name": "Lake Gylia",
-    "price": 16,
+    "price": 14,
     "palette": "blossom",
     "animation": "ripple"
   },
@@ -347,7 +347,7 @@
     "id": "animated_brass",
     "kind": "animatedPalette",
     "name": "Clockwork",
-    "price": 16,
+    "price": 14,
     "palette": "brass",
     "animation": "converge"
   },
@@ -355,7 +355,7 @@
     "id": "animated_ash",
     "kind": "animatedPalette",
     "name": "Beacon of Hope",
-    "price": 16,
+    "price": 14,
     "palette": "ash",
     "animation": "pulse"
   },
@@ -363,7 +363,7 @@
     "id": "animated_gaze",
     "kind": "animatedPalette",
     "name": "The Eye's Gaze",
-    "price": 16,
+    "price": 14,
     "palette": "gaze",
     "animation": "oculus"
   },
@@ -489,7 +489,7 @@
     "id": "font_pill",
     "kind": "font",
     "name": "Pill banner",
-    "price": 27,
+    "price": 22,
     "font": "minecraft:banner/pill",
     "allows": [
       "color"
@@ -500,7 +500,7 @@
     "id": "font_box",
     "kind": "font",
     "name": "Box banner",
-    "price": 27,
+    "price": 22,
     "font": "minecraft:banner/box",
     "allows": [
       "color"
@@ -511,7 +511,7 @@
     "id": "font_flag",
     "kind": "font",
     "name": "Flag banner",
-    "price": 27,
+    "price": 22,
     "font": "minecraft:banner/flag",
     "allows": [
       "color"
@@ -522,7 +522,7 @@
     "id": "font_ribbon",
     "kind": "font",
     "name": "Ribbon banner",
-    "price": 27,
+    "price": 22,
     "font": "minecraft:banner/ribbon",
     "allows": [
       "color"

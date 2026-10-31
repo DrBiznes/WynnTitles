@@ -68,7 +68,9 @@ public final class WynntilsDetectors {
 		detectors.put("professionLevel", new ProfessionLevelDetector());
 		detectors.put("professionLevelAll", new ProfessionLevelDetector());
 		detectors.put("location", WynntilsDetectors::location);
-		detectors.put("territorySet", new TerritorySetDetector(new VisitedTerritories(visitedFile)));
+		VisitedTerritories visited = new VisitedTerritories(visitedFile);
+		detectors.put("territorySet", new TerritorySetDetector(visited, false));
+		detectors.put("territoryAny", new TerritorySetDetector(visited, true));
 		detectors.put("coordinates", trigger -> nearby(trigger, new JsonObject()));
 		detectors.put("itemAtLocation", WynntilsDetectors::itemAtLocation);
 		detectors.put("inventoryItem", detector(WynntilsDetectors::inventoryItem, WynntilsDetectors::inventoryItemProgress));
@@ -292,12 +294,15 @@ public final class WynntilsDetectors {
 		private static final int SCAN_ATTEMPTS = 3;
 
 		private final VisitedTerritories visited;
+		/** Whether one listed place is enough, rather than all of them. */
+		private final boolean any;
 		private String scannedWorld;
 		private long scannedAt;
 		private int scanAttempts;
 
-		TerritorySetDetector(VisitedTerritories visited) {
+		TerritorySetDetector(VisitedTerritories visited, boolean any) {
 			this.visited = visited;
+			this.any = any;
 		}
 
 		@Override
@@ -313,10 +318,11 @@ public final class WynntilsDetectors {
 			if (territory != null) {
 				visited.add(character, territory.getName());
 			}
-			for (String name : trigger.territoryNames()) {
-				if (!visited.contains(character, name)) {
-					return null;
-				}
+			boolean met = any
+					? trigger.territoryNames().stream().anyMatch(name -> visited.contains(character, name))
+					: trigger.territoryNames().stream().allMatch(name -> visited.contains(character, name));
+			if (!met) {
+				return null;
 			}
 			long inContentBook = trigger.territoryNames().stream()
 					.filter(name -> discovered.contains(VisitedTerritories.key(name)))
@@ -331,7 +337,7 @@ public final class WynntilsDetectors {
 		@Override
 		public String progress(Trigger trigger) {
 			String character = character();
-			if (character == null) {
+			if (character == null || any) {
 				return null;
 			}
 			long done = trigger.territoryNames().stream().filter(name -> visited.contains(character, name)).count();
@@ -799,7 +805,7 @@ public final class WynntilsDetectors {
 		return count(best, trigger.level(), "levels");
 	}
 
-	/** One character with every listed gamemode at the level. A dead hardcore character loses the mode in the API. */
+	/** One character with every listed gamemode at the level. The API does not say whether a hardcore character is alive, so dead ones count. */
 	private static JsonObject gamemodeLevel(Trigger trigger) {
 		for (CharacterData character : characters()) {
 			if (character.level() >= trigger.level() && hasGamemodes(character, trigger)) {
