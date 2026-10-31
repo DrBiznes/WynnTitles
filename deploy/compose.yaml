@@ -1,0 +1,42 @@
+services:
+  wynntitles:
+    image: ghcr.io/drbiznes/wynntitles-server:latest
+    restart: unless-stopped
+    user: "${WT_UID:-568}:${WT_GID:-568}"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    # Keep a flood of traffic from slowing down the rest of the machine.
+    mem_limit: 256m
+    pids_limit: 128
+    cpus: 1.0
+    environment:
+      WT_ADDR: ":8080"
+      WT_DB: /data/wynntitles.db
+      WT_ADMIN_ADDR: ":8081"
+      WT_ADMIN_USERNAME: "${WT_ADMIN_USERNAME:-admin}"
+      WT_ADMIN_PASSWORD: "${WT_ADMIN_PASSWORD:?Set a random password of at least 24 characters}"
+      # The dashboard sees connections from Docker's gateway on this network.
+      WT_ADMIN_ALLOWED_CIDRS: "${WT_ADMIN_ALLOWED_CIDRS:-172.30.80.0/24}"
+      WT_DEV_UUID: "${WT_DEV_UUID:-}"
+    volumes:
+      - ${WT_DATA_DIR:-./data}:/data
+    # Both stay on this machine. Put HTTPS in front of 8080, and never expose
+    # 8081; see README.md.
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8081:8081"
+    stop_grace_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.30.80.0/24

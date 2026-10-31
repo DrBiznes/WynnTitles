@@ -39,7 +39,7 @@ The dev client points at `http://localhost:8080`; release builds default to `htt
 
 ## Hosting and moderation
 
-See [the complete Docker, Cloudflare and dashboard setup](deploy/README.md).
+Guilds and friend groups can run their own private server with their own achievements. See [Running your own WynnTitles server](deploy/README.md).
 The Go binary includes an optional server-rendered moderation console on `WT_ADMIN_ADDR`.
 It never mounts dashboard routes on the public API. The console supports player search,
 reported claim evidence, confirmed revoke/restore actions, purchase resets (one player or everyone), and an append-only audit history.

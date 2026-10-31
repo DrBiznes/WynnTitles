@@ -17,5 +17,6 @@ mod/logs/
 mod/out/
 mod/bin/
 
-# local deployment secrets
+# local deployment secrets and private setup notes
 deploy/.env
+deploy/private/
