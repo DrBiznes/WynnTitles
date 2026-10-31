@@ -11,6 +11,12 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.17.2 · 2026-10-31
+**Readable Emissary title**
+
+- Emissary's first gradient stop goes from `#5B6FA8` to `#7C8CB9`, which clears the contrast minimum in `EffectColorsTest.nativeStylesAreReadable`.
+- `mod_version` goes from 0.17.1 to 0.17.2.
+
 ## 0.17.1 · 2026-10-31
 **Config menu fix**
 
