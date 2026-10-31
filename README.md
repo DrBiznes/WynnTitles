@@ -1,5 +1,7 @@
 # WynnTitles
 
+![WynnTitles](docs/branding/banner.png)
+
 Earn title words from Wynncraft achievements and wear them above your name. Players use everything in game, with no separate account to create. An optional private moderation dashboard runs on its own listener.
 
 ```

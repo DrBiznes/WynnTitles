@@ -11,6 +11,13 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.15.1 · 2026-10-31
+**Mod icon and banner**
+
+- The placeholder mod icon is replaced: the DrBiznes head under a gold King's Recruit nametag.
+- The icon and a matching 468×200 banner live in `docs/branding`, and the README opens with the banner.
+- `mod_version` goes from 0.15.0 to 0.15.1.
+
 ## 0.15.0 · 2026-10-31
 **Native style for Sleuth**
 
