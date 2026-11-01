@@ -11,6 +11,50 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.19.0 · 2026-11-01
+**A smaller, stranger collection category**
+
+- Nine collection achievements are cut: Grandmother, Alkatraz, Pupil Hoarder, Wealthy Beyond Measure, Eyes Yet Open, Rib Collector, Redbeard's Beard, Mega Fern and Blazing Fireball.
+- Five replace them: **Warp** (Phased Drifter), **Idol** (Drowned Devotee), **Mama Zomble's Memory** (Mama's Favourite), **Coalescence** (Coalesced) and **Canned Abis** at 420 carried (Baked).
+- Five native-only animations: **phase**, **undertow**, **coalesce**, **kaleido** and **lullaby**. An achievement's two words may now share one native style.
+- Ingredients now unlock `inventoryItem` achievements. Their names end in a star tier, so Borange Fluff could never match before.
+- `inventoryItem` takes an optional `rarity`, so Idol ignores the False Idol helmet.
+- Every font is 1 point cheaper: 12 → 11, 18 → 17 and 22 → 21.
+- The title word test also rejects a word used as both a prefix and a suffix, and has its own test.
+- Catalog: 163 → **159 achievements / 561 pts**; shop stays at **65 items**, 688 → **678**, which keeps it 82.7% earnable.
+- `mod_version` goes from 0.18.3 to 0.19.0.
+
+## 0.18.3 · 2026-11-01
+**Smoke test exits cleanly on Windows**
+
+- `scripts/smoke-test.sh` waits for the test server to exit before deleting its database, so a passing run no longer exits 1 on `Device or resource busy`.
+- A temp file that can't be deleted no longer fails the run.
+- `mod_version` goes from 0.18.2 to 0.18.3.
+
+## 0.18.2 · 2026-11-01
+**Tab bar rivets sit centered**
+
+- The two rivets on the tab bar move up one pixel, to the middle of the bar's flat stone.
+- `mod_version` goes from 0.18.1 to 0.18.2.
+
+## 0.18.1 · 2026-11-01
+**Titles show in raids by default**
+
+- `hideTitlesInRaids` is now off by default. Configs that already saved the option keep their value.
+- `mod_version` goes from 0.18.0 to 0.18.1.
+
+## 0.18.0 · 2026-11-01
+**Live quest and dungeon unlocks, and fewer Content Book scans**
+
+- Quests and dungeons unlock from Wynncraft's chat messages as soon as they finish, instead of waiting for the Wynncraft API. The API still covers past completions, other characters and anything chat misses.
+- A corrupted win counts as its own dungeon, and a dungeon win that arrives twice counts once.
+- Dungeon counts add this session's clears to the API's count, so a 10-clear achievement no longer waits for the API on the last clear.
+- The `Models.Quest` check is gone, because nothing fills it. Evidence `source` is now `questChat`, `dungeonChat` or `wynncraftApi`.
+- The Content Book is scanned once per character per game launch, not on every world join, and `territorySet` and `territoryAny` share that scan. Places that are not territories now unlock at the next launch.
+- The Content Book goes back to the filter it was on before the scan.
+- New plan doc: `docs/LIVE_COMPLETION_EVENTS.md`.
+- `mod_version` goes from 0.17.2 to 0.18.0.
+
 ## 0.17.2 · 2026-10-31
 **Readable Emissary title**
 

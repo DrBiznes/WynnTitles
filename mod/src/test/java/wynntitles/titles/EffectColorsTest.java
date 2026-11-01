@@ -294,6 +294,69 @@ class EffectColorsTest {
 		assertTrue(EffectColors.luma(scattering[0]) > EffectColors.luma(scattering[4]), "the ends should still be brighter");
 	}
 
+	private static long scrambled(EffectColors.Letter[] letters) {
+		return Arrays.stream(letters).filter(l -> l.glyph() == EffectColors.Glyph.SCRAMBLED).count();
+	}
+
+	@Test
+	void phaseOpensARiftThenTheWordIsWhole() {
+		TitleEffect effect = animated("ice", TitleAnimation.PHASE);
+		int beat = TitleAnimation.PHASE.defaultCycleMs;
+		long start = T0 - T0 % beat;
+		assertTrue(scrambled(EffectColors.letters(effect, 12, start + 10)) > 0, "the rift should be open");
+		assertEquals(0, scrambled(EffectColors.letters(effect, 12, start + beat / 4)));
+	}
+
+	@Test
+	void undertowComesInFastAndCarriesOneBoldLetter() {
+		TitleEffect effect = new TitleEffect("gradient", List.of("#F0E2B6", "#E6FFF4", "#6FE8D0", "#38B6E8", "#5A97F2"), null, true, 0, TitleAnimation.UNDERTOW.id);
+		int beat = TitleAnimation.UNDERTOW.defaultCycleMs;
+		long start = T0 - T0 % beat;
+		int dry = 0xF0E2B6;
+		assertEquals(dry, EffectColors.colors(effect, 9, start)[8]);
+		int[] high = EffectColors.colors(effect, 9, start + beat * 35 / 100);
+		assertTrue(Arrays.stream(high).noneMatch(c -> c == dry), "high tide should cover the word");
+		for (int ms = 0; ms < beat; ms += 41) {
+			assertTrue(Arrays.stream(EffectColors.letters(effect, 9, start + ms)).filter(EffectColors.Letter::bold).count() <= 2);
+		}
+	}
+
+	@Test
+	void coalesceLocksFromTheEndsAndFlipsItsColors() {
+		TitleEffect effect = new TitleEffect("gradient", List.of("#FF6FB0", "#A78BFF", "#6FE3FF"), null, true, 0, TitleAnimation.COALESCE.id);
+		int beat = TitleAnimation.COALESCE.defaultCycleMs;
+		long even = (T0 / beat + (T0 / beat & 1)) * beat;
+		EffectColors.Letter[] locking = EffectColors.letters(effect, 9, even + beat / 5);
+		assertEquals(EffectColors.Glyph.PLAIN, locking[0].glyph());
+		assertEquals(EffectColors.Glyph.SCRAMBLED, locking[4].glyph());
+		int[] settled = EffectColors.colors(effect, 9, even + beat * 70 / 100);
+		assertEquals(0x6FE3FF, settled[0]);
+		assertEquals(0xFF6FB0, settled[8]);
+		assertEquals(0xFF6FB0, EffectColors.colors(effect, 9, even + beat + beat * 70 / 100)[0]);
+	}
+
+	@Test
+	void kaleidoMirrorsItsRingsAndKeepsTheWordReadable() {
+		TitleEffect effect = new TitleEffect("gradient", List.of("#FF5FD2", "#FF9A3D", "#FFF04D", "#5CFF8F", "#4DE8FF", "#B57CFF"), null, true, 0, TitleAnimation.KALEIDO.id);
+		int slips = 0, frames = 0, length = 5;
+		for (int ms = 0; ms < 42_000; ms += 29, frames++) {
+			slips += (int) scrambled(EffectColors.letters(effect, length, T0 + ms));
+		}
+		assertTrue(slips > 0, "letters should slip now and then");
+		assertTrue(slips < frames * length * 0.12, "most letters should stay readable, got " + slips);
+	}
+
+	@Test
+	void lullabyOnlyChangesColor() {
+		TitleEffect effect = new TitleEffect("gradient", List.of("#FFB0A8", "#FFD3A1", "#E8C3FF", "#BFE3A0"), null, true, 0, TitleAnimation.LULLABY.id);
+		int beat = TitleAnimation.LULLABY.defaultCycleMs;
+		for (int ms = 0; ms < beat; ms += 53) {
+			assertTrue(Arrays.stream(EffectColors.letters(effect, 9, T0 + ms))
+					.allMatch(l -> !l.bold() && l.glyph() == EffectColors.Glyph.PLAIN));
+		}
+		assertArrayEquals(EffectColors.colors(effect, 9, T0), EffectColors.colors(effect, 9, T0 + beat));
+	}
+
 	@Test
 	void oculusOpensFromTheMiddleGlancesThenShuts() {
 		TitleEffect effect = new TitleEffect("gradient", List.of("#C9A2FF", "#E8D0FF", "#7CE8E0"), null, true, 0, TitleAnimation.OCULUS.id);

@@ -119,7 +119,7 @@ public class WynnTitles implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
 			try {
 				WynntilsMod.registerEventListener(this);
-				WynntilsMod.registerEventListener(WynntilsDetectors.eventListener());
+				WynntilsDetectors.eventListeners().forEach(WynntilsMod::registerEventListener);
 				Nametags.hookPresent();
 			} catch (Throwable t) {
 				LOGGER.error("Wynntils changed its events; WynnTitles will not load on Wynncraft", t);

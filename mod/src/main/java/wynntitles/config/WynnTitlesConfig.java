@@ -15,7 +15,7 @@ public class WynnTitlesConfig implements ConfigData {
 	public boolean showTitles = true;
 
 	@ConfigEntry.Gui.Tooltip
-	public boolean hideTitlesInRaids = true;
+	public boolean hideTitlesInRaids = false;
 
 	/** Nametag title size, in percent of the name's. */
 	@ConfigEntry.Gui.Tooltip

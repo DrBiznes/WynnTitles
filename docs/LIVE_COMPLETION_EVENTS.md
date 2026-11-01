@@ -2,7 +2,9 @@
 
 Plan for detecting quest and dungeon completions from Wynncraft's chat messages, so that these achievements come from the Wynncraft API plus our own live events. No Content Book scan is involved.
 
-Status: planned, nothing built yet. Step 1 needs a real game session, because the exact chat text has not been captured.
+Status: shipped in 0.18.0 and tested on Wynncraft. Discoveries, party wins, failed dungeons and mini-quests have no live trigger on purpose: they rely on the Wynncraft API and the Content Book scan.
+
+The same update changes the scan that `territorySet` and `territoryAny` use. See [Content Book scans](#content-book-scans).
 
 ## Why
 
@@ -38,27 +40,23 @@ public void onChat(ChatMessageEvent.Match event) {
 
 ## Step 1: capture the real text
 
-We do not know the exact messages. The dev logs have no chat lines, and web searches did not find them. Do not write a pattern from memory: Wynntils' own patterns include exact color codes, so ours may need to as well.
+Captured on 2026-11-01 with a temporary mod, since removed, that logged every chat message, title and subtitle:
 
-1. Add a temporary listener that logs every `ChatMessageEvent.Match`, title and subtitle. For chat, log `getRecipientType()` and the raw `StyledText` with its formatting codes.
-2. Play these cases and record the output in the table below:
+| Case | Captured text | Recipient type |
+|---|---|---|
+| Normal dungeon win | `§6Great job! You've completed the DecrepitÀÀÀSewers Dungeon!` (from `latest.log`) | Not captured, assumed `INFO` |
+| Corrupted dungeon win | `§6Great job! You've completed the CorruptedÀÀÀDecrepitÀÀÀSewers Dungeon!` | `INFO` |
+| Quest finished | `<padding>§6[Quest Completed]`, then `<padding>§e§lDearly Departed` as the next message | `INFO` |
 
-| Case | Why it is needed | Captured text | Recipient type |
-|---|---|---|---|
-| Normal dungeon win | The main pattern | | |
-| Corrupted dungeon win | Must be told apart from normal | | |
-| Dungeon win in a party | Must count for each member | | |
-| Quest finished | The main pattern | | |
-| Mini-quest finished | Must not count as a quest, unless the names overlap harmlessly | | |
-| Quest with odd characters in its name | `???`, `Dwarves and Doguns Part IV` | | |
-| Failed dungeon | Must not match | | |
-| Another player's completion, if it is announced | Must not match | | |
+What the capture settled:
 
-3. Answer these from the capture:
-   - Does the name appear on the same line as the completion text? If not, the listener has to remember the header line and read the name from the next message.
-   - Is the name in the message spelled the same as in `server/catalog/achievements.json`? Check apostrophes in `Galleon's Graveyard` and the hyphen in `Sand-Swept Tomb`.
-   - Does the message come through as chat at all, or only as a title?
-4. Remove the temporary listener before merging.
+- Both come through as chat, so titles are not needed.
+- A dungeon's name is on the completion line, and a corrupted win says `Corrupted`. Wynncraft draws its spaces with `À`, so a run of those becomes a space.
+- A quest's name is the next message after the header.
+- Quest lines start with a padding glyph that depends on the name's length, such as `U+D0074`. These are unassigned code points, not private use ones, so the patterns allow any text without a `§` there.
+- The whole dungeon win block arrived twice in the same second, as separate events. Repeats within 10 seconds count once. It is not known whether this happens every time.
+
+Not captured: names with `'` or `-`, like `Galleon's Graveyard` and `Sand-Swept Tomb`, and the quests `???` and `Dwarves and Doguns Part IV`. If one of them differs from `server/catalog/achievements.json`, that unlock waits for the API.
 
 ## Step 2: the listener
 
@@ -86,7 +84,7 @@ Rules:
 - **Normalize names** with the existing `WynntilsDetectors.key()`, which lowercases them.
 - **Keep the patterns together** at the top of the class, so a Wynncraft wording change is a one-place fix.
 
-Registration: `WynntilsDetectors.eventListener()` returns only `RAIDS` today, and `WynnTitles.java` registers that one object. Make it register `LiveCompletions` as well, inside the existing `try` block, because that block already handles Wynntils changing its events.
+Registration: `WynntilsDetectors.eventListeners()` returns `RAIDS` and a small chat listener that passes `INFO` messages to `LiveCompletions`. `LiveCompletions` has no Wynntils types, so unit tests can call it. `WynnTitles.java` registers both inside the existing `try` block, because that block already handles Wynntils changing its events.
 
 ## Step 3: the detectors
 
@@ -135,6 +133,16 @@ Add `mod/src/test/java/wynntitles/achievements/LiveCompletionsTest.java`, using 
 
 Then run `scripts/smoke-test.sh`, and in-game finish one dungeon and one quest and confirm each unlocks within a couple of seconds.
 
+## Content Book scans
+
+`territorySet` and `territoryAny` still need `Models.Discovery.reloadDiscoveries`, which scans three filters and leaves the book on the last one. Wynntils has a `RESET_FILTERS` constant, but it is false and the restore step is compiled out of the jar, so there is nothing to switch on.
+
+- **Fewer scans:** `DiscoveryScans` scans each character once per game launch, not once per world join, and both detectors share it. A discovery that is not a territory now counts from the next launch. A scan that leaves nothing to read is still retried up to 3 times.
+- **Filter restore:** `ContentBookFilter` queues its own Wynntils queries around the scan: read the active filter from the Filter item in slot 66, run the scan, then click slot 66 until the saved filter is back. Queries run in order, so all three start together.
+- **Failures:** a retried scan keeps the filter saved before the first one. A failed restore is retried up to 3 times, a minute apart, and only while a place set is still locked. A failed save skips the restore and never blocks the scan.
+
+This only covers scans that WynnTitles starts. A scan Wynntils starts itself, such as from its Content Book screen, can still change the filter.
+
 ## When the text changes
 
 | Failure | Result |
@@ -153,8 +161,11 @@ A wording change costs a few minutes of delay and never a wrong unlock, so it ne
 
 ## Done when
 
-- [ ] The capture table is filled in and the temporary listener is gone
-- [ ] `LiveCompletions` is added, registered and tested
-- [ ] `quest`, `dungeon` and `dungeonSet` use it, and `Models.Quest` is gone
-- [ ] Tested in game
-- [ ] `docs/CHANGELOG.md` is updated and this doc is removed or marked as shipped
+- [x] The capture table is filled in
+- [x] The temporary capture mod is deleted
+- [x] `LiveCompletions` is added, registered and tested
+- [x] `quest`, `dungeon` and `dungeonSet` use it, and `Models.Quest` is gone
+- [x] Scans run once per character per launch, and the filter is restored
+- [x] Tested on Wynncraft
+- [x] `docs/CHANGELOG.md` is updated
+- [x] This doc is marked as shipped

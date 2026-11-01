@@ -179,18 +179,25 @@ var palettes = map[string]bool{
 //   - ascend: each color wipes over the last, and the final one lands and holds bold
 //   - reel: letters spin scrambled, lock in from the left, then a gleam crosses
 //   - prism: the word flashes white, and the light scatters into its colors
+//   - phase: rifts open at random, scrambling the letters inside them
+//   - undertow: a tide rolls in fast and drains slowly, a bold letter on its foam
+//   - coalesce: scattered letters lock in from both ends, flash, and their colors invert
+//   - kaleido: mirrored rings of color spin through a drifting gradient as letters slip
+//   - lullaby: the colors rock gently back and forth under a soft glow
 var animations = map[string]bool{
 	"flow": true, "pulse": true, "shimmer": true, "wave": true, "flicker": true, "sparkle": true,
 	"comet": true, "aurora": true, "charge": true, "ripple": true, "converge": true, "oculus": true,
 	"decipher": true, "glitch": true, "eclipse": true, "strike": true, "heartbeat": true, "swell": true,
-	"ascend": true, "reel": true, "prism": true,
+	"ascend": true, "reel": true, "prism": true, "phase": true, "undertow": true, "coalesce": true,
+	"kaleido": true, "lullaby": true,
 }
 
 // nativeOnly animations belong to achievements' native styles and are never
 // sold, like obfuscated, so the biggest titles have looks nobody can buy.
 var nativeOnly = map[string]bool{
 	"decipher": true, "glitch": true, "eclipse": true, "strike": true, "heartbeat": true, "swell": true,
-	"ascend": true, "reel": true, "prism": true,
+	"ascend": true, "reel": true, "prism": true, "phase": true, "undertow": true, "coalesce": true,
+	"kaleido": true, "lullaby": true,
 }
 
 var namedColors = map[string]bool{
@@ -326,6 +333,10 @@ func validateTrigger(t *Trigger) error {
 	case "inventoryItem":
 		need("itemName", t.ItemName != "")
 		need("amount", t.Amount > 0)
+		// Names match by ending, so a rarity tells Idol from the False Idol helmet.
+		if t.Rarity != "" && !rarities[t.Rarity] {
+			return fmt.Errorf("unknown trigger.rarity %q", t.Rarity)
+		}
 	case "raid":
 		need("raidName", t.RaidName != "")
 		need("amount", t.Amount > 0)

@@ -126,6 +126,18 @@ public final class EffectColors {
 	/** Oculus: when in the beat the lids finish opening and start closing, the share they take to shut, and the iris's glances per beat. */
 	private static final float OCULUS_OPEN = 0.14f, OCULUS_CLOSE = 0.82f, OCULUS_SHUT = 0.1f;
 	private static final int OCULUS_GLANCES = 4;
+	/** Phase: rifts per beat, and the share of each one's turn it stays open. */
+	private static final int RIFTS = 3;
+	private static final float RIFT_OPEN = 0.42f;
+	/** Undertow: when the tide is fully in, and where the wet end of the palette starts. */
+	private static final float HIGH_TIDE = 0.35f, WET = 0.5f;
+	/** Coalesce: when the last letters lock, the colors have swapped, and the word starts scattering. */
+	private static final float LOCKED = 0.46f, SWAPPED = 0.56f, SCATTER = 0.9f;
+	/** Kaleido: slips per beat, and the share of letters that slip each time. */
+	private static final int SLIPS = 8;
+	private static final float SLIP_SHARE = 0.06f;
+	/** Lullaby: how far the colors rock along the word, and the strength of the glow that follows them. */
+	private static final float ROCK = 0.22f, GLOW = 0.28f;
 
 	/** How a letter is drawn besides its color: as itself, scrambled (obfuscated), or as its Wynnic rune. */
 	public enum Glyph { PLAIN, SCRAMBLED, RUNE }
@@ -241,7 +253,93 @@ public final class EffectColors {
 			case REEL -> reel(ramp, position, i, length, phase);
 			case PRISM -> Letter.of(prism(ramp, position, phase));
 			case OCULUS -> oculus(ramp, position, i, length, phase, now / cycle);
+			case PHASE -> phase(ramp, position, i, length, phase, now / Math.max(cycle / RIFTS, 1));
+			case UNDERTOW -> undertow(ramp, i, length, phase);
+			case COALESCE -> coalesce(ramp, position, i, phase, now / cycle);
+			case KALEIDO -> kaleido(ramp, position, i, now, cycle);
+			case LULLABY -> Letter.of(lullaby(ramp, position, phase));
 		};
+	}
+
+	/**
+	 * Rifts open at a new random spot a few times a beat: the letters inside
+	 * scramble and the ones beside them catch the light, then the word is whole.
+	 */
+	private static Letter phase(Ramp ramp, float position, int i, int length, float phase, long rift) {
+		int base = ramp.loop(0.5f * position + phase);
+		if (frac(phase * RIFTS) > RIFT_OPEN) {
+			return Letter.of(base);
+		}
+		float d = Math.abs(i - hash01(rift, 3) * (length - 1));
+		if (d <= 1.1f) {
+			return new Letter(mix(ramp.lightest(), WHITE, 0.4f), false, Glyph.SCRAMBLED);
+		}
+		return Letter.of(d <= 2.2f ? mix(base, WHITE, 0.45f) : base);
+	}
+
+	/**
+	 * The tide comes in fast over the palette's dry first color and drains
+	 * slowly, darker the deeper it runs. The letter at the waterline rides the
+	 * foam, bold; only that one is, so the word barely changes width.
+	 */
+	private static Letter undertow(Ramp ramp, int i, int length, float phase) {
+		float level = phase < HIGH_TIDE ? smooth(phase / HIGH_TIDE) : 1 - smooth((phase - HIGH_TIDE) / (1 - HIGH_TIDE));
+		float depth = level * (length + 3) - 1.5f - i;
+		if (Math.abs(depth) < 0.6f) {
+			return new Letter(ramp.at(1f / Math.max(ramp.stops() - 1, 1)), true, Glyph.PLAIN);
+		}
+		if (depth < 0) {
+			return Letter.of(ramp.at(0));
+		}
+		float swell = 0.08f * (float) Math.sin(2 * Math.PI * (phase * 3 - i / 5f));
+		return Letter.of(ramp.at(Math.clamp(WET + (1 - WET) * depth / length + swell, WET - 0.05f, 1f)));
+	}
+
+	/**
+	 * Letters scatter, lock in from both ends to the middle with a flash, and
+	 * land with the gradient flipped, so each beat starts where the last ended.
+	 */
+	private static Letter coalesce(Ramp ramp, float position, int i, float phase, long beat) {
+		float before = (beat & 1) == 0 ? position : 1 - position;
+		float lock = 0.04f + 0.34f * (1 - Math.abs(position - 0.5f) * 2);
+		if (phase < lock) {
+			return new Letter(ramp.loop(position + hash01(i, (long) (phase * 50))), false, Glyph.SCRAMBLED);
+		}
+		if (phase < LOCKED) {
+			return Letter.of(mix(ramp.at(before), WHITE, 1 - (phase - lock) / 0.05f));
+		}
+		int flipped = ramp.at(1 - before);
+		if (phase < SWAPPED) {
+			return Letter.of(mix(WHITE, flipped, (phase - LOCKED) / (SWAPPED - LOCKED)));
+		}
+		if (hash01(i, beat + 5) >= (phase - SCATTER) / (1 - SCATTER)) {
+			return Letter.of(flipped);
+		}
+		return new Letter(ramp.loop(position + hash01(i, beat)), false, Glyph.SCRAMBLED);
+	}
+
+	/**
+	 * Rings mirrored about the middle spin one way through a gradient drifting
+	 * the other, blended round the hue wheel at a speed that never lines up with
+	 * either. A letter or two slips out of reality now and then.
+	 */
+	private static Letter kaleido(Ramp ramp, float position, int i, long now, int cycle) {
+		float distance = Math.abs(position - 0.5f) * 2;
+		float rings = (now % cycle) / (float) cycle;
+		long slow = Math.max(1, Math.round(cycle * AURORA_SECOND));
+		long blend = Math.max(1, Math.round(cycle * AURORA_BLEND));
+		float drift = (now % slow) / (float) slow;
+		float k = 0.5f + 0.5f * (float) Math.sin(2 * Math.PI * ((now % blend) / (float) blend + distance));
+		int color = mixHue(ramp.loop(0.9f * distance - rings), ramp.loop(0.7f * position + drift), k);
+		long slip = now / Math.max(cycle / SLIPS, 1);
+		return hash01(i, slip) < SLIP_SHARE ? new Letter(mix(color, WHITE, 0.3f), false, Glyph.SCRAMBLED) : Letter.of(color);
+	}
+
+	/** The gradient rocks slowly side to side like a cradle, a soft glow swaying with it. */
+	private static int lullaby(Ramp ramp, float position, float phase) {
+		float sway = (float) Math.sin(2 * Math.PI * phase);
+		float glow = 0.5f + 0.5f * (float) Math.cos(2 * Math.PI * (position - 0.5f - 0.5f * sway));
+		return mix(ramp.loop(0.6f * position + ROCK * sway), WHITE, GLOW * glow * glow);
 	}
 
 	/**

@@ -25,6 +25,9 @@ public final class Nametags {
 	private static final String HOOKED_METHOD = "addAccountTypeNametag";
 	private static final String NAMETAG_CLASS = FEATURE_CLASS + "$CustomNametag";
 
+	/** Wynntils stacks each line one line height times its scale up, which leaves the backings touching. */
+	private static final float TITLE_GAP = 0.1f;
+
 	private static final MethodHandle NEW_NAMETAG = findConstructor();
 
 	/** Set by the first failure; a broken hook would otherwise log every frame. */
@@ -73,6 +76,7 @@ public final class Nametags {
 		if (nametags.isEmpty()) {
 			nametags.add(NEW_NAMETAG.invoke(event.getEntityRenderState().nameTag, 1f));
 		}
+		nametags.add(NEW_NAMETAG.invoke(Component.empty(), TITLE_GAP));
 		Component text = TitleRenderer.render(title);
 		nametags.add(NEW_NAMETAG.invoke(text, WynnTitlesConfig.get().titleScale / 100f));
 	}

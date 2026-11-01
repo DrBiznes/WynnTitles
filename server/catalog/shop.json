@@ -405,7 +405,7 @@
     "id": "font_wynncraft",
     "kind": "font",
     "name": "Wynncraft",
-    "price": 12,
+    "price": 11,
     "font": "minecraft:language/wynncraft",
     "allows": [
       "color",
@@ -419,7 +419,7 @@
     "id": "font_small_caps",
     "kind": "font",
     "name": "Small caps",
-    "price": 12,
+    "price": 11,
     "font": "minecraft:language/five",
     "allows": [
       "color",
@@ -433,7 +433,7 @@
     "id": "font_outline",
     "kind": "font",
     "name": "Outline",
-    "price": 12,
+    "price": 11,
     "font": "minecraft:language/wynncraft_outline",
     "allows": [
       "color",
@@ -447,7 +447,7 @@
     "id": "font_wynnic",
     "kind": "font",
     "name": "Wynnic",
-    "price": 18,
+    "price": 17,
     "font": "minecraft:language/wynnic",
     "allows": [
       "color",
@@ -461,7 +461,7 @@
     "id": "font_high_gavellian",
     "kind": "font",
     "name": "High Gavellian",
-    "price": 18,
+    "price": 17,
     "font": "minecraft:language/high_gavellian",
     "allows": [
       "color",
@@ -475,7 +475,7 @@
     "id": "font_old_fruman",
     "kind": "font",
     "name": "Old Fruman",
-    "price": 18,
+    "price": 17,
     "font": "minecraft:language/old_fruman",
     "allows": [
       "color",
@@ -489,7 +489,7 @@
     "id": "font_pill",
     "kind": "font",
     "name": "Pill banner",
-    "price": 22,
+    "price": 21,
     "font": "minecraft:banner/pill",
     "allows": [
       "color"
@@ -500,7 +500,7 @@
     "id": "font_box",
     "kind": "font",
     "name": "Box banner",
-    "price": 22,
+    "price": 21,
     "font": "minecraft:banner/box",
     "allows": [
       "color"
@@ -511,7 +511,7 @@
     "id": "font_flag",
     "kind": "font",
     "name": "Flag banner",
-    "price": 22,
+    "price": 21,
     "font": "minecraft:banner/flag",
     "allows": [
       "color"
@@ -522,7 +522,7 @@
     "id": "font_ribbon",
     "kind": "font",
     "name": "Ribbon banner",
-    "price": 22,
+    "price": 21,
     "font": "minecraft:banner/ribbon",
     "allows": [
       "color"

@@ -299,8 +299,9 @@ def bar():
                 col = STONE
             cv.set(x, y, col)
     rounded(cv, 2)
-    cv.stamp(3, H // 2 - 1, RIVET, STONE_PAL)
-    cv.stamp(W - 6, H // 2 - 1, RIVET, STONE_PAL)
+    # Centred on the flat stone, rows 2-14: the bottom edge's shading takes up the two rows below it.
+    cv.stamp(3, H // 2 - 2, RIVET, STONE_PAL)
+    cv.stamp(W - 6, H // 2 - 2, RIVET, STONE_PAL)
     return cv, dict(width=W, height=H, border=dict(left=8, right=8, top=4, bottom=4))
 
 

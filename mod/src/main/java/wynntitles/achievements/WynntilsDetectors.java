@@ -4,8 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.text.StyledText;
+import com.wynntils.handlers.chat.event.ChatMessageEvent;
+import com.wynntils.handlers.chat.type.RecipientType;
 import com.wynntils.models.activities.discoveries.DiscoveryInfo;
-import com.wynntils.models.activities.type.ActivityStatus;
 import com.wynntils.models.activities.type.DiscoveryType;
 import com.wynntils.models.character.type.CharacterGamemode;
 import com.wynntils.models.character.type.ClassType;
@@ -49,12 +50,23 @@ import wynntitles.mc.Mc;
 public final class WynntilsDetectors {
 	private static final PlayerProfile PROFILE = new PlayerProfile();
 	private static final RaidDetector RAIDS = new RaidDetector();
+	private static final LiveCompletions LIVE = new LiveCompletions();
 
 	private WynntilsDetectors() {}
 
-	/** Detectors that listen for Wynntils events; register it once Wynntils has started. */
-	public static Object eventListener() {
-		return RAIDS;
+	/** Objects that listen for Wynntils events; register them once Wynntils has started. */
+	public static List<Object> eventListeners() {
+		return List.of(RAIDS, new CompletionChat());
+	}
+
+	/** Only INFO counts: it is the channel Wynncraft uses for these, and players cannot type in it. */
+	private static final class CompletionChat {
+		@SubscribeEvent
+		public void onChat(ChatMessageEvent.Match event) {
+			if (event.getRecipientType() == RecipientType.INFO) {
+				LIVE.onMessage(event.getMessage().getString(), System.currentTimeMillis());
+			}
+		}
 	}
 
 	/** Each character's visited places for territorySet triggers are kept in visitedFile. */
@@ -69,8 +81,10 @@ public final class WynntilsDetectors {
 		detectors.put("professionLevelAll", new ProfessionLevelDetector());
 		detectors.put("location", WynntilsDetectors::location);
 		VisitedTerritories visited = new VisitedTerritories(visitedFile);
-		detectors.put("territorySet", new TerritorySetDetector(visited, false));
-		detectors.put("territoryAny", new TerritorySetDetector(visited, true));
+		DiscoveryScans scans = new DiscoveryScans();
+		ContentBookFilter filter = new ContentBookFilter(scans);
+		detectors.put("territorySet", new TerritorySetDetector(visited, false, scans, filter));
+		detectors.put("territoryAny", new TerritorySetDetector(visited, true, scans, filter));
 		detectors.put("coordinates", trigger -> nearby(trigger, new JsonObject()));
 		detectors.put("itemAtLocation", WynntilsDetectors::itemAtLocation);
 		detectors.put("inventoryItem", detector(WynntilsDetectors::inventoryItem, WynntilsDetectors::inventoryItemProgress));
@@ -284,25 +298,24 @@ public final class WynntilsDetectors {
 	/**
 	 * Every listed place visited on one character. Places come from the Content
 	 * Book's discoveries, which Wynntils only reads when asked, so this asks once
-	 * each time a character joins a world, and only while a set is locked. A
-	 * discovery that is not a territory, like The Moon or a library, therefore
-	 * counts from the next join. Territories count straight away, from where the
-	 * character stands.
+	 * per character each game launch, and only while a set is locked. A discovery
+	 * that is not a territory, like The Moon or a library, therefore counts from
+	 * the next launch. Territories count straight away, from where the character
+	 * stands.
 	 */
 	private static final class TerritorySetDetector implements Detector {
-		private static final long SCAN_RETRY_MS = 60_000;
-		private static final int SCAN_ATTEMPTS = 3;
-
 		private final VisitedTerritories visited;
 		/** Whether one listed place is enough, rather than all of them. */
 		private final boolean any;
-		private String scannedWorld;
-		private long scannedAt;
-		private int scanAttempts;
+		/** Shared by both detectors, so one launch does not scan for each. */
+		private final DiscoveryScans scans;
+		private final ContentBookFilter filter;
 
-		TerritorySetDetector(VisitedTerritories visited, boolean any) {
+		TerritorySetDetector(VisitedTerritories visited, boolean any, DiscoveryScans scans, ContentBookFilter filter) {
 			this.visited = visited;
 			this.any = any;
+			this.scans = scans;
+			this.filter = filter;
 		}
 
 		@Override
@@ -355,20 +368,17 @@ public final class WynntilsDetectors {
 
 		/** A failed scan leaves nothing to read, so that is what is retried; a query fails if a menu is open. */
 		private void scanDiscoveries(String character) {
-			String world = character + "@" + Models.WorldState.getCurrentWorldName();
-			long now = System.currentTimeMillis();
-			if (!world.equals(scannedWorld)) {
-				scanAttempts = 0;
-			} else if (scanAttempts >= SCAN_ATTEMPTS
-					|| now - scannedAt < SCAN_RETRY_MS
-					|| Models.Discovery.getAllDiscoveriesForType(DiscoveryType.TERRITORY).findAny().isPresent()) {
+			if (Mc.screen() != null) {
 				return;
 			}
-			if (Mc.screen() == null) {
-				scannedWorld = world;
-				scannedAt = now;
-				scanAttempts++;
+			long now = System.currentTimeMillis();
+			boolean hasResults = Models.Discovery.getAllDiscoveriesForType(DiscoveryType.TERRITORY).findAny().isPresent();
+			if (scans.scanDue(character, now, hasResults)) {
+				filter.save();
 				Models.Discovery.reloadDiscoveries(true, true, true);
+				filter.restore();
+			} else if (scans.restoreDue(now)) {
+				filter.restore();
 			}
 		}
 
@@ -402,7 +412,7 @@ public final class WynntilsDetectors {
 	}
 
 	private static JsonObject itemAtLocation(Trigger trigger) {
-		if (!Models.Character.hasCharacter() || Models.Inventory.getAmountInInventory(trigger.itemName()) < 1) {
+		if (!Models.Character.hasCharacter() || carriedAmount(trigger) < 1) {
 			return null;
 		}
 		JsonObject evidence = new JsonObject();
@@ -410,11 +420,31 @@ public final class WynntilsDetectors {
 		return nearby(trigger, evidence);
 	}
 
+	/**
+	 * How many of the trigger's item are carried or worn. Ingredient names end in
+	 * their star tier, which getAmountInInventory's name ending never matches, so
+	 * they are counted by Wynntils' ingredient name. A rarity narrows the match:
+	 * "Idol" alone also ends the False Idol helmet.
+	 */
+	private static int carriedAmount(Trigger trigger) {
+		if (trigger.rarity() == null) {
+			return Math.max(Models.Inventory.getAmountInInventory(trigger.itemName()),
+					Models.Inventory.getIngredientAmountInInventory(trigger.itemName()));
+		}
+		int amount = 0;
+		for (ItemStack stack : Mc.inventory()) {
+			if (!stack.isEmpty() && hasRarity(stack, trigger.rarity()) && carriedName(stack).endsWith(trigger.itemName())) {
+				amount += stack.getCount();
+			}
+		}
+		return amount;
+	}
+
 	private static JsonObject inventoryItem(Trigger trigger) {
 		if (!Models.Character.hasCharacter()) {
 			return null;
 		}
-		int amount = Models.Inventory.getAmountInInventory(trigger.itemName());
+		int amount = carriedAmount(trigger);
 		if (amount < trigger.amount()) {
 			return null;
 		}
@@ -427,16 +457,21 @@ public final class WynntilsDetectors {
 		if (!Models.Character.hasCharacter()) {
 			return null;
 		}
-		return count(Models.Inventory.getAmountInInventory(trigger.itemName()), trigger.amount(), "carried");
+		return count(carriedAmount(trigger), trigger.amount(), "carried");
 	}
 
-	/** Item names the way Wynntils matches them in getAmountInInventory, worn items included. */
+	/** An item's name the way Wynntils matches it in getAmountInInventory. */
+	private static String carriedName(ItemStack stack) {
+		String name = StyledText.fromComponent(stack.getHoverName()).getNormalized().trim().getString();
+		return WynnUtils.stripItemNameMarkers(name, false);
+	}
+
+	/** Every carried item's name, worn items included. */
 	private static List<String> carriedNames() {
 		List<String> names = new ArrayList<>();
 		for (ItemStack stack : Mc.inventory()) {
 			if (!stack.isEmpty()) {
-				String name = StyledText.fromComponent(stack.getHoverName()).getNormalized().trim().getString();
-				names.add(WynnUtils.stripItemNameMarkers(name, false));
+				names.add(carriedName(stack));
 			}
 		}
 		return names;
@@ -481,14 +516,17 @@ public final class WynntilsDetectors {
 	private static int rarityCount(Trigger trigger) {
 		int count = 0;
 		for (ItemStack stack : Mc.inventory()) {
-			boolean matches = Models.Item.asWynnItemProperty(stack, GearTierItemProperty.class)
-					.map(item -> item.getGearTier().name().equalsIgnoreCase(trigger.rarity()))
-					.orElse(false);
-			if (matches) {
+			if (hasRarity(stack, trigger.rarity())) {
 				count++;
 			}
 		}
 		return count;
+	}
+
+	private static boolean hasRarity(ItemStack stack, String rarity) {
+		return Models.Item.asWynnItemProperty(stack, GearTierItemProperty.class)
+				.map(item -> item.getGearTier().name().equalsIgnoreCase(rarity))
+				.orElse(false);
 	}
 
 	private static String itemRarityCountProgress(Trigger trigger) {
@@ -606,21 +644,19 @@ public final class WynntilsDetectors {
 	}
 
 	/**
-	 * Checks the quest book Wynntils keeps for the current character, and the
-	 * Wynncraft API so quests finished on other characters count too.
+	 * Quests seen finishing in chat since the game started, and the Wynncraft
+	 * API so past quests and ones finished on other characters count too.
 	 */
 	private static final class QuestDetector implements Detector {
 		@Override
 		public JsonObject check(Trigger trigger) {
 			String quest = trigger.questName();
-			boolean inQuestBook = Models.Quest.getQuestFromName(quest)
-					.map(info -> info.status() == ActivityStatus.COMPLETED)
-					.orElse(false);
-			if (!inQuestBook && !completedOnAccount().contains(quest.toLowerCase(Locale.ROOT))) {
+			boolean inChat = LIVE.questCompleted(quest);
+			if (!inChat && !completedOnAccount().contains(quest.toLowerCase(Locale.ROOT))) {
 				return null;
 			}
 			JsonObject evidence = new JsonObject();
-			evidence.addProperty("source", inQuestBook ? "questBook" : "wynncraftApi");
+			evidence.addProperty("source", inChat ? "questChat" : "wynncraftApi");
 			return evidence;
 		}
 
@@ -698,37 +734,43 @@ public final class WynntilsDetectors {
 		return completed;
 	}
 
+	/** Clears on the whole account: the API's count plus the ones seen in chat that it has not reached yet. */
+	private static int dungeonCount(String dungeon) {
+		Integer onAccount = PROFILE.get() == null ? null : completions(GlobalData::dungeons).getOrDefault(key(dungeon), 0);
+		return LIVE.dungeonCount(dungeon, onAccount);
+	}
+
 	private static JsonObject dungeon(Trigger trigger) {
-		int completions = completions(GlobalData::dungeons).getOrDefault(key(trigger.dungeonName()), 0);
+		int completions = dungeonCount(trigger.dungeonName());
 		if (completions < trigger.amount()) {
 			return null;
 		}
+		int onAccount = completions(GlobalData::dungeons).getOrDefault(key(trigger.dungeonName()), 0);
 		JsonObject evidence = new JsonObject();
+		evidence.addProperty("source", completions > onAccount ? "dungeonChat" : "wynncraftApi");
 		evidence.addProperty("completions", completions);
 		return evidence;
 	}
 
 	private static String dungeonProgress(Trigger trigger) {
-		if (PROFILE.get() == null) {
+		if (PROFILE.get() == null && LIVE.dungeonClears(trigger.dungeonName()) == 0) {
 			return null;
 		}
-		return count(completions(GlobalData::dungeons).getOrDefault(key(trigger.dungeonName()), 0), trigger.amount(), "clears");
+		return count(dungeonCount(trigger.dungeonName()), trigger.amount(), "clears");
 	}
 
 	private static String dungeonSetProgress(Trigger trigger) {
-		if (PROFILE.get() == null) {
+		long done = trigger.dungeonNames().stream().filter(d -> dungeonCount(d) > 0).count();
+		if (PROFILE.get() == null && done == 0) {
 			return null;
 		}
-		Map<String, Integer> completed = completions(GlobalData::dungeons);
-		long done = trigger.dungeonNames().stream().filter(d -> completed.getOrDefault(key(d), 0) > 0).count();
 		return count(done, trigger.dungeonNames().size(), "dungeons cleared");
 	}
 
 	private static JsonObject dungeonSet(Trigger trigger) {
-		Map<String, Integer> completed = completions(GlobalData::dungeons);
 		JsonObject evidence = new JsonObject();
 		for (String dungeon : trigger.dungeonNames()) {
-			int completions = completed.getOrDefault(key(dungeon), 0);
+			int completions = dungeonCount(dungeon);
 			if (completions < 1) {
 				return null;
 			}

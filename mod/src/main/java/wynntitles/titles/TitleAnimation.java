@@ -29,7 +29,12 @@ public enum TitleAnimation {
 	SWELL("Swell", "a bold crest rolling along", 2600, true),
 	ASCEND("Ascend", "climbing through its colors to a bold finish", 5000, true),
 	REEL("Reel", "spinning letters locking in one by one", 5400, true),
-	PRISM("Prism", "a blinding flash scattering into colored light", 4000, true);
+	PRISM("Prism", "a blinding flash scattering into colored light", 4000, true),
+	PHASE("Phase", "rifts opening where letters slip away", 3000, true),
+	UNDERTOW("Undertow", "a tide rolling in and draining slowly", 5200, true),
+	COALESCE("Coalesce", "scattered letters meeting and swapping colors", 4600, true),
+	KALEIDO("Kaleido", "mirrored rings of color melting into each other", 4200, true),
+	LULLABY("Lullaby", "colors rocking gently back and forth", 7000, true);
 
 	public final String id;
 	public final String label;

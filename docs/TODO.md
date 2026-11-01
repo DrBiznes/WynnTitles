@@ -4,7 +4,7 @@
 
 Reviewed all 164 current achievements against the wiki, cached Wynntils item data and the Oct. 28, 2026 Wynncraft pack. Updated 91 icon entries in `server/catalog/achievements.json`; see [the icon review](docs/achievement-icons.md) for sources, symbolic choices and alternatives.
 
-- [x] Pick relevant, selectable Wynncraft item models and distinguish class/profession tiers. Keep each raid's emblem across its tiers, as requested; Borange Fluff, Eyes Yet Open and Dynamite intentionally use vanilla items
+- [x] Pick relevant, selectable Wynncraft item models and distinguish class/profession tiers. Keep each raid's emblem across its tiers, as requested; Borange Fluff and Dynamite intentionally use vanilla items
 - [x] Give each one a vanilla fallback that still makes sense without the Wynncraft pack
 - [x] Run the `wynnPack` test against a cached pack from a Wynncraft profile's `downloads/` folder
 - [x] Check the icons in the smoke-test screenshots, including contact sheets for every achievement with and without the real pack
@@ -13,7 +13,7 @@ Point at models only. Never copy textures out of the Wynncraft pack.
 
 ## 2. Add more achievements
 
-The catalog now has **163 achievements worth 569 points**, across quests (20), raids (17), professions (19), class levels (24), exploration (11), collection (18), statistics (10), dungeons (16), gamemodes (7), guilds (6) and secrets (15).
+The catalog now has **159 achievements worth 561 points**, across quests (20), raids (17), professions (19), class levels (24), exploration (11), collection (14), statistics (10), dungeons (16), gamemodes (7), guilds (6) and secrets (15).
 
 - [x] Draft the new list, then add it to `server/catalog/achievements.json`
 - [x] For any new trigger type, add a validation case in `server/catalog/catalog.go` and a detector in `WynntilsDetectors.java`

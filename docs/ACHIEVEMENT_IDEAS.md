@@ -25,7 +25,7 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 - **Quest names:** every quest name used matches a real player's API quest list, including "???" and "A Hunter's Calling" (the API has no "???" prefix on it).
 - **Dungeon names:** the API keys match, including "Timelost Sanctum" and "Corrupted Lost Sanctuary". The API also still lists a legacy "Lost Sanctuary", which no set requires.
 - **Territory names:** every `location` name used is in the API's territory list.
-- **`territorySet` names:** every name must be a discovery. `TestTerritorySetNamesAreDiscoveries` checks them against a copy of the names in Wynntils' `content_book_dump.json`. A name that is also a territory unlocks on the spot; any other, like The Moon or a library, unlocks at the next world join. "Town of Lutho" is the one discovery named differently from its territory, and the mod treats the two as the same place.
+- **`territorySet` names:** every name must be a discovery. `TestTerritorySetNamesAreDiscoveries` checks them against a copy of the names in Wynntils' `content_book_dump.json`. A name that is also a territory unlocks on the spot; any other, like The Moon or a library, unlocks at the next game launch. "Town of Lutho" is the one discovery named differently from its territory, and the mod treats the two as the same place.
 - **`discoveries` in the API** is the character's world, territorial and secret discoveries added together, so it can't say which places were visited. Fully completed characters read 674 (177 + 376 + 121).
 - **Profession max:** 132 per profession (1584 total). The top players on the professions leaderboard are at exactly that.
 - **`completedQuests`:** the sum over every character, with mini-quests included. Top accounts are near 3,000, so the ladder is 50, 300 and 1,000.
@@ -110,22 +110,20 @@ Stage 1 adds 129 achievements worth 463 points, bringing the catalog to 164 achi
 | Stormchaser | silver | statistic worldEvents 100 |  | Stormchaser |
 | Restless Defender | gold | statistic worldEvents 500 | Restless | Defender |
 
-### collection (16)
+### collection (14)
 
 | Achievement | Tier | Trigger | Prefix | Suffix |
 |---|---|---|---|---|
+| Token of Excellence | gold | inventoryItem "Legendary Island Token" x1 | Legendary ✦ | Hero ✦ |
 | Block Party | bronze | inventoryItem "Emerald Block" x64 |  | Banker |
 | Ten Stacks | gold | inventoryItem "Liquid Emerald" x640 | Gilded ✦ | Magnate |
-| Grandmother | gold | inventoryItem "Grandmother" x1 | Grandmother's | Heirloom |
-| Alkatraz | gold | inventoryItem "Alkatraz" x1 |  | Escapee |
-| Archaic Writing | gold | inventoryItem "Archaic Writing" x1 | Gavellian | Scribe |
+| Warp | gold | inventoryItem "Warp" x1, mythic | Phased ✦ | Drifter |
+| Idol | gold | inventoryItem "Idol" x1, mythic | Drowned ✦ | Devotee ✦ |
+| Mama Zomble's Memory | gold | inventoryItem "Mama Zomble's Memory" x1 | Mama's ✦ | Favourite ✦ |
+| Archaic Writing | gold | inventoryItem "Archaic Writing" x1 | Gavellian ✦ | Scribe |
 | Borange | silver | inventoryItem "Borange Fluff" x1 | Borange |  |
-| Eyes Yet Open | silver | inventoryItem "Eyes Yet Open" x1 | Unblinking |  |
-| Mega Fern | bronze | inventoryItem "Mega Fern" x1 | Fernly |  |
-| Blazing Fireball | bronze | inventoryItem "Blazing Fireball" x1 | Blazing |  |
-| Rib Collector | silver | inventoryItem "Witherhead's Rib" x10 | Rib-Rattled |  |
-| Redbeard's Beard | silver | inventoryItem "Redbeard's Hair" x10 | Plundering | Buccaneer |
-| Pupil Hoarder | gold | inventoryItem "The Eye's Pupil" x10 | All-Seeing |  |
+| Coalescence | silver | inventoryItem "Coalescence" x1 | Coalesced ✦ |  |
+| Canned Abis | silver | inventoryItem "Canned Abis" x420 | Baked ✦ |  |
 | Mythic Hoard | gold | itemRarityCount mythic 3 | Mythic ✦ | Hoarder |
 | Shiny! | gold | shinyItem 1 | Shining ✦ | Prodigy |
 | Morphling | gold | itemSet (1 set) | Shapeshifting | Morphling |
@@ -238,6 +236,7 @@ These depend on exact chat text, festival menus or boss messages that still need
 | Herbert's Bane | gold | bossKilled "Doctor Legendary" | Unbowed | Challenger | |
 | Grandmaster | gold | raidRank Grandmaster | Grandmaster ✦ | | |
 | All In | gold | raidGambits ≥ 3 in one clear | Reckless | Gambler | |
+| Last One Standing | gold | raidLastAlive "Wartorn Palace" or "The Nameless Anomaly" | Lone | Holdout | Every other party member is dead when the raid is won. A solo clear must not count. Still need to capture how the game shows party deaths in a raid. |
 | Prelude Survivor | gold | worldEventNamed "Prelude to Annihilation" | | Survivor | |
 | Keen-Eyed | silver | secretDiscoveryCount 40 | Keen-Eyed | | |
 | Pathfinder | silver | discoveryCount territorial 200 | Far-Roaming | Pathfinder | |

@@ -26,9 +26,9 @@ were inspected. A copy of this review's screenshots is saved in
   silver and gold. The pack has individual emblems for the first four raids;
   Wartorn Palace retains the generic raid emblem because this cached pack has no
   dedicated Wartorn Palace content emblem.
-- Borange Fluff uses **orange wool**; Eyes Yet Open uses an **Eye of Ender**.
-  Cached ingredient data identifies both actual items as custom player heads,
-  not selectable resource-pack models. They intentionally have no `icon.model`.
+- Borange Fluff uses **orange wool**. Cached ingredient data identifies the
+  actual item as a custom player head, not a selectable resource-pack model. It
+  intentionally has no `icon.model`.
 - Fruma uses crown and flame imagery: Queen's Crown for Queen's Recruit, soul
   flame for Overture to Despair, and burning flame for Apotheosis. These are
   symbols for the quests, not assertions about quest rewards.
@@ -39,8 +39,10 @@ All paths below are relative to `minecraft:item/`.
 
 | Achievement | Model or item | Evidence |
 | --- | --- | --- |
-| Grandmother | `wynn/weapon/archer/bow_earth_c`; crossbow fallback | [Wiki](https://wynncraft.wiki.gg/wiki/Grandmother) calls it a bow with crossbow lore; cached icon `bow.earth3` maps to this model. |
-| Alkatraz | `wynn/weapon/warrior/spear_earth_a`; mace fallback | [Wiki](https://wynncraft.wiki.gg/wiki/Alkatraz) identifies an earth spear with maul lore; cached icon `spear.earth1` maps to this model. |
+| Warp | `wynn/weapon/mage/wand_air_c`; breeze rod fallback | [Wiki](https://wynncraft.wiki.gg/wiki/Warp) identifies an air wand; the Wynncraft API's icon `wand.air3` maps to this model. |
+| Idol | `wynn/weapon/warrior/spear_water_c`; trident fallback | [Wiki](https://wynncraft.wiki.gg/wiki/Idol) identifies a water spear with trident lore; the API's icon `spear.water3` maps to this model. |
+| Mama Zomble's Memory | Vanilla zombie head | [The item](https://wynncraft.wiki.gg/wiki/Mama_Zomble's_Memory) is a zombie head, so it needs no pack model. |
+| Coalescence, Canned Abis | Amethyst shard and fern | Symbolic vanilla items: the first is a dark meta-ingredient, the second a [cave plant](https://wynncraft.wiki.gg/wiki/Realm_of_Light_IV_-_Finding_the_Light). |
 | Little Rocket Mushroom | `wynn/ingredient/brown_mushroom`; brown mushroom fallback | [Talking Mushroom](https://wynncraft.wiki.gg/wiki/Talking_Mushroom) is a Brown Mushroom, rather than a garden gnome. |
 | Tower of Ascension | `wynn/armor/helmet/pale_iron_helmet`; iron helmet fallback | [Champion Helmet](https://wynncraft.wiki.gg/wiki/Champion_Helmet) is a quest reward; cached gear icon is `helmet.pale_iron`. |
 | The Qira Hive | `wynn/weapon/warrior/spear_multi_c`; purple concrete fallback | [Infused Hive weapons](https://wynncraft.wiki.gg/wiki/Master_Weapon_Merchant) cost a Master Voucher. Cached Infused Hive Spear icon is `spear.multi3`. [Master Voucher](https://wynncraft.wiki.gg/wiki/Hive_Vouchers) uses Purple Concrete. |
@@ -48,8 +50,7 @@ All paths below are relative to `minecraft:item/`.
 | Hive armour set (achievement named Hive Mind) | `wynn/armor/chestplate/diamond_chestplate`; diamond chestplate fallback | [Soulflare](https://wynncraft.wiki.gg/wiki/Soulflare) is a Diamond Chestplate in one of the accepted sets. This achievement does **not** require the unrelated helmet also named Hive Mind. |
 | Shiny item | `wynn/gui/store/consumable/token/shiny_adder` | Uses a shiny-specific symbol rather than suggesting all shiny items are Fabled. |
 | Shh, Library | Vanilla TNT | [Dynamite](https://wynncraft.wiki.gg/wiki/Dynamite) uses TNT. The similarly named pack pet is not the item. |
-| Bob's Tear, Mega Fern, Blazing Fireball | Existing named ingredient models | Match cached ingredient names and pack models. |
-| Witherhead's Ribs, Redbeard's Hair, The Eye's Pupils | Existing dungeon token models | Keep the relevant boss-token artwork. |
+| Bob's Tear | Existing named ingredient model | Matches cached ingredient names and pack models. |
 | Archaic Writing | Existing named Outer Void drop model | Keep the actual item model. |
 
 ## Class and profession progression

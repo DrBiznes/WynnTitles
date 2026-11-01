@@ -2079,31 +2079,6 @@
     }
   },
   {
-    "id": "item_le_stack",
-    "category": "collection",
-    "name": "Wealthy Beyond Measure",
-    "description": "Accumulate a massive stack of emeralds.",
-    "tier": "silver",
-    "points": 3,
-    "icon": {
-      "model": "wynn/pouch/emerald_full",
-      "fallback": "minecraft:emerald"
-    },
-    "trigger": {
-      "type": "inventoryItem",
-      "itemName": "Liquid Emerald",
-      "amount": 64
-    },
-    "rewards": {
-      "prefix": {
-        "text": "Wealthy"
-      },
-      "suffix": {
-        "text": "Merchant"
-      }
-    }
-  },
-  {
     "id": "item_li_token",
     "category": "collection",
     "name": "Token of Excellence",
@@ -2213,49 +2188,160 @@
     }
   },
   {
-    "id": "item_grandmother",
+    "id": "item_warp",
     "category": "collection",
-    "name": "Grandmother",
-    "description": "Carry the mythic bow Grandmother.",
+    "name": "Warp",
+    "description": "Carry the mythic wand Warp.",
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/weapon/archer/bow_earth_c",
-      "fallback": "minecraft:crossbow"
+      "model": "wynn/weapon/mage/wand_air_c",
+      "fallback": "minecraft:breeze_rod"
     },
     "trigger": {
       "type": "inventoryItem",
-      "itemName": "Grandmother",
-      "amount": 1
+      "itemName": "Warp",
+      "amount": 1,
+      "rarity": "mythic"
     },
     "rewards": {
       "prefix": {
-        "text": "Grandmother's"
+        "text": "Phased",
+        "runs": [
+          {
+            "text": "Phased",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#D8F7FF",
+                "#7FDBFF",
+                "#B9A6FF",
+                "#EFD9FF"
+              ],
+              "animated": true,
+              "animation": "phase"
+            }
+          }
+        ]
       },
       "suffix": {
-        "text": "Heirloom"
+        "text": "Drifter"
       }
     }
   },
   {
-    "id": "item_alkatraz",
+    "id": "item_idol",
     "category": "collection",
-    "name": "Alkatraz",
-    "description": "Carry the mythic spear Alkatraz.",
+    "name": "Idol",
+    "description": "Carry the mythic spear Idol.",
     "tier": "gold",
     "points": 5,
     "icon": {
-      "model": "wynn/weapon/warrior/spear_earth_a",
-      "fallback": "minecraft:mace"
+      "model": "wynn/weapon/warrior/spear_water_c",
+      "fallback": "minecraft:trident"
     },
     "trigger": {
       "type": "inventoryItem",
-      "itemName": "Alkatraz",
+      "itemName": "Idol",
+      "amount": 1,
+      "rarity": "mythic"
+    },
+    "rewards": {
+      "prefix": {
+        "text": "Drowned",
+        "runs": [
+          {
+            "text": "Drowned",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#F0E2B6",
+                "#E6FFF4",
+                "#6FE8D0",
+                "#38B6E8",
+                "#5A97F2"
+              ],
+              "animated": true,
+              "animation": "undertow"
+            }
+          }
+        ]
+      },
+      "suffix": {
+        "text": "Devotee",
+        "runs": [
+          {
+            "text": "Devotee",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#F0E2B6",
+                "#E6FFF4",
+                "#6FE8D0",
+                "#38B6E8",
+                "#5A97F2"
+              ],
+              "animated": true,
+              "animation": "undertow"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "item_mama_zomble",
+    "category": "collection",
+    "name": "Mama Zomble's Memory",
+    "description": "Carry or wear Mama Zomble's Memory, a keepsake from a very rare giant.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "fallback": "minecraft:zombie_head"
+    },
+    "trigger": {
+      "type": "inventoryItem",
+      "itemName": "Mama Zomble's Memory",
       "amount": 1
     },
     "rewards": {
+      "prefix": {
+        "text": "Mama's",
+        "runs": [
+          {
+            "text": "Mama's",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#FFB0A8",
+                "#FFD3A1",
+                "#E8C3FF",
+                "#BFE3A0"
+              ],
+              "animated": true,
+              "animation": "lullaby"
+            }
+          }
+        ]
+      },
       "suffix": {
-        "text": "Escapee"
+        "text": "Favourite",
+        "runs": [
+          {
+            "text": "Favourite",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#FFB0A8",
+                "#FFD3A1",
+                "#E8C3FF",
+                "#BFE3A0"
+              ],
+              "animated": true,
+              "animation": "lullaby"
+            }
+          }
+        ]
       }
     }
   },
@@ -2321,136 +2407,77 @@
     }
   },
   {
-    "id": "item_eyes_yet_open",
+    "id": "item_coalescence",
     "category": "collection",
-    "name": "Eyes Yet Open",
-    "description": "Carry the ingredient Eyes Yet Open.",
+    "name": "Coalescence",
+    "description": "Carry a Coalescence from the Panic Zealot.",
     "tier": "silver",
     "points": 3,
     "icon": {
-      "fallback": "minecraft:ender_eye"
+      "fallback": "minecraft:amethyst_shard"
     },
     "trigger": {
       "type": "inventoryItem",
-      "itemName": "Eyes Yet Open",
+      "itemName": "Coalescence",
       "amount": 1
     },
     "rewards": {
       "prefix": {
-        "text": "Unblinking"
+        "text": "Coalesced",
+        "runs": [
+          {
+            "text": "Coalesced",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#FF6FB0",
+                "#A78BFF",
+                "#6FE3FF"
+              ],
+              "animated": true,
+              "animation": "coalesce"
+            }
+          }
+        ]
       }
     }
   },
   {
-    "id": "item_mega_fern",
+    "id": "item_canned_abis",
     "category": "collection",
-    "name": "Mega Fern",
-    "description": "Carry a Mega Fern from the Bushpig Matriarch.",
-    "tier": "bronze",
-    "points": 1,
+    "name": "Canned Abis",
+    "description": "Carry 420 Canned Abis from Realm of Light IV.",
+    "tier": "silver",
+    "points": 3,
     "icon": {
-      "model": "wynn/ingredient/mega_fern",
       "fallback": "minecraft:fern"
     },
     "trigger": {
       "type": "inventoryItem",
-      "itemName": "Mega Fern",
-      "amount": 1
+      "itemName": "Canned Abis",
+      "amount": 420
     },
     "rewards": {
       "prefix": {
-        "text": "Fernly"
-      }
-    }
-  },
-  {
-    "id": "item_blazing_fireball",
-    "category": "collection",
-    "name": "Blazing Fireball",
-    "description": "Carry a Blazing Fireball from the Fire Zombie.",
-    "tier": "bronze",
-    "points": 1,
-    "icon": {
-      "model": "wynn/ingredient/blazing_fireball",
-      "fallback": "minecraft:fire_charge"
-    },
-    "trigger": {
-      "type": "inventoryItem",
-      "itemName": "Blazing Fireball",
-      "amount": 1
-    },
-    "rewards": {
-      "prefix": {
-        "text": "Blazing"
-      }
-    }
-  },
-  {
-    "id": "item_witherhead_rib",
-    "category": "collection",
-    "name": "Rib Collector",
-    "description": "Carry 10 Witherhead's Ribs from the Decrepit Sewers.",
-    "tier": "silver",
-    "points": 3,
-    "icon": {
-      "model": "wynn/dungeon/token/decrepit_sewers",
-      "fallback": "minecraft:bone"
-    },
-    "trigger": {
-      "type": "inventoryItem",
-      "itemName": "Witherhead's Rib",
-      "amount": 10
-    },
-    "rewards": {
-      "prefix": {
-        "text": "Rib-Rattled"
-      }
-    }
-  },
-  {
-    "id": "item_redbeard_hair",
-    "category": "collection",
-    "name": "Redbeard's Beard",
-    "description": "Carry 10 Redbeard's Hair from Galleon's Graveyard.",
-    "tier": "silver",
-    "points": 3,
-    "icon": {
-      "model": "wynn/dungeon/token/galleon_graveyard",
-      "fallback": "minecraft:string"
-    },
-    "trigger": {
-      "type": "inventoryItem",
-      "itemName": "Redbeard's Hair",
-      "amount": 10
-    },
-    "rewards": {
-      "prefix": {
-        "text": "Plundering"
-      },
-      "suffix": {
-        "text": "Buccaneer"
-      }
-    }
-  },
-  {
-    "id": "item_eye_pupil",
-    "category": "collection",
-    "name": "Pupil Hoarder",
-    "description": "Carry 10 of The Eye's Pupils from Eldritch Outlook.",
-    "tier": "gold",
-    "points": 5,
-    "icon": {
-      "model": "wynn/dungeon/token/eldritch_outlook",
-      "fallback": "minecraft:ender_eye"
-    },
-    "trigger": {
-      "type": "inventoryItem",
-      "itemName": "The Eye's Pupil",
-      "amount": 10
-    },
-    "rewards": {
-      "prefix": {
-        "text": "All-Seeing"
+        "text": "Baked",
+        "runs": [
+          {
+            "text": "Baked",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#FF5FD2",
+                "#FF9A3D",
+                "#FFF04D",
+                "#5CFF8F",
+                "#4DE8FF",
+                "#B57CFF"
+              ],
+              "animated": true,
+              "animation": "kaleido"
+            }
+          }
+        ]
       }
     }
   },

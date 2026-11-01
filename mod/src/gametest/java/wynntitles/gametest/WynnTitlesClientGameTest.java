@@ -484,17 +484,18 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		context.runOnClient(client -> Models.Raid.onTitle(
 				new TitleSetTextEvent(new TheNamelessAnomalyRaid().getEntryTitle().getComponent())));
 		check(context.computeOnClient(client -> Models.Raid.getCurrentRaid() != null), "the entry title should start a raid");
-		checkTitleDrawn(context, title, false, "in a raid");
-		screenshot(context, "wynntitles-nametag-raid");
-
+		check(!context.computeOnClient(client -> new WynnTitlesConfig().hideTitlesInRaids), "titles should show in raids by default");
 		context.runOnClient(client -> WynnTitlesConfig.get().hideTitlesInRaids = false);
 		checkTitleDrawn(context, title, true, "in a raid with the option off");
+
 		context.runOnClient(client -> WynnTitlesConfig.get().hideTitlesInRaids = true);
-		checkTitleDrawn(context, title, false, "in a raid with the option back on");
+		checkTitleDrawn(context, title, false, "in a raid with the option on");
+		screenshot(context, "wynntitles-nametag-raid");
 
 		context.runOnClient(client -> Models.Raid.failedRaid());
 		check(context.computeOnClient(client -> Models.Raid.getCurrentRaid() == null), "failing should end the raid");
 		checkTitleDrawn(context, title, true, "after the raid");
+		context.runOnClient(client -> WynnTitlesConfig.get().hideTitlesInRaids = false);
 	}
 
 	private static void checkTitleDrawn(ClientGameTestContext context, String title, boolean expected, String when) {

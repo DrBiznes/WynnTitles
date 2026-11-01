@@ -19,8 +19,11 @@ server_pid=""
 cleanup() {
 	if [[ -n "$server_pid" ]]; then
 		kill "$server_pid" 2>/dev/null || true
+		# Windows won't delete the database until the server has really gone.
+		wait "$server_pid" 2>/dev/null || true
 	fi
-	rm -rf "$tmp"
+	# Leftover temp files shouldn't fail a run that passed.
+	rm -rf "$tmp" || true
 }
 trap cleanup EXIT
 
