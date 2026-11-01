@@ -2,7 +2,7 @@
 
 <img width="468" height="200" alt="banner" src="https://github.com/user-attachments/assets/3ced8e93-39c7-4d10-87cf-8905e9de5206" />
 
-Let your nametag do the bragging. WynnTitles is a Minecraft mod that lets you earn title words from Wynncraft achievements and wear them above your name, then style them in a shop with colors, animations and Wynncraft fonts. Everyone else with the mod sees it. No account to make, you log in with the Minecraft account you're already playing on. Made for my modpack [World of Wynncraft](https://modrinth.com/modpack/world-of-wynncraft)
+WynnTitles is a Minecraft mod that lets you earn title words from Wynncraft achievements and wear them above your name, then style them in a shop with colors, animations and Wynncraft fonts. Everyone else with the mod sees it. No account to make, you log in with the Minecraft account you're already playing on. Made for my modpack [World of Wynncraft](https://modrinth.com/modpack/world-of-wynncraft)
 
 <img width="1280" height="720" alt="title-reel" src="https://github.com/user-attachments/assets/6a428802-6dea-4497-9fd7-067141ea2530" />
 
