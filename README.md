@@ -1,10 +1,10 @@
 # WynnTitles
 
-<img width="468" height="200" alt="banner" src="https://github.com/user-attachments/assets/3ced8e93-39c7-4d10-87cf-8905e9de5206" />
+![banner](https://github.com/user-attachments/assets/3ced8e93-39c7-4d10-87cf-8905e9de5206)
 
 WynnTitles is a Minecraft mod that lets you earn title words from Wynncraft achievements and wear them above your name, then style them in a shop with colors, animations and Wynncraft fonts. Everyone else with the mod sees it. No account to make, you log in with the Minecraft account you're already playing on. Made for my modpack [World of Wynncraft](https://modrinth.com/modpack/world-of-wynncraft)
 
-<img width="1280" height="720" alt="title-reel" src="https://github.com/user-attachments/assets/6a428802-6dea-4497-9fd7-067141ea2530" />
+![title-reel](https://github.com/user-attachments/assets/6a428802-6dea-4497-9fd7-067141ea2530)
 
 ## What's Up
 
@@ -24,45 +24,45 @@ WynnTitles is a Minecraft mod that lets you earn title words from Wynncraft achi
 
 ### Your Title
 
-<img width="1280" height="720" alt="nametag" src="https://github.com/user-attachments/assets/ce0f9831-afc9-4e5e-8fa9-dc031d6081de" />
+![nametag](https://github.com/user-attachments/assets/ce0f9831-afc9-4e5e-8fa9-dc031d6081de)
 
 Prefix, suffix and style, right above your head!!
 
 ### Animations
 
-<img width="1920" height="1080" alt="shop-animations" src="https://github.com/user-attachments/assets/bb64f573-a1a1-4aba-8851-99379263a307" />
+![shop-animations](https://github.com/user-attachments/assets/bb64f573-a1a1-4aba-8851-99379263a307)
 
 All 12 animations you can currently buy in the shop.
 
-<img width="1920" height="1080" alt="native-animations" src="https://github.com/user-attachments/assets/fa37f466-655a-43ef-885e-32ae767a36d3" />
+![native-animations](https://github.com/user-attachments/assets/fa37f466-655a-43ef-885e-32ae767a36d3)
 
 And some of the ones you can't. These only come on the titles that earn them!!
 
 ### Fonts
 
-<img width="1920" height="1080" alt="fonts" src="https://github.com/user-attachments/assets/423b71a1-e8f9-42b6-9160-689adcd76c5d" />
+![fonts](https://github.com/user-attachments/assets/423b71a1-e8f9-42b6-9160-689adcd76c5d)
 
 Ten Wynncraft fonts, from the normal one to Wynnic, High Gavellian, Old Fruman and the banners.
 
 ### The Screens
 
-<img width="1708" height="960" alt="tab-tour" src="https://github.com/user-attachments/assets/87036067-b4f2-40a1-a6c4-a6315b210c26" />
+![tab-tour](https://github.com/user-attachments/assets/87036067-b4f2-40a1-a6c4-a6315b210c26)
 
 Titles, Styles, Shop and Achievements.
 
-<img width="1708" height="960" alt="pick-a-title" src="https://github.com/user-attachments/assets/6a3878c6-8baf-4222-9aca-e8c1c6e8098e" />
+![pick-a-title](https://github.com/user-attachments/assets/6a3878c6-8baf-4222-9aca-e8c1c6e8098e)
 
 Pick a prefix and a suffix then hit Equip.
 
-<img width="854" height="480" alt="style-a-title" src="https://github.com/user-attachments/assets/7480be2f-0b30-45ca-b5b7-6a81577305ee" />
+![style-a-title](https://github.com/user-attachments/assets/7480be2f-0b30-45ca-b5b7-6a81577305ee)
 
 Try on the animated styles you own, then Wear the one you like.
 
-<img width="854" height="480" alt="try-on-in-the-shop" src="https://github.com/user-attachments/assets/6205e9f5-4864-4e7c-b244-7317761a4a84" />
+![try-on-in-the-shop](https://github.com/user-attachments/assets/6205e9f5-4864-4e7c-b244-7317761a4a84)
 
 The shop lets you try before you buy.
 
-<img width="800" height="240" alt="unlock-toast" src="https://github.com/user-attachments/assets/ea6be1fb-c98c-4ea0-bfff-00091b07e288" />
+![unlock-toast](https://github.com/user-attachments/assets/ea6be1fb-c98c-4ea0-bfff-00091b07e288)
 
 Ding!! Achievement unlocked.
 
