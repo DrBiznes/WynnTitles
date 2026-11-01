@@ -1,4 +1,4 @@
-module github.com/DrBzines/WynnTitles/server
+module github.com/DrBiznes/WynnTitles/server
 
 go 1.26.0
 

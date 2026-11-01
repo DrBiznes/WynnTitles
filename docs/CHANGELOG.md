@@ -11,6 +11,15 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.19.1 · 2026-11-01
+**Release cleanup and a player-facing README**
+
+- `README.md` is rewritten for players: what the mod does, install, commands, config, requirements and privacy. Screenshots and GIFs are dragged in on GitHub rather than committed.
+- The old architecture, running-locally, tests and API sections moved to `docs/ARCHITECTURE.md`, and the references to them are updated.
+- The author and license holder is DrBiznes, not DrBzines, in `LICENSE`, `fabric.mod.json` and the Go module path (`github.com/DrBiznes/WynnTitles/server`).
+- `docs/TODO.md`, `docs/ACHIEVEMENT_IDEAS.md` and `.claude/launch.json` are removed; the work they tracked is done.
+- `mod_version` goes from 0.19.0 to 0.19.1.
+
 ## 0.19.0 · 2026-11-01
 **A smaller, stranger collection category**
 
@@ -20,7 +29,7 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 - Ingredients now unlock `inventoryItem` achievements. Their names end in a star tier, so Borange Fluff could never match before.
 - `inventoryItem` takes an optional `rarity`, so Idol ignores the False Idol helmet.
 - Every font is 1 point cheaper: 12 → 11, 18 → 17 and 22 → 21.
-- The title word test also rejects a word used as both a prefix and a suffix, and has its own test.
+- The title word test still rejects any word two achievements share, ignoring case, and now also rejects a word used as both a prefix and a suffix. The check has its own test.
 - Catalog: 163 → **159 achievements / 561 pts**; shop stays at **65 items**, 688 → **678**, which keeps it 82.7% earnable.
 - `mod_version` goes from 0.18.3 to 0.19.0.
 

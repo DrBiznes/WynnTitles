@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-WynnTitles: a Fabric client mod for Wynncraft plus a small Go server. There is deliberately no website; everything happens in game. See README.md for the architecture and API.
+WynnTitles: a Fabric client mod for Wynncraft plus a small Go server. There is deliberately no website; everything happens in game. See ARCHITECTURE.md for the architecture, running locally and the API.
 
 ## Commands
 

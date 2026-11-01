@@ -5,7 +5,7 @@ package titles
 import (
 	"sync"
 
-	"github.com/DrBzines/WynnTitles/server/catalog"
+	"github.com/DrBiznes/WynnTitles/server/catalog"
 )
 
 // Title is what other players see above someone's head.

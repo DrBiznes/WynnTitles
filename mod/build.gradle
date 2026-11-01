@@ -24,7 +24,7 @@ loom {
 	runs {
 		client {
 			// Lets `./gradlew runClient` log in to a local server started with
-			// WT_OFFLINE_AUTH=true. See README.md.
+			// WT_OFFLINE_AUTH=true. See docs/ARCHITECTURE.md.
 			property "wynntitles.serverUrl", "http://localhost:8080"
 		}
 	}

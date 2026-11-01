@@ -16,10 +16,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/DrBzines/WynnTitles/server/catalog"
-	"github.com/DrBzines/WynnTitles/server/internal/auth"
-	"github.com/DrBzines/WynnTitles/server/internal/store"
-	"github.com/DrBzines/WynnTitles/server/internal/titles"
+	"github.com/DrBiznes/WynnTitles/server/catalog"
+	"github.com/DrBiznes/WynnTitles/server/internal/auth"
+	"github.com/DrBiznes/WynnTitles/server/internal/store"
+	"github.com/DrBiznes/WynnTitles/server/internal/titles"
 )
 
 const (

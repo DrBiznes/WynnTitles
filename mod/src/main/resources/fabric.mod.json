@@ -4,7 +4,7 @@
 	"version": "${version}",
 	"name": "WynnTitles",
 	"description": "Earn title words from Wynncraft achievements and wear them above your name.",
-	"authors": ["DrBzines"],
+	"authors": ["DrBiznes"],
 	"license": "MIT",
 	"icon": "assets/wynntitles/icon.png",
 	"environment": "client",

@@ -1,93 +1,181 @@
 # WynnTitles
 
-![WynnTitles](docs/branding/banner.png)
+![WynnTitlesBanner](docs/branding/banner.png)
 
-Earn title words from Wynncraft achievements and wear them above your name. Players use everything in game, with no separate account to create. An optional private moderation dashboard runs on its own listener.
+Let your nametag do the bragging. WynnTitles is a Minecraft mod that lets you earn title words from Wynncraft achievements and wear them above your name, then style them in a shop with colors, animations and Wynncraft fonts. Everyone else with the mod sees it. No account to make, you log in with the Minecraft account you're already playing on. Made for my modpack [World of Wynncraft](https://modrinth.com/modpack/world-of-wynncraft)
+
+<!-- DROP HERE: marketing/titles/title-reel.gif (best opener, 640x360) -->
+
+## What's Up
+
+- Earn title words from **159 achievements**: quests, raids, dungeons, class levels, professions, exploration, collection, stats, gamemodes, guilds and some secret ones
+- Wear a **prefix and a suffix** above your name, and other WynnTitles players see it on your nametag
+- Spend your achievement points in the **style shop**: solid colors, palettes, rainbow, bold, italic, underline, strikethrough, **12 animations** and **10 Wynncraft fonts** (text fonts, scripts like Wynnic, and banners)
+- Try everything on your title before you buy it
+- The big achievements come with their own **native style** that you can't buy, only earn
+- Quest and dungeon completions unlock as soon as you finish them, the rest is read from Wynntils
+- Every achievement has an icon of the Wynncraft item it's about in a bronze, silver or gold frame
+- Shows how rare each achievement is, from Normal all the way down to Mythic
+- Screens built to look like Wynncraft's own menus, with an unlock pop-up and chat message when you earn something
+- Doesn't need a website, everything happens in game
+- Configurable settings via Mod Menu or config file
+
+## See It
+
+### Your Title
+
+<!-- DROP HERE: marketing/titles/nametag.png -->
+
+Prefix, suffix and style, right above your head!!
+
+### Animations
+
+<!-- DROP HERE: marketing/titles/shop-animations.gif (7.9 s loop) -->
+
+All 12 animations you can buy in the shop.
+
+<!-- DROP HERE: marketing/titles/native-animations.gif (7.9 s loop) -->
+
+And the 9 you can't. Those only come on the titles that earn them!!
+
+### Fonts
+
+<!-- DROP HERE: marketing/titles/fonts.png -->
+
+Ten Wynncraft fonts, from the normal one to Wynnic, High Gavellian, Old Fruman and the banners.
+
+### The Screens
+
+<!-- DROP HERE: marketing/gui/tab-tour.gif -->
+
+Titles, Styles, Shop and Achievements.
+
+<!-- DROP HERE: marketing/gui/pick-a-title.gif -->
+
+Pick a prefix and a suffix then hit Equip.
+
+<!-- DROP HERE: marketing/gui/style-a-title.gif -->
+
+Try on the animated styles you own, then Wear the one you like.
+
+<!-- DROP HERE: marketing/gui/try-on-in-the-shop.gif -->
+
+The shop lets you try before you buy.
+
+<!-- DROP HERE: marketing/gui/unlock-toast.gif -->
+
+Ding!! Achievement unlocked.
+
+## Installation
+
+1. Make sure you have Fabric Loader and Fabric API installed
+2. Download and install Wynntils
+3. Download the latest version of WynnTitles from the versions page
+4. Place the downloaded .jar file in your Minecraft mods folder
+5. Join Wynncraft and press the backtick key (`` ` ``) to open WynnTitles
+
+## Usage
+
+- Press `` ` `` or run `/titles` to open WynnTitles. You can rebind the key in the controls menu under WynnTitles
+- **Titles** is where you pick your prefix and suffix, then hit Equip
+- **Styles** is where you color and animate them with what you own
+- **Shop** is where you spend your points. Buying asks you once first and purchases are final, so try things on before you buy
+- **Achievements** shows your progress, the title words each one gives you and how rare it is
+- WynnTitles only talks to its server while you're on Wynncraft
+
+### Commands
+
+- `/titles` - Opens WynnTitles
+- `/titles achievements` - Opens it straight to the Achievements tab
+- `/titles status` - Shows which server the mod is using and how it's doing
+- `/titles login` - Tries logging in again
+- `/titles reload` - Reloads your titles and achievements from the server
+
+## Configuration
+
+You can configure WynnTitles using Mod Menu or by editing `config/wynntitles.json`:
+
+- **Show titles** shows other players' titles above their names. Needs Wynntils' custom nametags turned on
+- **Hide titles in raids** needs Wynntils' raid tracking turned on
+- **Title size** is how big titles are compared to the name
+- **Animate titles** turns all the animations off if you want still titles everywhere
+- **Unlock messages in chat** and **Unlock pop-ups** are each their own switch
+- **Advanced** has the server URL, leave it blank for the official server
+
+## Future Features
+
+- More achievements and shop items as Wynncraft grows. The catalog comes from the server so most of them don't need a mod update
+- More shop styles, glow outlines are on the list
+- Suggest features on the GitHub issues page!
+
+## Requirements
+
+- Minecraft 1.21.11
+- Fabric Loader 0.18.4 or higher
+- Fabric API
+- Wynntils 4.2.16 or higher
+- Cloth Config (already included in the mod, nothing to download)
+- Mod Menu (optional, it's how you get to the config screen)
+- Wynncraft's resource pack gives you the real item icons and fonts, it loads by itself when you join Wynncraft. Without it you get vanilla items and fonts
+
+## How It Works
+
+- Achievements are detected with Wynntils data, on Wynncraft only, and sent to the WynnTitles server
+- Titles are cosmetic so claims are trusted. Cheating gets you a cool name above your head and nothing else, and I have moderation tools for the people who try it
+- Logging in uses the same Mojang check a Minecraft server does when you join it. Your access token only ever goes to Mojang
+- The server keeps your UUID, username, unlocked achievements (with what the mod reported, like the quest name or your class and level), purchases and login times
+- To show titles it asks the server about the players near you
+- The mod doesn't include anything from the Wynncraft resource pack, it just points at the items and fonts you already have loaded
+- The full tour is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+
+## Run Your Own Server
+
+Got a guild or a group of friends? You can run a private WynnTitles server with your own achievements, shop and moderation dashboard. Everyone installs the normal mod and points it at your server. Here's how: [Running your own WynnTitles server](deploy/README.md)
+
+## Go Ham
+
+- I don't know nothing about java so if you wanna fork this and fix this up go ham.
+- Feel free to use this in your modpack
+- It needs JDK 21 for the mod and Go 1.26 for the server
 
 ```
-mod/      Fabric client mod (Wynntils addon, Cloth Config options)
-server/   Go API server with SQLite; also the home of the achievement catalog
+cd mod && ./gradlew build    # builds the mod and runs the unit tests
+cd server && go test ./...   # server tests
+scripts/smoke-test.sh        # everything offline, including an in-game test
 ```
 
-## How it fits together
+- The smoke test starts a throwaway server, boots a real client with Wynntils and saves screenshots to `mod/build/run/clientGameTest/screenshots`
+- Running it locally and the API are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and the rules for adding achievements are in [docs/AGENTS.md](docs/AGENTS.md)
+- Not made by or affiliated with Wynncraft or Wynntils
 
-- **Login** uses the Mojang session handshake, the same check a Minecraft server does when you join it. The mod asks the server for a challenge, calls Mojang's `joinServer` with it, and the server confirms with Mojang's `hasJoined`. The resulting session token is cached in `config/wynntitles/session.json`.
-- **The catalog** (`server/catalog/achievements.json`) is the single source of truth. It is embedded in the server binary and validated at startup. The mod downloads it from `GET /v1/catalog`, so adding an achievement that uses an existing trigger type needs no mod update.
-- **Title words are plain text** unless their achievement gives them a **native style** (`runs` in the catalog). Only the big ones have one: the level 120s, The Moon, the Legendary Island token, The Wartorn Palace, and Greg from The Nameless Anomaly, whose native style is dark, obfuscated text like the raid's own title. Native styles use their own hex colors, never a shop palette or named color, so none can be bought, and the biggest use one of nine native-only animations the shop never sells: decipher (letters scramble, show as Wynnic runes, then resolve), glitch, eclipse, strike, heartbeat, swell, ascend (each color wipes over the last, up to a bold finish), reel and prism.
-- **The style shop** (`server/catalog/shop.json`) sells style pieces for achievement points: solid colors, palettes, animated palettes, rainbow, bold, italic, underlined and strikethrough, and ten Wynncraft font styles (three text fonts, three scripts and four banners). Each animated palette pairs a palette with one of twelve animations (flow, pulse, shimmer, wave, flicker, sparkle, comet, aurora, charge, ripple, converge, oculus), named by the item's `animation`; the mod colors every letter in `titles/EffectColors.java`, the one place nametags, chat and screens all go through, and an older mod shows any animation as flow. Obfuscated and the native-only animations are never sold. The 159 achievements award 561 points; the full shop costs 678 (82.7% earnable), so completionists can buy most of it. Each slot (prefix and suffix) wears either the word's native style or a shop style built from one color source, an optional font and compatible formats, and a shop style replaces the native one completely, so restyling Greg reveals the name. The server builds the styled title, so the nametag code only ever sees runs. Font items declare allowed color-source kinds and format support in the shop catalog. Banners use one solid background and a separately picked letter color (automatic black/white contrast by default); switching to a banner previews removing formats and replacing an effect with its first palette color before Wear saves it. Banners require ASCII letters, digits and spaces, and incompatible titles or missing-pack font choices are disabled with explanations. Without the pack, equipped fonts fall back to vanilla text in their solid color. A player's balance is points earned minus prices paid; purchases record the price paid, so repricing never changes a balance. Purchases are final for players, so Buy asks once before spending; a moderator can reset one player's or everyone's purchases from the dashboard, which refunds every price paid. Prices and items are data, so they can be retuned or added to without a mod update; an older mod hides item kinds it does not know.
-- **Claims are trusted.** The mod detects triggers with Wynntils data, only while on a Wynncraft world, and claims them in batches, and the server records every claim with its evidence in the `unlocks` table. Moderation can revoke a row later by setting `revoked_at`.
-- **Achievement icons** are the achievement's Wynncraft item inside a hexagonal bronze, silver or gold frame. The catalog names an item model from the Wynncraft resource pack (for example `wynn/prop/quest_scroll`) and a vanilla fallback. Whenever resource packs load, the mod indexes the loaded item definitions to find which item and damage or custom model data show that model, so nothing from the pack is copied, and renumbering in a pack update is picked up automatically. Off Wynncraft, or if a model disappears, the fallback item shows.
-- **The screens** (`mod/.../mc/screen`) are built on a small UI kit of our own (`mc/screen/ui`), laid out like Wynncraft's raid start screen, in our own regal purple and gold: a field between two stone pillars with a skull on the bottom ledge, a wine-red ribbon for the title, a stone tab bar with the Wynncraft eye carved into it, dark stone wells and stone buttons. Achievements are a trophy list: categories with their progress, then each achievement with its reward, unlock date and rarity. The sprites are drawn by `scripts/draw-ui-sprites.py`. The panel is pixel art drawn at a whole number of window pixels per pixel: as big as the player's GUI scale, and smaller when that would not fit the window. Tabs switch with a gliding gold frame and the page slides in; lists glide when scrolled. Text uses the Wynncraft pack's fonts by id (`language/wynncraft` and the small-caps `language/five`) when the loaded packs define them, and the vanilla font otherwise (`mc/WynnFonts.java`); like icons, nothing is copied from the pack.
-- **Rarity** (`GET /v1/stats/achievements`) is the share of WynnTitles players (everyone who has logged in with the mod) holding each achievement, not counting revoked unlocks or suspended players. The mod names it after Wynncraft's item tiers, from Normal down to Mythic below 1%. The server counts every unlock to answer, so it reuses the result for `WT_STATS_TTL`.
-- **Title lookups** (`POST /v1/titles/batch`) are served from an in-memory map rebuilt from SQLite at startup, so crowded world events never touch the database.
+## License
 
-## Running locally
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Server (needs Go 1.26+):
+## Acknowledgments
 
-```bash
-cd server && WT_OFFLINE_AUTH=true go run ./cmd/wynntitles
-```
+- Thanks to the Wynntils team, this mod would know nothing about what you've done without them
+- Thanks to the Wynncraft team for creating an awesome MMORPG experience in Minecraft
+- Thanks to shedaniel for Cloth Config
+- Thanks to igbarvonsquid!!!
 
-`WT_OFFLINE_AUTH=true` skips the Mojang check so the dev client's offline account can log in. Never set it in production. Other settings: `WT_ADDR` (default `:8080`), `WT_DB` (default `data/wynntitles.db`), `WT_SESSION_TTL` (default `720h`), `WT_STATS_TTL` (how long rarity is cached, default `1m`).
+## Support and My Mods
+Please report any bugs or feature suggestions on the Github Issues page, I'll be updating this frequently with community feedback and ideas! You can also [join my discord](https://discord.gg/jqFF64rXZZ) if you need direct support, or want to stay updated with all of my mods.
+### Check out all my projects!
+>   [World of Wynncraft Modpack](https://modrinth.com/modpack/world-of-wynncraft)
 
-Mod (Gradle downloads its own Java 25 to run; the mod targets Java 21):
+>   [WynnTitles](https://modrinth.com/mod/wynntitles)
 
-```bash
-cd mod && ./gradlew runClient
-```
+>   [WynnWanderer](https://modrinth.com/mod/wynnwanderer)
 
-The dev client points at `http://localhost:8080`; release builds default to `https://wynntitles.jamino.me`. Join a singleplayer world, then press `` ` `` or run `/titles` to open the title screen. `/titles status`, `/titles login` and `/titles reload` help with troubleshooting.
+>   [WynnVista](https://modrinth.com/mod/wynnvista)
 
-## Hosting and moderation
+>   [Wynn Weapon Bigger](https://modrinth.com/mod/wynnweaponbigger)
 
-Guilds and friend groups can run their own private server with their own achievements. See [Running your own WynnTitles server](deploy/README.md).
-The Go binary includes an optional server-rendered moderation console on `WT_ADMIN_ADDR`.
-It never mounts dashboard routes on the public API. The console supports player search,
-reported claim evidence, confirmed revoke/restore actions (one claim or all of them), account suspension, per-achievement holder lists and bulk clears, live claim pauses and mod version limits, purchase resets (one player or everyone), and an append-only audit history.
-Developer grants of catalog achievements and free shop styles are limited to `WT_DEV_UUID`.
-Minecraft authentication and the mod's API response shapes are unchanged.
+>   [Nimble ReWynnded](https://modrinth.com/mod/nimble-rewynnded)
 
-## Tests
+>   [Class Keybind Profiles](https://modrinth.com/mod/class-keybind-profiles)
 
-Everything runs offline with one command:
+>   [WynnBubbles](https://modrinth.com/mod/wynnbubbles)
 
-```bash
-scripts/smoke-test.sh
-```
-
-It runs the Go tests, starts a throwaway server with offline auth and a temporary database, then runs:
-
-- **Mod JUnit tests** (`mod/src/test`): the real API client against that server (login, cached session, claim, equip, batch lookup), plus the achievement tracker with a fake detector standing in for Wynntils data.
-- **Client game test** (`mod/src/gametest`): boots the real client with Wynntils into a singleplayer world, checks that joining logs in, equips a title, spawns a fake player in front of the camera, and asserts that player's title reaches the Wynntils nametag stack. A stand-in pack in `src/gametest/resources` selects models the way Wynncraft's does, so the test also checks that icons resolve and fall back. It saves screenshots of the nametag, the Titles tab, the Achievements tab and the unlock toast to `mod/build/run/clientGameTest/screenshots`.
-
-To check every catalog icon against the real Wynncraft pack, point the unit tests at a cached copy (Minecraft keeps them in the profile's `downloads/` folder after you join Wynncraft):
-
-```bash
-cd mod && ./gradlew test -Dwynntitles.wynnPack="<profile>/downloads/<id>/<hash>"
-```
-
-To also see the screens the way players do, with the Wynncraft pack's fonts and item models, pass the same cached pack to the smoke test. The client test loads it after its own checks and saves `*-wynnpack` screenshots:
-
-```bash
-WT_WYNN_PACK="<profile>/downloads/<id>/<hash>" scripts/smoke-test.sh
-```
-
-Wynntils only fires nametag events on Wynncraft, so a test-only mixin forwards that one event in singleplayer. Use `scripts/smoke-test.sh --no-game` to skip the client test.
-
-## API
-
-| Method | Path | Auth | Purpose |
-|---|---|---|---|
-| GET | `/healthz` | | Liveness, including a database query (503 if it fails) |
-| GET | `/v1/catalog` | | Achievements, title words and the style shop (ETag cached) |
-| GET | `/v1/stats/achievements` | | `{players, unlocks: {achievementId: count}}` for rarity (cached for `WT_STATS_TTL`) |
-| POST | `/v1/auth/challenge` | | `{username}` → `{serverId}` |
-| POST | `/v1/auth/verify` | | `{username, serverId}` → `{token, uuid, username, expiresAt}` |
-| POST | `/v1/auth/logout` | Bearer | Ends the session |
-| GET | `/v1/me` | Bearer | Unlocks, points, balance, owned items, available words, equipped words and styles, title |
-| PUT | `/v1/me/title` | Bearer | `{prefix, suffix}` (null unequips) |
-| PUT | `/v1/me/style` | Bearer | `{prefix, suffix}`, each `{source, formats, font, color, letterColor}` or null for native style; source/formats/font are owned item ids, color is a solid fallback when a font replaces an effect, and letterColor is a banner color |
-| POST | `/v1/shop/buy` | Bearer | `{itemIds: [...]}`, all or nothing |
-| POST | `/v1/claims` | Bearer | `{claims: [{achievementId, triggerType, evidence}], modVersion}` (max 200) → `{results: [{achievementId, status}]}` in one transaction; status is `unlocked`, `alreadyUnlocked`, `unknown`, `outdated`, `tooLarge`, `updateRequired` or `paused` |
-| POST | `/v1/titles/batch` | | `{uuids: [...]}` (max 500) → `{titles: {uuid: title or null}}` |
+>   [WynnLODGrabber](https://modrinth.com/mod/wynnlodgrabber)
