@@ -358,6 +358,29 @@ class EffectColorsTest {
 	}
 
 	@Test
+	void vigilLeavesOneLetterBurningThenRelightsTheWord() {
+		List<String> colors = List.of("#F2E6CF", "#FFC86B", "#FF9548", "#EE6A3C");
+		TitleEffect effect = new TitleEffect("gradient", colors, null, true, 0, TitleAnimation.VIGIL.id);
+		int[] still = EffectColors.colors(new TitleEffect("gradient", colors, null, false, 0, null), WORD.length(), T0);
+		int beat = TitleAnimation.VIGIL.defaultCycleMs;
+		long start = T0 - T0 % beat;
+		Set<Integer> survivors = new HashSet<>();
+		for (int round = 0; round < 12; round++, start += beat) {
+			assertArrayEquals(still, EffectColors.colors(effect, WORD.length(), start + beat / 20));
+			EffectColors.Letter[] alone = EffectColors.letters(effect, WORD.length(), start + beat * 6 / 10);
+			assertEquals(1, Arrays.stream(alone).filter(EffectColors.Letter::bold).count(), "one letter burns");
+			survivors.add(Arrays.asList(alone).indexOf(Arrays.stream(alone).filter(EffectColors.Letter::bold).findFirst().orElseThrow()));
+			assertEquals(2, Arrays.stream(alone).mapToInt(EffectColors.Letter::color).distinct().count(), "the rest are dark");
+			assertArrayEquals(still, EffectColors.colors(effect, WORD.length(), start + beat * 95 / 100));
+			for (int ms = 0; ms < beat; ms += 41) {
+				assertTrue(Arrays.stream(EffectColors.letters(effect, WORD.length(), start + ms)).filter(EffectColors.Letter::bold).count() <= 1);
+			}
+		}
+		assertTrue(survivors.size() > 1, "a different letter should survive");
+		assertEquals(1, EffectColors.colors(effect, 1, T0).length);
+	}
+
+	@Test
 	void oculusOpensFromTheMiddleGlancesThenShuts() {
 		TitleEffect effect = new TitleEffect("gradient", List.of("#C9A2FF", "#E8D0FF", "#7CE8E0"), null, true, 0, TitleAnimation.OCULUS.id);
 		int beat = TitleAnimation.OCULUS.defaultCycleMs;

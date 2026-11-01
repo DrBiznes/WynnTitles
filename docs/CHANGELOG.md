@@ -11,6 +11,16 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.20.0 · 2026-11-01
+**Last Rites: win a raid as the last one alive**
+
+- **Last Rites** (gold) rewards the suffix **Pallbearer** for winning The Nameless Anomaly or The Wartorn Palace as the last one alive in the party.
+- A new `raidLastStanding` trigger takes `raidNames`. `RaidLastStand` reads the party list Wynntils parses from the scoreboard, where a dead player's name is struck through, and needs at least one fallen party member, so solo clears and parties emptied by disconnects don't count.
+- There is no API for this, so only wins seen while the game is running count.
+- A new native-only animation, **vigil**: letters break and fall dark at random until one burns alone, then it relights the word.
+- Catalog: 159 → **160 achievements / 566 pts**; shop stays at **65 items** and **678**, now 83.5% earnable.
+- `mod_version` goes from 0.19.1 to 0.20.0.
+
 ## 0.19.1 · 2026-11-01
 **Release cleanup and a player-facing README**
 

@@ -214,6 +214,7 @@ func TestTriggerParameters(t *testing.T) {
 	}
 	good := []string{
 		`{"type": "statistic", "statistic": "wars", "amount": 100}`,
+		`{"type": "raidLastStanding", "raidNames": ["The Nameless Anomaly", "The Wartorn Palace"]}`,
 		`{"type": "dungeon", "dungeonName": "Decrepit Sewers", "amount": 1}`,
 		`{"type": "dungeonSet", "dungeonNames": ["Ice Barrows", "Infested Pit"]}`,
 		`{"type": "professionLevel", "professionName": "Mining", "level": 132}`,
@@ -237,6 +238,7 @@ func TestTriggerParameters(t *testing.T) {
 	}
 	bad := []string{
 		`{"type": "statistic", "statistic": "pvpKills", "amount": 1}`,
+		`{"type": "raidLastStanding", "raidNames": ["The Wartorn Palace"]}`,
 		`{"type": "dungeon", "dungeonName": "Decrepit Sewers"}`,
 		`{"type": "dungeonSet", "dungeonNames": ["Ice Barrows"]}`,
 		`{"type": "professionLevel", "professionName": "Smithing", "level": 100}`,

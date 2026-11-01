@@ -154,6 +154,16 @@ This only covers scans that WynnTitles starts. A scan Wynntils starts itself, su
 
 A wording change costs a few minutes of delay and never a wrong unlock, so it needs no version check.
 
+## Raid last stands
+
+`raidLastStanding` is not chat based. Wynntils parses the scoreboard's party list into `Models.Party`, and a dead player's name is struck through, which gives `PartyMember.alive()`. `LastStandDetector` reads those rows on every `ScoreboardUpdatedEvent` during a raid and again on `RaidEndedEvent.Completed`.
+
+- **What counts:** a win within 10 seconds of the rows showing everyone else dead or offline, with at least one member dead. Rows can lag the win by a tick, and the dead only return when a room is finished.
+- **The player's own row:** it is not known whether Wynncraft lists the player, so both cases work. If everyone else is dead and the raid was won, the player is the one who won it.
+- **Capture still needed:** this has not been seen on Wynncraft. Each raid win logs a line starting `Won <raid> with`, with the row count and how many had fallen, so the first real last stand shows whether the rows hold up at the moment of the win.
+- **Missed wins:** a party member outside the raid shows as alive and blocks the unlock. A win needs Wynntils' Track Raids and Query Party Members options, both on by default. A nicknamed teammate's row does not parse, which blocks the unlock rather than risking a wrong one.
+- **No fallback:** the API has no such record, so a game closed before the claim succeeds loses the win.
+
 ## Limitations
 
 - **Hidden API data:** a player who hides quest data would only unlock quests finished from now on, never their past ones. If that matters later, add one scan that runs only when the API returns no quest data.

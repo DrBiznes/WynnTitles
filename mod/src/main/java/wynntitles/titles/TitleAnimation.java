@@ -34,7 +34,8 @@ public enum TitleAnimation {
 	UNDERTOW("Undertow", "a tide rolling in and draining slowly", 5200, true),
 	COALESCE("Coalesce", "scattered letters meeting and swapping colors", 4600, true),
 	KALEIDO("Kaleido", "mirrored rings of color melting into each other", 4200, true),
-	LULLABY("Lullaby", "colors rocking gently back and forth", 7000, true);
+	LULLABY("Lullaby", "colors rocking gently back and forth", 7000, true),
+	VIGIL("Vigil", "letters falling until one burns alone, then relights the word", 6000, true);
 
 	public final String id;
 	public final String label;

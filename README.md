@@ -8,7 +8,7 @@ WynnTitles is a Minecraft mod that lets you earn title words from Wynncraft achi
 
 ## What's Up
 
-- Earn title words from **159 achievements**: quests, raids, dungeons, class levels, professions, exploration, collection, stats, gamemodes, guilds and some secret ones
+- Earn title words from **160 achievements**: quests, raids, dungeons, class levels, professions, exploration, collection, stats, gamemodes, guilds and some secret ones
 - Wear a **prefix and a suffix** above your name, and other WynnTitles players see it on your nametag
 - Spend your achievement points in the **style shop**: solid colors, palettes, rainbow, bold, italic, underline, strikethrough, **12 animations** and **10 Wynncraft fonts** (text fonts, scripts like Wynnic, and banners)
 - Try everything on your title before you buy it

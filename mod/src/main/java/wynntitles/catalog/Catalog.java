@@ -124,6 +124,7 @@ public record Catalog(String version, List<Achievement> achievements, List<ShopI
 			int amount,
 			String statistic,
 			String raidName,
+			List<String> raidNames,
 			String dungeonName,
 			List<String> dungeonNames,
 			String professionName,

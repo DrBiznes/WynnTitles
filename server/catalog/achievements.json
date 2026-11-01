@@ -3385,6 +3385,46 @@
     }
   },
   {
+    "id": "raid_last_alive",
+    "category": "raid",
+    "name": "Last Rites",
+    "description": "Win The Nameless Anomaly or The Wartorn Palace as the last one alive in your party.",
+    "tier": "gold",
+    "points": 5,
+    "icon": {
+      "model": "wynn/prop/burning_flame",
+      "fallback": "minecraft:candle"
+    },
+    "trigger": {
+      "type": "raidLastStanding",
+      "raidNames": [
+        "The Nameless Anomaly",
+        "The Wartorn Palace"
+      ]
+    },
+    "rewards": {
+      "suffix": {
+        "text": "Pallbearer",
+        "runs": [
+          {
+            "text": "Pallbearer",
+            "effect": {
+              "type": "gradient",
+              "colors": [
+                "#F2E6CF",
+                "#FFC86B",
+                "#FF9548",
+                "#EE6A3C"
+              ],
+              "animated": true,
+              "animation": "vigil"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
     "id": "stat_raids_100",
     "category": "raid",
     "name": "Seasoned Raider",

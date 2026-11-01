@@ -75,6 +75,7 @@ type Trigger struct {
 	Statistic     string `json:"statistic,omitempty"`
 	RaidName      string `json:"raidName,omitempty"`
 
+	RaidNames       []string `json:"raidNames,omitempty"`
 	DungeonName     string   `json:"dungeonName,omitempty"`
 	DungeonNames    []string `json:"dungeonNames,omitempty"`
 	ProfessionName  string   `json:"professionName,omitempty"`
@@ -184,12 +185,13 @@ var palettes = map[string]bool{
 //   - coalesce: scattered letters lock in from both ends, flash, and their colors invert
 //   - kaleido: mirrored rings of color spin through a drifting gradient as letters slip
 //   - lullaby: the colors rock gently back and forth under a soft glow
+//   - vigil: letters fall until one burns alone, then it relights the word
 var animations = map[string]bool{
 	"flow": true, "pulse": true, "shimmer": true, "wave": true, "flicker": true, "sparkle": true,
 	"comet": true, "aurora": true, "charge": true, "ripple": true, "converge": true, "oculus": true,
 	"decipher": true, "glitch": true, "eclipse": true, "strike": true, "heartbeat": true, "swell": true,
 	"ascend": true, "reel": true, "prism": true, "phase": true, "undertow": true, "coalesce": true,
-	"kaleido": true, "lullaby": true,
+	"kaleido": true, "lullaby": true, "vigil": true,
 }
 
 // nativeOnly animations belong to achievements' native styles and are never
@@ -197,7 +199,7 @@ var animations = map[string]bool{
 var nativeOnly = map[string]bool{
 	"decipher": true, "glitch": true, "eclipse": true, "strike": true, "heartbeat": true, "swell": true,
 	"ascend": true, "reel": true, "prism": true, "phase": true, "undertow": true, "coalesce": true,
-	"kaleido": true, "lullaby": true,
+	"kaleido": true, "lullaby": true, "vigil": true,
 }
 
 var namedColors = map[string]bool{
@@ -340,6 +342,9 @@ func validateTrigger(t *Trigger) error {
 	case "raid":
 		need("raidName", t.RaidName != "")
 		need("amount", t.Amount > 0)
+	case "raidLastStanding":
+		// Any listed raid won as the last one alive in the party.
+		need("raidNames", allSet(t.RaidNames))
 	case "statistic":
 		need("amount", t.Amount > 0)
 		if !statistics[t.Statistic] {

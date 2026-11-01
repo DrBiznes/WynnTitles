@@ -138,6 +138,8 @@ public final class EffectColors {
 	private static final float SLIP_SHARE = 0.06f;
 	/** Lullaby: how far the colors rock along the word, and the strength of the glow that follows them. */
 	private static final float ROCK = 0.22f, GLOW = 0.28f;
+	/** Vigil: when letters start falling and the last is gone, when the word starts relighting and is lit, and how long a letter takes to fall or catch. */
+	private static final float VIGIL_FALL = 0.1f, VIGIL_ALONE = 0.5f, VIGIL_RELIGHT = 0.72f, VIGIL_LIT = 0.86f, VIGIL_SNAP = 0.03f;
 
 	/** How a letter is drawn besides its color: as itself, scrambled (obfuscated), or as its Wynnic rune. */
 	public enum Glyph { PLAIN, SCRAMBLED, RUNE }
@@ -258,6 +260,7 @@ public final class EffectColors {
 			case COALESCE -> coalesce(ramp, position, i, phase, now / cycle);
 			case KALEIDO -> kaleido(ramp, position, i, now, cycle);
 			case LULLABY -> Letter.of(lullaby(ramp, position, phase));
+			case VIGIL -> vigil(ramp, position, i, length, phase, now / cycle);
 		};
 	}
 
@@ -340,6 +343,36 @@ public final class EffectColors {
 		float sway = (float) Math.sin(2 * Math.PI * phase);
 		float glow = 0.5f + 0.5f * (float) Math.cos(2 * Math.PI * (position - 0.5f - 0.5f * sway));
 		return mix(ramp.loop(0.6f * position + ROCK * sway), WHITE, GLOW * glow * glow);
+	}
+
+	/**
+	 * The last one standing: letters break and fall dark at random, leaving one
+	 * burning bold alone, which relights the word outward from where it stands.
+	 * A different letter survives each beat. Only it is ever bold, so the word
+	 * barely changes width.
+	 */
+	private static Letter vigil(Ramp ramp, float position, int i, int length, float phase, long beat) {
+		int base = ramp.at(position);
+		int survivor = (int) (hash01(beat, 0x1A57) * length);
+		if (i == survivor) {
+			if (phase >= VIGIL_LIT) {
+				return Letter.of(base);
+			}
+			if (phase >= VIGIL_ALONE) {
+				float burn = 0.5f + 0.25f * (float) Math.sin(2 * Math.PI * phase * 14);
+				return new Letter(mix(ramp.lightest(), WHITE, burn), true, Glyph.PLAIN);
+			}
+			return Letter.of(mix(base, ramp.lightest(), (phase - VIGIL_FALL) / (VIGIL_ALONE - VIGIL_FALL)));
+		}
+		float falls = VIGIL_FALL + (VIGIL_ALONE - VIGIL_SNAP - VIGIL_FALL) * hash01(i, beat);
+		if (phase < falls) {
+			return Letter.of(base);
+		}
+		if (phase < falls + VIGIL_SNAP) {
+			return new Letter(mix(base, WHITE, 0.5f), false, Glyph.SCRAMBLED);
+		}
+		float lit = VIGIL_RELIGHT + (VIGIL_LIT - VIGIL_SNAP - VIGIL_RELIGHT) * Math.abs(i - survivor) / Math.max(length - 1, 1);
+		return Letter.of(phase < lit ? readable(mix(ramp.darkest(), 0x5A5A5A, 0.75f)) : mix(WHITE, base, (phase - lit) / VIGIL_SNAP));
 	}
 
 	/**

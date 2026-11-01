@@ -6,6 +6,7 @@ import com.wynntils.core.components.Models;
 import com.wynntils.core.text.StyledText;
 import com.wynntils.handlers.chat.event.ChatMessageEvent;
 import com.wynntils.handlers.chat.type.RecipientType;
+import com.wynntils.handlers.scoreboard.event.ScoreboardUpdatedEvent;
 import com.wynntils.models.activities.discoveries.DiscoveryInfo;
 import com.wynntils.models.activities.type.DiscoveryType;
 import com.wynntils.models.character.type.CharacterGamemode;
@@ -13,6 +14,7 @@ import com.wynntils.models.character.type.ClassType;
 import com.wynntils.models.guild.type.GuildRank;
 import com.wynntils.models.items.properties.GearTierItemProperty;
 import com.wynntils.models.items.properties.ShinyItemProperty;
+import com.wynntils.models.players.type.PartyMember;
 import com.wynntils.models.players.type.wynnplayer.CharacterData;
 import com.wynntils.models.players.type.wynnplayer.ContentCompletedData;
 import com.wynntils.models.players.type.wynnplayer.GlobalData;
@@ -22,6 +24,7 @@ import com.wynntils.models.profession.type.ProfessionType;
 import com.wynntils.models.raid.event.RaidEndedEvent;
 import com.wynntils.models.territories.profile.TerritoryProfile;
 import com.wynntils.services.leaderboard.type.LeaderboardType;
+import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.wynn.WynnUtils;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -39,6 +42,7 @@ import java.util.function.ToLongFunction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
+import wynntitles.WynnTitles;
 import wynntitles.catalog.Catalog.Trigger;
 import wynntitles.mc.Mc;
 
@@ -50,13 +54,14 @@ import wynntitles.mc.Mc;
 public final class WynntilsDetectors {
 	private static final PlayerProfile PROFILE = new PlayerProfile();
 	private static final RaidDetector RAIDS = new RaidDetector();
+	private static final LastStandDetector LAST_STAND = new LastStandDetector();
 	private static final LiveCompletions LIVE = new LiveCompletions();
 
 	private WynntilsDetectors() {}
 
 	/** Objects that listen for Wynntils events; register them once Wynntils has started. */
 	public static List<Object> eventListeners() {
-		return List.of(RAIDS, new CompletionChat());
+		return List.of(RAIDS, LAST_STAND, new CompletionChat());
 	}
 
 	/** Only INFO counts: it is the channel Wynncraft uses for these, and players cannot type in it. */
@@ -95,6 +100,7 @@ public final class WynntilsDetectors {
 		detectors.put("statistic", new StatisticDetector());
 		detectors.put("quest", new QuestDetector());
 		detectors.put("raid", RAIDS);
+		detectors.put("raidLastStanding", LAST_STAND);
 		detectors.put("dungeon", detector(WynntilsDetectors::dungeon, WynntilsDetectors::dungeonProgress));
 		detectors.put("dungeonSet", detector(WynntilsDetectors::dungeonSet, WynntilsDetectors::dungeonSetProgress));
 		detectors.put("characterRoster",
@@ -712,6 +718,59 @@ public final class WynntilsDetectors {
 			evidence.addProperty("source", thisSession >= onAccount ? "raidEvent" : "wynncraftApi");
 			evidence.addProperty("completions", completions);
 			return evidence;
+		}
+	}
+
+	/**
+	 * Winning any listed raid as the last one alive in the party. Wynntils reads
+	 * the party list from the scoreboard and refreshes it whenever the scoreboard
+	 * changes, which the raid timer does every second.
+	 */
+	private static final class LastStandDetector implements Detector {
+		private final RaidLastStand raids = new RaidLastStand();
+
+		@SubscribeEvent
+		public void onScoreboard(ScoreboardUpdatedEvent event) {
+			if (Models.Raid.getCurrentRaid() != null) {
+				readParty();
+			}
+		}
+
+		@SubscribeEvent
+		public void onRaidCompleted(RaidEndedEvent.Completed event) {
+			readParty();
+			String raid = event.getRaid().getRaidKind().getRaidName();
+			raids.onCompleted(raid, System.currentTimeMillis());
+			WynnTitles.LOGGER.info("Won {} with {} party rows, last stand over {} fallen",
+					raid, Models.Party.getSbPartyMemberCount(), raids.fallen(raid));
+		}
+
+		private void readParty() {
+			List<RaidLastStand.Member> rows = new ArrayList<>();
+			for (int i = 0; i < Models.Party.getSbPartyMemberCount(); i++) {
+				PartyMember member = Models.Party.getSbPartyMember(i);
+				rows.add(new RaidLastStand.Member(member.name(), member.online(), member.alive()));
+			}
+			raids.onParty(McUtils.playerName(), Models.Party.getPartyMembers().size(), rows, System.currentTimeMillis());
+		}
+
+		@Override
+		public boolean supports(Trigger trigger) {
+			return trigger.raidNames() != null;
+		}
+
+		@Override
+		public JsonObject check(Trigger trigger) {
+			for (String raid : trigger.raidNames()) {
+				int fallen = raids.fallen(raid);
+				if (fallen > 0) {
+					JsonObject evidence = new JsonObject();
+					evidence.addProperty("raid", raid);
+					evidence.addProperty("fallen", fallen);
+					return evidence;
+				}
+			}
+			return null;
 		}
 	}
 
