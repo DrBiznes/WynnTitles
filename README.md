@@ -125,11 +125,11 @@ If you run into bugs, crashes, or weird behavior, feel free to report them eithe
 - The server keeps your UUID, username, unlocked achievements (with what the mod reported, like the quest name or your class and level), purchases and login times
 - To show titles it asks the server about the players near you
 - The mod doesn't include anything from the Wynncraft resource pack, it just points at the items and fonts you already have loaded
-- The full tour is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- The full tour is in [docs/ARCHITECTURE.md](https://github.com/DrBiznes/WynnTitles/blob/main/docs/ARCHITECTURE.md)
 
 ## Run Your Own Server
 
-Got a guild or a group of friends? You can run a private WynnTitles server with your own achievements, shop and moderation dashboard. Everyone installs the normal mod and points it at your server. Here's how: [Running your own WynnTitles server](deploy/README.md)
+Got a guild or a group of friends? You can run a private WynnTitles server with your own achievements, shop and moderation dashboard. Everyone installs the normal mod and points it at your server. Here's how: [Running your own WynnTitles server](https://github.com/DrBiznes/WynnTitles/blob/main/deploy/README.md)
 
 ## Go Ham
 
@@ -144,7 +144,7 @@ scripts/smoke-test.sh        # everything offline, including an in-game test
 ```
 
 - The smoke test starts a throwaway server, boots a real client with Wynntils and saves screenshots to `mod/build/run/clientGameTest/screenshots`
-- Running it locally and the API are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and the rules for adding achievements are in [docs/AGENTS.md](docs/AGENTS.md)
+- Running it locally and the API are in [docs/ARCHITECTURE.md](https://github.com/DrBiznes/WynnTitles/blob/main/docs/ARCHITECTURE.md), and the rules for adding achievements are in [docs/AGENTS.md](https://github.com/DrBiznes/WynnTitles/blob/main/docs/AGENTS.md)
 - Not made by or affiliated with Wynncraft or Wynntils
 
 ## License
