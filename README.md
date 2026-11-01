@@ -104,8 +104,7 @@ You can configure WynnTitles using Mod Menu or by editing `config/wynntitles.jso
 
 ## Feedback & Suggestions
 
-Got an idea for a cool achievement title, a native style, or a new animation? Hop into the [Discord](https://discord.gg/jqFF64rXZZ) to share your ideas—I'm always looking for community suggestions to expand the catalog (and since the achievement list syncs from the server, new ones drop without needing a mod update).
-
+Got an idea for a cool achievement title, a native style, or a new animation? Hop into the [Discord](https://discord.gg/jqFF64rXZZ) to share your idea!!
 If you run into bugs, crashes, or weird behavior, feel free to report them either on [GitHub Issues](https://github.com/DrBiznes/WynnTitles/issues) or in the Discord support channel!
 
 ## Requirements
