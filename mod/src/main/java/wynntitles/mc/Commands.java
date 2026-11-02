@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import wynntitles.WynnTitles;
 import wynntitles.api.ApiException;
 import wynntitles.config.WynnTitlesConfig;
@@ -14,6 +15,16 @@ import wynntitles.mc.screen.TitlesScreen;
 
 /** /titles opens the title screen; the subcommands are for troubleshooting. */
 public final class Commands {
+	/** Subcommand (with its leading space) and what it does, in the order /titles help lists them. */
+	private static final String[][] HELP = {
+		{"", "Opens WynnTitles"},
+		{" achievements", "Opens it straight to the Achievements tab"},
+		{" status", "Shows which server the mod is using and how it's doing"},
+		{" login", "Tries logging in again"},
+		{" reload", "Reloads your titles and achievements from the server"},
+		{" help", "Shows this list"},
+	};
+
 	private Commands() {}
 
 	public static void register() {
@@ -25,7 +36,18 @@ public final class Commands {
 				}))
 				.then(literal("login").executes(Commands::login))
 				.then(literal("reload").executes(Commands::reload))
-				.then(literal("status").executes(Commands::status))));
+				.then(literal("status").executes(Commands::status))
+				.then(literal("help").executes(Commands::help))));
+	}
+
+	private static int help(CommandContext<FabricClientCommandSource> ctx) {
+		MutableComponent text = Component.literal("Commands").withStyle(ChatFormatting.GOLD);
+		for (String[] line : HELP) {
+			text.append(Component.literal("\n/titles" + line[0]).withStyle(ChatFormatting.AQUA))
+					.append(Component.literal(" - " + line[1]).withStyle(ChatFormatting.GRAY));
+		}
+		ctx.getSource().sendFeedback(Mc.tagged(text));
+		return 1;
 	}
 
 	private static int open(CommandContext<FabricClientCommandSource> ctx) {

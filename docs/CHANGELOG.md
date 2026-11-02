@@ -11,6 +11,13 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.20.1 · 2026-11-02
+**A /titles help command**
+
+- `/titles help` prints every `/titles` command with a one-line description in chat.
+- The README command list gains the new entry.
+- `mod_version` goes from 0.20.0 to 0.20.1.
+
 ## 0.20.0 · 2026-11-01
 **Last Rites: win a raid as the last one alive**
 

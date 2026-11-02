@@ -90,6 +90,7 @@ Ding!! Achievement unlocked.
 - `/titles status` - Shows which server the mod is using and how it's doing
 - `/titles login` - Tries logging in again
 - `/titles reload` - Reloads your titles and achievements from the server
+- `/titles help` - Lists these commands in chat
 
 ## Configuration
 
