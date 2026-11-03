@@ -2082,7 +2082,7 @@
     "id": "item_li_token",
     "category": "collection",
     "name": "Token of Excellence",
-    "description": "Acquire a Legendary Island token.",
+    "description": "Hold a Diamond Legendary Token.",
     "tier": "gold",
     "points": 5,
     "icon": {
@@ -2091,7 +2091,7 @@
     },
     "trigger": {
       "type": "inventoryItem",
-      "itemName": "Legendary Island Token",
+      "itemName": "Diamond Legendary Token",
       "amount": 1
     },
     "rewards": {
@@ -2485,7 +2485,7 @@
     "id": "item_mythic_hoard",
     "category": "collection",
     "name": "Mythic Hoard",
-    "description": "Carry three mythic items at once.",
+    "description": "Carry three mythic weapons or armor pieces at once.",
     "tier": "gold",
     "points": 5,
     "icon": {

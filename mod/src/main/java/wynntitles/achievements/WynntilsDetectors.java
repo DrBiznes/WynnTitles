@@ -13,6 +13,7 @@ import com.wynntils.models.character.type.CharacterGamemode;
 import com.wynntils.models.character.type.ClassType;
 import com.wynntils.models.guild.type.GuildRank;
 import com.wynntils.models.items.properties.GearTierItemProperty;
+import com.wynntils.models.items.properties.GearTypeItemProperty;
 import com.wynntils.models.items.properties.ShinyItemProperty;
 import com.wynntils.models.players.type.PartyMember;
 import com.wynntils.models.players.type.wynnplayer.CharacterData;
@@ -519,14 +520,24 @@ public final class WynntilsDetectors {
 		return count(best, size, "set pieces carried");
 	}
 
+	/**
+	 * Weapons and armor of the trigger's rarity. Aspects, mounts, caches, tomes
+	 * and charms carry a gear tier too, so the gear type is checked as well.
+	 */
 	private static int rarityCount(Trigger trigger) {
 		int count = 0;
 		for (ItemStack stack : Mc.inventory()) {
-			if (hasRarity(stack, trigger.rarity())) {
+			if (isWeaponOrArmor(stack) && hasRarity(stack, trigger.rarity())) {
 				count++;
 			}
 		}
 		return count;
+	}
+
+	private static boolean isWeaponOrArmor(ItemStack stack) {
+		return Models.Item.asWynnItemProperty(stack, GearTypeItemProperty.class)
+				.map(item -> item.getGearType().isWeapon() || item.getGearType().isArmor())
+				.orElse(false);
 	}
 
 	private static boolean hasRarity(ItemStack stack, String rarity) {
@@ -539,7 +550,7 @@ public final class WynntilsDetectors {
 		if (!Models.Character.hasCharacter()) {
 			return null;
 		}
-		return count(rarityCount(trigger), trigger.amount(), trigger.rarity() + " items carried");
+		return count(rarityCount(trigger), trigger.amount(), trigger.rarity() + " weapons and armor carried");
 	}
 
 	private static JsonObject itemRarityCount(Trigger trigger) {

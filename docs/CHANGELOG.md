@@ -11,6 +11,13 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.20.2 · 2026-11-02
+**Token of Excellence and Mythic Hoard fixes**
+
+- **Token of Excellence** now looks for the in-game name, Diamond Legendary Token. It looked for "Legendary Island Token", which no item is called, so it could never unlock.
+- **Mythic Hoard** counts only mythic weapons and armor. `itemRarityCount` used to count anything Wynntils gives a gear tier, so mythic aspects, mounts, caches, tomes and charms counted too. Wynntils' gear type now decides what is a weapon or armor.
+- `mod_version` goes from 0.20.1 to 0.20.2.
+
 ## 0.20.1 · 2026-11-02
 **A /titles help command**
 
