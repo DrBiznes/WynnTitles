@@ -135,7 +135,9 @@ Then run `scripts/smoke-test.sh`, and in-game finish one dungeon and one quest a
 
 ## Content Book scans
 
-`territorySet` and `territoryAny` still need `Models.Discovery.reloadDiscoveries`, which scans three filters and leaves the book on the last one. Wynntils has a `RESET_FILTERS` constant, but it is false and the restore step is compiled out of the jar, so there is nothing to switch on.
+`territorySet` and `territoryAny` still need `Models.Discovery.reloadDiscoveries`, which scans a filter per discovery type and leaves the book on the last one. Wynntils has a `RESET_FILTERS` constant, but it is false and the restore step is compiled out of the jar, so there is nothing to switch on.
+
+- **No territorial scan:** only the secret and world filters are scanned. The territorial filter has about 376 entries against 177 world and 121 secret, so it took longest. Every place an achievement lists is a world or secret discovery except Entrance to Gavel, and that one is a territory, so it counts while the character stands in it. `TestTerritorySetNamesAreDiscoveries` checks this against world and secret names only.
 
 - **Fewer scans:** `DiscoveryScans` scans each character once per game launch, not once per world join, and both detectors share it. A discovery that is not a territory now counts from the next launch. A scan that leaves nothing to read is still retried up to 3 times.
 - **Filter restore:** `ContentBookFilter` queues its own Wynntils queries around the scan: read the active filter from the Filter item in slot 66, run the scan, then click slot 66 until the saved filter is back. Queries run in order, so all three start together.

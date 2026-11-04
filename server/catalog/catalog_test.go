@@ -167,8 +167,9 @@ func TestPlainWordsGetOneRun(t *testing.T) {
 }
 
 // A misspelled place can never unlock, so every territorySet name must be a
-// discovery. testdata/discoveries.json holds the world, territorial and secret
-// names from Wynntils' content_book_dump.json in its Static-Storage repository.
+// discovery the mod scans for. testdata/discoveries.json holds the world and
+// secret names from Wynntils' content_book_dump.json in its Static-Storage
+// repository. Territorial discoveries are not scanned.
 func TestTerritorySetNamesAreDiscoveries(t *testing.T) {
 	c, err := Load()
 	if err != nil {
@@ -183,7 +184,9 @@ func TestTerritorySetNamesAreDiscoveries(t *testing.T) {
 		t.Fatal(err)
 	}
 	// VisitedTerritories in the mod treats "Town of Lutho" as this territory.
-	known := map[string]bool{"lutho": true}
+	// Entrance to Gavel is only a territorial discovery, but it is also a
+	// territory, so it counts while the character stands in it.
+	known := map[string]bool{"lutho": true, "entrance to gavel": true}
 	for _, name := range names {
 		known[strings.ToLower(name)] = true
 	}

@@ -11,6 +11,15 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.20.3 · 2026-11-04
+**Faster Content Book scans**
+
+- The discovery scan for `territorySet` and `territoryAny` skips the territorial filter, the longest of the three, and reads only secret and world discoveries.
+- No achievement loses a place. Every listed place is a world or secret discovery except Entrance to Gavel. That one is also a territory, so it counts while the character stands in it, and **Mind the Gap** also takes Jofash Tunnel.
+- The scan counts as finished once world discoveries have loaded, since territorial ones no longer load.
+- `testdata/discoveries.json` keeps only world and secret names, so the catalog test rejects a place the mod no longer scans for. Entrance to Gavel is allowed by name.
+- `mod_version` goes from 0.20.2 to 0.20.3.
+
 ## 0.20.2 · 2026-11-02
 **Token of Excellence and Mythic Hoard fixes**
 

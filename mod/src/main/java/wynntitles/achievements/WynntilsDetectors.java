@@ -304,11 +304,12 @@ public final class WynntilsDetectors {
 
 	/**
 	 * Every listed place visited on one character. Places come from the Content
-	 * Book's discoveries, which Wynntils only reads when asked, so this asks once
-	 * per character each game launch, and only while a set is locked. A discovery
-	 * that is not a territory, like The Moon or a library, therefore counts from
-	 * the next launch. Territories count straight away, from where the character
-	 * stands.
+	 * Book's world and secret discoveries, which Wynntils only reads when asked,
+	 * so this asks once per character each game launch, and only while a set is
+	 * locked. A discovery that is not a territory, like The Moon or a library,
+	 * therefore counts from the next launch. Territories count straight away, from
+	 * where the character stands, so territorial discoveries, the longest of the
+	 * three filters, are not scanned.
 	 */
 	private static final class TerritorySetDetector implements Detector {
 		private final VisitedTerritories visited;
@@ -379,10 +380,11 @@ public final class WynntilsDetectors {
 				return;
 			}
 			long now = System.currentTimeMillis();
-			boolean hasResults = Models.Discovery.getAllDiscoveriesForType(DiscoveryType.TERRITORY).findAny().isPresent();
+			boolean hasResults = Models.Discovery.getAllDiscoveriesForType(DiscoveryType.WORLD).findAny().isPresent();
 			if (scans.scanDue(character, now, hasResults)) {
 				filter.save();
-				Models.Discovery.reloadDiscoveries(true, true, true);
+				// Secret and world discoveries, not territorial.
+				Models.Discovery.reloadDiscoveries(true, true, false);
 				filter.restore();
 			} else if (scans.restoreDue(now)) {
 				filter.restore();

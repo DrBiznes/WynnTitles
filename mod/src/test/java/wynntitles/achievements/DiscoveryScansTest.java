@@ -53,7 +53,7 @@ class DiscoveryScansTest {
 	void retryKeepsTheFilterFromBeforeTheFirstScan() {
 		DiscoveryScans scans = new DiscoveryScans();
 		scans.saveFilter("Recommended");
-		scans.saveFilter("Territorial Discoveries");
+		scans.saveFilter("World Discoveries");
 
 		assertEquals("Recommended", scans.savedFilter());
 	}
