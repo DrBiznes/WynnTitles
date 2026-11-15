@@ -40,6 +40,7 @@ import wynntitles.mc.Nametags;
 import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.UnlockToast;
 import wynntitles.mc.WynnFonts;
+import wynntitles.mc.screen.AchievementTooltip;
 import wynntitles.mc.screen.UnlockToastArt;
 import wynntitles.mc.screen.TitlesScreen;
 import wynntitles.titles.Title;
@@ -223,11 +224,13 @@ public class WynnTitles implements ClientModInitializer {
 		return hint.append("/titles to equip)");
 	}
 
-	/** The chat line for an unlock, badge included. */
+	/** The chat line for an unlock, badge included; hovering the name shows the achievement's card. */
 	public static MutableComponent unlockMessage(Catalog.Achievement achievement) {
 		Title reward = Title.of(achievement.rewards().prefix(), achievement.rewards().suffix());
 		var message = Component.literal("Achievement unlocked: ").withStyle(ChatFormatting.GOLD)
-				.append(Component.literal(achievement.name()).withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD));
+				.append(Mc.withHover(
+						Component.literal(achievement.name()).withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD, ChatFormatting.UNDERLINE),
+						AchievementTooltip.of(achievement, stats == null ? null : stats.stats())));
 		if (reward != null) {
 			message.append(Component.literal("\n New title words: ").withStyle(ChatFormatting.GRAY))
 					.append(TitleRenderer.render(reward))

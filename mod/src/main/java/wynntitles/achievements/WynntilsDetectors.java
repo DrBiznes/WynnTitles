@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.ToLongFunction;
@@ -57,6 +58,10 @@ public final class WynntilsDetectors {
 	private static final RaidDetector RAIDS = new RaidDetector();
 	private static final LastStandDetector LAST_STAND = new LastStandDetector();
 	private static final LiveCompletions LIVE = new LiveCompletions();
+	/** Set by create, for rescanDiscoveries. */
+	private static volatile DiscoveryScans discoveryScans;
+	/** Set by create, for discoveries seen in chat. */
+	private static volatile VisitedTerritories visitedTerritories;
 
 	private WynntilsDetectors() {}
 
@@ -70,12 +75,43 @@ public final class WynntilsDetectors {
 		@SubscribeEvent
 		public void onChat(ChatMessageEvent.Match event) {
 			if (event.getRecipientType() == RecipientType.INFO) {
-				LIVE.onMessage(event.getMessage().getString(), System.currentTimeMillis());
+				String text = event.getMessage().getString();
+				LIVE.onMessage(text, System.currentTimeMillis());
+				discoveryFound(LiveCompletions.discovery(text));
 			}
 		}
 	}
 
-	/** Each character's visited places for territorySet triggers are kept in visitedFile. */
+	/** Counts a place named by a discovery message for the character being played. */
+	private static void discoveryFound(String place) {
+		String character = TerritorySetDetector.character();
+		VisitedTerritories visited = visitedTerritories;
+		DiscoveryScans scans = discoveryScans;
+		if (place == null || character == null || visited == null || scans == null) {
+			return;
+		}
+		visited.add(character, place);
+		scans.discoveryFound(character, VisitedTerritories.key(place));
+	}
+
+	/**
+	 * Scans the current character's Content Book again the next time a place set
+	 * is checked. False when no character is being played.
+	 */
+	public static boolean rescanDiscoveries() {
+		String character = TerritorySetDetector.character();
+		DiscoveryScans scans = discoveryScans;
+		if (character == null || scans == null) {
+			return false;
+		}
+		scans.requestScan(character);
+		return true;
+	}
+
+	/**
+	 * Each character's visited places for territorySet triggers are kept in
+	 * visitedFile, and when it was last scanned in a file beside it.
+	 */
 	public static Map<String, Detector> create(Path visitedFile) {
 		Map<String, Detector> detectors = new HashMap<>();
 		detectors.put("combatLevel", detector(WynntilsDetectors::combatLevel, WynntilsDetectors::combatLevelProgress));
@@ -87,7 +123,9 @@ public final class WynntilsDetectors {
 		detectors.put("professionLevelAll", new ProfessionLevelDetector());
 		detectors.put("location", WynntilsDetectors::location);
 		VisitedTerritories visited = new VisitedTerritories(visitedFile);
-		DiscoveryScans scans = new DiscoveryScans();
+		visitedTerritories = visited;
+		DiscoveryScans scans = new DiscoveryScans(visitedFile.resolveSibling("discovery-scans.json"));
+		discoveryScans = scans;
 		ContentBookFilter filter = new ContentBookFilter(scans);
 		detectors.put("territorySet", new TerritorySetDetector(visited, false, scans, filter));
 		detectors.put("territoryAny", new TerritorySetDetector(visited, true, scans, filter));
@@ -305,9 +343,12 @@ public final class WynntilsDetectors {
 	/**
 	 * Every listed place visited on one character. Places come from the Content
 	 * Book's world and secret discoveries, which Wynntils only reads when asked,
-	 * so this asks once per character each game launch, and only while a set is
-	 * locked. A discovery that is not a territory, like The Moon or a library,
-	 * therefore counts from the next launch. Territories count straight away, from
+	 * so this asks once per character and keeps what it found, and only while a
+	 * set is locked. After that, discoveries count straight away from Wynncraft's
+	 * chat message. It asks again on a launch where the Wynncraft API counts a
+	 * different number of discoveries than the scan and the messages since add up
+	 * to, which catches play without the mod, or after /titles rescan.
+	 * Territories also count from
 	 * where the character stands, so territorial discoveries, the longest of the
 	 * three filters, are not scanned.
 	 */
@@ -381,7 +422,10 @@ public final class WynntilsDetectors {
 			}
 			long now = System.currentTimeMillis();
 			boolean hasResults = Models.Discovery.getAllDiscoveriesForType(DiscoveryType.WORLD).findAny().isPresent();
-			if (scans.scanDue(character, now, hasResults)) {
+			Integer apiCount = apiDiscoveries(character);
+			if (scans.scanDue(character, now, hasResults, apiCount)) {
+				WynnTitles.LOGGER.info("Scanning the Content Book for character {}, API discoveries {}",
+						character, apiCount);
 				filter.save();
 				// Secret and world discoveries, not territorial.
 				Models.Discovery.reloadDiscoveries(true, true, false);
@@ -389,6 +433,24 @@ public final class WynntilsDetectors {
 			} else if (scans.restoreDue(now)) {
 				filter.restore();
 			}
+		}
+
+		/**
+		 * The character's discovery count from the Wynncraft API, whose character
+		 * UUIDs start with the Wynntils ID. Null until the profile arrives, and
+		 * when the player hides it.
+		 */
+		private static Integer apiDiscoveries(String character) {
+			WynnPlayerInfo info = PROFILE.get();
+			if (info == null) {
+				return null;
+			}
+			for (Map.Entry<UUID, CharacterData> entry : info.characters().entrySet()) {
+				if (entry.getKey().toString().startsWith(character)) {
+					return entry.getValue().discoveries().orElse(null);
+				}
+			}
+			return null;
 		}
 
 		/** Discovered places on the current character, as VisitedTerritories keys. Empty until a scan finishes. */

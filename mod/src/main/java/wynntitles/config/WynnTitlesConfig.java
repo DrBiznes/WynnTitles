@@ -22,6 +22,11 @@ public class WynnTitlesConfig implements ConfigData {
 	@ConfigEntry.BoundedDiscrete(min = 50, max = 150)
 	public int titleScale = 80;
 
+	/** Above the name by default; null after a hand-edited config with an unknown value, which {@link #validatePostLoad} repairs. */
+	@ConfigEntry.Gui.Tooltip
+	@ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+	public TitlePosition titlePosition = TitlePosition.ABOVE;
+
 	@ConfigEntry.Gui.Tooltip
 	public boolean animateTitles = true;
 
@@ -72,5 +77,8 @@ public class WynnTitlesConfig implements ConfigData {
 	@Override
 	public void validatePostLoad() {
 		titleScale = Math.clamp(titleScale, 50, 150);
+		if (titlePosition == null) {
+			titlePosition = TitlePosition.ABOVE;
+		}
 	}
 }
