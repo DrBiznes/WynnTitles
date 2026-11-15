@@ -11,6 +11,17 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.21.0 · 2026-11-14
+**Title position, live discoveries and fewer Content Book scans**
+
+- New **Title position** option: show your title **above** or **below** player names.
+- The Content Book is now scanned once per character, not on every game launch. It is only scanned again if you made discoveries without the mod.
+- Discoveries now count the moment you find them, so place achievements unlock straight away.
+- New `/titles rescan` command reads the current character's discoveries again.
+- Hovering an achievement's name in the **Achievement unlocked** chat line shows its card.
+- New `/titles config` command opens the settings (needs Mod Menu), and `/achievements` opens the Achievements tab.
+- `mod_version` goes from 0.20.3 to 0.21.0.
+
 ## 0.20.3 · 2026-11-04
 **Faster Content Book scans**
 

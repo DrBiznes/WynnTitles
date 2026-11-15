@@ -285,7 +285,7 @@ final class AchievementsPage {
 		return name.toString();
 	}
 
-	private static int tierColor(String tier) {
+	static int tierColor(String tier) {
 		return switch (tier) {
 			case "silver" -> 0xD2D6E0;
 			case "gold" -> 0xF2CF4A;

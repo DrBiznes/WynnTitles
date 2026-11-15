@@ -5,41 +5,114 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class DiscoveryScansTest {
 	@Test
 	void eachCharacterScansOnce() {
 		DiscoveryScans scans = new DiscoveryScans();
 
-		assertTrue(scans.scanDue("archer", 0, false));
-		assertFalse(scans.scanDue("archer", 3_600_000, true), "a world hop does not scan again");
-		assertTrue(scans.scanDue("mage", 3_600_000, true));
+		assertTrue(scans.scanDue("archer", 0, false, null));
+		assertFalse(scans.scanDue("archer", 3_600_000, true, null), "a world hop does not scan again");
+		assertTrue(scans.scanDue("mage", 3_600_000, true, null));
 	}
 
 	@Test
 	void savedResultsDoNotSkipTheFirstScan() {
-		assertTrue(new DiscoveryScans().scanDue("archer", 0, true));
+		assertTrue(new DiscoveryScans().scanDue("archer", 0, true, null));
 	}
 
 	@Test
 	void twoDetectorsOnOneTickScanOnce() {
 		DiscoveryScans scans = new DiscoveryScans();
 
-		assertTrue(scans.scanDue("archer", 0, false));
-		assertFalse(scans.scanDue("archer", 0, false));
+		assertTrue(scans.scanDue("archer", 0, false, null));
+		assertFalse(scans.scanDue("archer", 0, false, null));
 	}
 
 	@Test
 	void scanWithNoResultsIsRetriedThenGivenUp() {
 		DiscoveryScans scans = new DiscoveryScans();
 
-		assertTrue(scans.scanDue("archer", 0, false));
-		assertFalse(scans.scanDue("archer", 59_999, false));
-		assertTrue(scans.scanDue("archer", 60_000, false));
-		assertTrue(scans.scanDue("archer", 120_000, false));
-		assertFalse(scans.scanDue("archer", 180_000, false));
+		assertTrue(scans.scanDue("archer", 0, false, null));
+		assertFalse(scans.scanDue("archer", 59_999, false, null));
+		assertTrue(scans.scanDue("archer", 60_000, false, null));
+		assertTrue(scans.scanDue("archer", 120_000, false, null));
+		assertFalse(scans.scanDue("archer", 180_000, false, null));
+	}
+
+	@Test
+	void savedScanIsKeptWhileTheApiCountMatches(@TempDir Path dir) {
+		Path file = dir.resolve("scans.json");
+		DiscoveryScans first = new DiscoveryScans(file);
+		assertTrue(first.scanDue("archer", 0, false, 40));
+		assertFalse(first.scanDue("archer", 1_000, true, 40));
+
+		DiscoveryScans next = new DiscoveryScans(file);
+		assertFalse(next.scanDue("archer", 0, false, null), "waits for the API's count");
+		assertFalse(next.scanDue("archer", 1_000, false, 40));
+		assertFalse(next.scanDue("archer", 2_000, false, 41), "compared once per launch");
+		assertTrue(next.scanDue("mage", 2_000, false, 12), "a character never scanned");
+	}
+
+	@Test
+	void changedApiCountScansAgain(@TempDir Path dir) {
+		Path file = dir.resolve("scans.json");
+		DiscoveryScans first = new DiscoveryScans(file);
+		first.scanDue("archer", 0, false, 40);
+		first.scanDue("archer", 1_000, true, 40);
+		first.scanDue("archer", 2_000, true, 43);
+
+		DiscoveryScans next = new DiscoveryScans(file);
+		assertTrue(next.scanDue("archer", 0, false, 43), "the count from the scan is kept, not a later one");
+		assertFalse(next.scanDue("archer", 1_000, true, 43));
+		assertFalse(new DiscoveryScans(file).scanDue("archer", 0, false, 43));
+	}
+
+	@Test
+	void scanWithoutAnApiCountIsRepeatedNextLaunch(@TempDir Path dir) {
+		Path file = dir.resolve("scans.json");
+		DiscoveryScans hidden = new DiscoveryScans(file);
+		hidden.scanDue("archer", 0, false, null);
+		hidden.scanDue("archer", 1_000, true, null);
+		assertTrue(new DiscoveryScans(file).scanDue("archer", 0, false, 40));
+
+		DiscoveryScans late = new DiscoveryScans(file);
+		late.scanDue("archer", 0, false, null);
+		late.scanDue("archer", 1_000, true, null);
+		late.scanDue("archer", 2_000, true, 40);
+		assertFalse(new DiscoveryScans(file).scanDue("archer", 0, false, 40), "the count arrived after the scan");
+	}
+
+	@Test
+	void requestedScanIgnoresTheSavedOne(@TempDir Path dir) {
+		Path file = dir.resolve("scans.json");
+		DiscoveryScans scans = new DiscoveryScans(file);
+		scans.scanDue("archer", 0, false, 40);
+		scans.scanDue("archer", 1_000, true, 40);
+
+		scans.requestScan("archer");
+		assertTrue(scans.scanDue("archer", 2_000, true, 40));
+		assertFalse(scans.scanDue("archer", 3_000, true, 40));
+	}
+
+	@Test
+	void discoveriesSeenInChatKeepTheSavedScanCurrent(@TempDir Path dir) {
+		Path file = dir.resolve("scans.json");
+		DiscoveryScans scans = new DiscoveryScans(file);
+		scans.scanDue("archer", 0, false, 40);
+		scans.scanDue("archer", 1_000, true, 40);
+		scans.discoveryFound("archer", "katoa ranch");
+		scans.discoveryFound("archer", "katoa ranch");
+		scans.discoveryFound("archer", "detlas suburbs");
+		scans.discoveryFound("mage", "katoa ranch");
+
+		assertFalse(new DiscoveryScans(file).scanDue("archer", 0, false, 42));
+		assertTrue(new DiscoveryScans(file).scanDue("archer", 0, false, 43), "one was found without the mod");
+		assertTrue(new DiscoveryScans(file).scanDue("mage", 0, false, 1), "never scanned");
 	}
 
 	@Test

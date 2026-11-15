@@ -12,6 +12,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import wynntitles.WynnTitles;
+import wynntitles.config.TitlePosition;
 import wynntitles.config.WynnTitlesConfig;
 import wynntitles.titles.Title;
 
@@ -76,9 +77,17 @@ public final class Nametags {
 		if (nametags.isEmpty()) {
 			nametags.add(NEW_NAMETAG.invoke(event.getEntityRenderState().nameTag, 1f));
 		}
-		nametags.add(NEW_NAMETAG.invoke(Component.empty(), TITLE_GAP));
-		Component text = TitleRenderer.render(title);
-		nametags.add(NEW_NAMETAG.invoke(text, WynnTitlesConfig.get().titleScale / 100f));
+		Object gap = NEW_NAMETAG.invoke(Component.empty(), TITLE_GAP);
+		Object line = NEW_NAMETAG.invoke(TitleRenderer.render(title), WynnTitlesConfig.get().titleScale / 100f);
+		if (WynnTitlesConfig.get().titlePosition == TitlePosition.BELOW) {
+			// The name is always the last line here, so slotting in before it puts the title right under it.
+			int name = nametags.size() - 1;
+			nametags.add(name, gap);
+			nametags.add(name, line);
+		} else {
+			nametags.add(gap);
+			nametags.add(line);
+		}
 	}
 
 	/**

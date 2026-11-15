@@ -1,6 +1,7 @@
 package wynntitles.achievements;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -107,5 +108,23 @@ class LiveCompletionsTest {
 		live.onMessage(CORRUPTED_WIN, 0);
 
 		assertEquals(1, live.dungeonCount("Corrupted Decrepit Sewers", null));
+	}
+
+	@Test
+	void readsDiscoveryMessages() {
+		assertEquals("Ragni Countryside South",
+				LiveCompletions.discovery("    §7Area Discovered: §fRagni Countryside South§d (+10 XP)"));
+		assertEquals("Detlas Suburbs",
+				LiveCompletions.discovery("         §6Area Discovered: §eDetlas Suburbs§d (+40 XP)"));
+		assertEquals("Bak'al's Destruction 2",
+				LiveCompletions.discovery("     §3Secret Discovery: §bBak'al's Destruction 2§d (+400 XP)"));
+		assertEquals("The Moon", LiveCompletions.discovery("§3Secret Discovery: §bThe Moon"));
+	}
+
+	@Test
+	void otherMessagesAreNotDiscoveries() {
+		assertNull(LiveCompletions.discovery("§6Area Discovered"));
+		assertNull(LiveCompletions.discovery("Steve: §7Area Discovered: §fThe Moon§d (+10 XP)"));
+		assertNull(LiveCompletions.discovery("§a                       Find Discoveries"));
 	}
 }

@@ -2,7 +2,7 @@
 
 Plan for detecting quest and dungeon completions from Wynncraft's chat messages, so that these achievements come from the Wynncraft API plus our own live events. No Content Book scan is involved.
 
-Status: shipped in 0.18.0 and tested on Wynncraft. Discoveries, party wins, failed dungeons and mini-quests have no live trigger on purpose: they rely on the Wynncraft API and the Content Book scan.
+Status: shipped in 0.18.0 and tested on Wynncraft. Party wins, failed dungeons and mini-quests have no live trigger on purpose: they rely on the Wynncraft API. Discoveries got a live trigger in 0.21.0. See [Live discoveries](#live-discoveries).
 
 The same update changes the scan that `territorySet` and `territoryAny` use. See [Content Book scans](#content-book-scans).
 
@@ -139,11 +139,31 @@ Then run `scripts/smoke-test.sh`, and in-game finish one dungeon and one quest a
 
 - **No territorial scan:** only the secret and world filters are scanned. The territorial filter has about 376 entries against 177 world and 121 secret, so it took longest. Every place an achievement lists is a world or secret discovery except Entrance to Gavel, and that one is a territory, so it counts while the character stands in it. `TestTerritorySetNamesAreDiscoveries` checks this against world and secret names only.
 
-- **Fewer scans:** `DiscoveryScans` scans each character once per game launch, not once per world join, and both detectors share it. A discovery that is not a territory now counts from the next launch. A scan that leaves nothing to read is still retried up to 3 times.
+- **Fewer scans:** `DiscoveryScans` scans each character once per game launch, not once per world join, and both detectors share it. A scan that leaves nothing to read is still retried up to 3 times. Since 0.21.0 a character is scanned once and then only when needed. See [Live discoveries](#live-discoveries).
 - **Filter restore:** `ContentBookFilter` queues its own Wynntils queries around the scan: read the active filter from the Filter item in slot 66, run the scan, then click slot 66 until the saved filter is back. Queries run in order, so all three start together.
 - **Failures:** a retried scan keeps the filter saved before the first one. A failed restore is retried up to 3 times, a minute apart, and only while a place set is still locked. A failed save skips the restore and never blocks the scan.
 
 This only covers scans that WynnTitles starts. A scan Wynntils starts itself, such as from its Content Book screen, can still change the filter.
+
+## Live discoveries
+
+Added in 0.21.0, so that a character's Content Book is scanned once, not once per game launch.
+
+Captured on 2026-11-14 with a temporary build that logged every chat message, title and subtitle. All three kinds arrive as chat with recipient type `INFO`, centred with leading spaces:
+
+| Kind | Captured text |
+|---|---|
+| Territorial | `§7Area Discovered: §fRagni Countryside South§d (+10 XP)` |
+| World | `§6Area Discovered: §eDetlas Suburbs§d (+40 XP)` |
+| Secret | `§3Secret Discovery: §bBak'al's Destruction 2§d (+400 XP)` |
+
+Not captured: a discovery on a level-capped character, which may have no `(+N XP)` ending, so the pattern takes the message with or without it.
+
+- **Characters:** Wynntils reads Wynncraft's 8-character character ID from the compass item (`Models.Character.getId()`). The Wynncraft API's character UUID starts with the same 8 characters, which is how the API's per-character `discoveries` count is found.
+- **Saved scans:** `DiscoveryScans` keeps `discovery-scans.json` beside `territories.json`: for each character, the API's discovery count that its last scan goes with. The first count known after the scan is kept, since a later one may include newer discoveries.
+- **When a character is scanned:** the first time it is played, on a launch where the API's count differs from the saved one, on a launch after a scan whose count was never known (a hidden profile), and after `/titles rescan`. The count is compared once per launch, so a session is not interrupted.
+- **Live messages:** `LiveCompletions.discovery` reads the place name from the message. The place is added to `VisitedTerritories` for the character, and the saved count goes up by one, so the API's count still matches at the next launch. A repeated message counts once.
+- **Failures:** if Wynncraft rewords the message, or a discovery raises the API's count by something other than one, the counts stop matching and the character is scanned at the next launch, as it was before 0.21.0.
 
 ## When the text changes
 

@@ -19,6 +19,9 @@ final class LiveCompletions {
 	// Quest lines start with an invisible padding glyph that depends on the name's length.
 	private static final Pattern QUEST_HEADER = Pattern.compile("^[^§]*§6\\[Quest Completed\\]$");
 	private static final Pattern QUEST_NAME = Pattern.compile("^[^§]*§e§l(.+)$");
+	// Centred with padding. Territorial, world and secret discoveries differ only in colours and the first words.
+	private static final Pattern DISCOVERY =
+			Pattern.compile("^[^§\\p{L}\\p{N}]*§[0-9a-f](?:Area Discovered|Secret Discovery): §[0-9a-f](.+?)(?:§d \\(\\+[\\d,]+ XP\\))?$");
 	/** Wynncraft can send a dungeon win twice, and no dungeon is cleared twice in this time. */
 	private static final long REPEAT_MS = 10_000;
 
@@ -27,6 +30,12 @@ final class LiveCompletions {
 	private final Map<String, Integer> baselines = new HashMap<>();
 	private final Set<String> quests = new HashSet<>();
 	private boolean questNameNext;
+
+	/** The place a discovery message names, or null for any other message. */
+	static String discovery(String text) {
+		Matcher discovery = DISCOVERY.matcher(text);
+		return discovery.matches() ? discovery.group(1) : null;
+	}
 
 	/** Takes a message on the game's own channel, with its formatting codes. */
 	synchronized void onMessage(String text, long now) {
