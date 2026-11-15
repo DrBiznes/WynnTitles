@@ -4,7 +4,9 @@
 
 WynnTitles lets you earn title words from Wynncraft achievements and wear them above your name, then style them in a shop with colors, animations and Wynncraft fonts. Everyone else with the mod sees it. Made for my modpack [World of Wynncraft](https://modrinth.com/modpack/world-of-wynncraft)
 
-![title-reel](https://github.com/user-attachments/assets/6a428802-6dea-4497-9fd7-067141ea2530)
+**Before 1.0.0 releases I will be occasionally resetting shop purchases and potentially the entire database if necessary**
+
+![sizzle](https://github.com/user-attachments/assets/19879fbf-631d-4dba-96a2-10ac4092ef2c)
 
 ## What's Up
 
@@ -12,16 +14,10 @@ WynnTitles lets you earn title words from Wynncraft achievements and wear them a
 - Wear a **prefix and a suffix** above your name, and other WynnTitles players see it on your nametag
 - Spend your achievement points in the **style shop**: Try every style on your title before you buy it (this is so cool)
 - The big achievements come with their own **native style** that you can't buy, only earn
+- Some achievements only unlock through the Wynncraft API meaning your account needs to be set to public, and there might be a few minutes of delay before they unlock.
 - Configurable settings via Mod Menu or config file
 
 ## See It
-
-### Your Title
-
-![nametag](https://github.com/user-attachments/assets/ce0f9831-afc9-4e5e-8fa9-dc031d6081de)
-
-Prefix, suffix and style, right above your head!!
-
 ### Animations
 
 ![shop-animations](https://github.com/user-attachments/assets/bb64f573-a1a1-4aba-8851-99379263a307)
@@ -70,16 +66,6 @@ Ding!! Achievement unlocked.
 - **Achievements** shows your progress, the title words each one gives you and how rare it is
 - Type `/titles help` for a list of all commands
 
-## How It Works
-
-- Achievements are detected with Wynntils data, on Wynncraft only, and sent to the WynnTitles server
-- Titles are cosmetic so claims are trusted. Cheating gets you a cool name above your head and nothing else, and I have moderation tools for the people who try it
-- Logging in uses the same Mojang check a Minecraft server does when you join it. Your access token only ever goes to Mojang
-- The server keeps your UUID, username, unlocked achievements (with what the mod reported, like the quest name or your class and level), purchases and login times
-- To show titles it asks the server about the players near you
-- The mod doesn't include anything from the Wynncraft resource pack, it just points at the items and fonts you already have loaded
-- The full tour is in [docs/ARCHITECTURE.md](https://github.com/DrBiznes/WynnTitles/blob/main/docs/ARCHITECTURE.md)
-
 ## Run Your Own Server
 
 Got a guild or a group of friends? You can run a private WynnTitles server with your own achievements, shop and moderation dashboard. Everyone installs the normal mod and points it at your server. Here's how: [Running your own WynnTitles server](https://github.com/DrBiznes/WynnTitles/blob/main/deploy/README.md)
@@ -88,21 +74,7 @@ Got a guild or a group of friends? You can run a private WynnTitles server with 
 
 - I don't know nothing about java so if you wanna fork this and fix this up go ham.
 - Feel free to use this in your modpack
-- It needs JDK 21 for the mod and Go 1.26 for the server
-
-```
-cd mod && ./gradlew build    # builds the mod and runs the unit tests
-cd server && go test ./...   # server tests
-scripts/smoke-test.sh        # everything offline, including an in-game test
-```
-
-- The smoke test starts a throwaway server, boots a real client with Wynntils and saves screenshots to `mod/build/run/clientGameTest/screenshots`
-- Running it locally and the API are in [docs/ARCHITECTURE.md](https://github.com/DrBiznes/WynnTitles/blob/main/docs/ARCHITECTURE.md), and the rules for adding achievements are in [docs/AGENTS.md](https://github.com/DrBiznes/WynnTitles/blob/main/docs/AGENTS.md)
 - Not made by or affiliated with Wynncraft or Wynntils
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
