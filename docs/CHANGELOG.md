@@ -11,6 +11,14 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.21.1 · 2026-11-21
+**Mod data moves out of the config folder**
+
+- The login session, catalog cache, visited territories and discovery scans now live in `wynntitles/` in the instance folder, next to `config/` and `saves/`, like Wynntils' own folder.
+- Settings stay in `config/wynntitles.json`.
+- Nothing is carried over from the old `config/wynntitles/` folder. You log in again automatically the next time you join Wynncraft, and each character's Content Book is scanned once more. The old folder can be deleted.
+- `mod_version` goes from 0.21.0 to 0.21.1.
+
 ## 0.21.0 · 2026-11-14
 **Title position, live discoveries and fewer Content Book scans**
 

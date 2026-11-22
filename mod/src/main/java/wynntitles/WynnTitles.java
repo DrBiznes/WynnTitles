@@ -87,7 +87,8 @@ public class WynnTitles implements ClientModInitializer {
 		String version = FabricLoader.getInstance().getModContainer(MOD_ID)
 				.map(mod -> mod.getMetadata().getVersion().getFriendlyString())
 				.orElse("dev");
-		Path dir = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID);
+		// Kept beside config/, not in it, so a shared config folder never carries a login session.
+		Path dir = FabricLoader.getInstance().getGameDir().resolve(MOD_ID);
 
 		ApiClient api = new ApiClient(WynnTitlesConfig::resolvedServerUrl, version);
 		account = new Account(api, new MojangSession(), dir.resolve("session.json"));
