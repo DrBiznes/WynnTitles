@@ -27,6 +27,10 @@ public class WynnTitlesConfig implements ConfigData {
 	@ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
 	public TitlePosition titlePosition = TitlePosition.ABOVE;
 
+	/** Your own title in third person; with Wynntils' Show Own Nametag on it sits with your name, otherwise alone. */
+	@ConfigEntry.Gui.Tooltip
+	public boolean showOwnTitle = false;
+
 	@ConfigEntry.Gui.Tooltip
 	public boolean animateTitles = true;
 

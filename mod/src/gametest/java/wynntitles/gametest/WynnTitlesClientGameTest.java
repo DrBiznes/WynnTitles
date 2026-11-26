@@ -1,7 +1,10 @@
 package wynntitles.gametest;
 
 import com.mojang.authlib.GameProfile;
+import com.wynntils.core.components.Managers;
 import com.wynntils.core.components.Models;
+import com.wynntils.core.persisted.config.Config;
+import com.wynntils.features.players.CustomNametagRendererFeature;
 import com.wynntils.mc.event.TitleSetTextEvent;
 import com.wynntils.models.raid.raids.TheNamelessAnomalyRaid;
 import java.nio.charset.StandardCharsets;
@@ -18,6 +21,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -34,6 +38,7 @@ import wynntitles.catalog.Catalog;
 import wynntitles.config.WynnTitlesConfig;
 import wynntitles.mc.Icons;
 import wynntitles.mc.Mc;
+import wynntitles.mc.TitleRenderer;
 import wynntitles.mc.UnlockToast;
 import wynntitles.mc.WynnFonts;
 import wynntitles.mc.screen.TitlesScreen;
@@ -105,6 +110,7 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 			screenshot(context, "wynntitles-nametag");
 			screenshotAnimatedNametags(context, catalog, dummyAchievement);
 			checkHiddenInRaids(context, dummyTitle);
+			checkOwnTitle(context);
 
 			context.setScreen(TitlesScreen::new);
 			context.waitForScreen(TitlesScreen.class);
@@ -496,6 +502,40 @@ public class WynnTitlesClientGameTest implements FabricClientGameTest {
 		check(context.computeOnClient(client -> Models.Raid.getCurrentRaid() == null), "failing should end the raid");
 		checkTitleDrawn(context, title, true, "after the raid");
 		context.runOnClient(client -> WynnTitlesConfig.get().hideTitlesInRaids = false);
+	}
+
+	/** Our own title in third person: hidden by default, alone without Wynntils' own nametag, with the name when it is on. */
+	@SuppressWarnings("unchecked")
+	private static void checkOwnTitle(ClientGameTestContext context) {
+		String title = context.computeOnClient(client ->
+				TitleRenderer.render(WynnTitles.titles().get(client.getUser().getProfileId())).getString());
+		String name = context.computeOnClient(client -> client.getUser().getName());
+		Config<Boolean> showOwnNametag = (Config<Boolean>) context.computeOnClient(client -> Managers.Feature
+				.getFeatureInstance(CustomNametagRendererFeature.class).getConfigOptionFromString("showOwnNametag").orElseThrow());
+		check(!context.computeOnClient(client -> new WynnTitlesConfig().showOwnTitle), "own title should be off by default");
+		context.runOnClient(client -> {
+			showOwnNametag.store(false);
+			client.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+		});
+		checkTitleDrawn(context, title, false, "on ourselves with the option off");
+
+		context.runOnClient(client -> WynnTitlesConfig.get().showOwnTitle = true);
+		checkTitleDrawn(context, title, true, "on ourselves with the option on");
+		check(NametagProbe.all().stream().noneMatch(line -> line.contains(name)),
+				"our name should stay hidden without Wynntils' own nametag; drew " + NametagProbe.all());
+		screenshot(context, "wynntitles-nametag-own");
+
+		context.runOnClient(client -> showOwnNametag.store(true));
+		checkTitleDrawn(context, title, true, "on ourselves with Wynntils' own nametag on");
+		check(NametagProbe.all().stream().anyMatch(line -> line.contains(name)),
+				"our name should show with Wynntils' own nametag; drew " + NametagProbe.all());
+		screenshot(context, "wynntitles-nametag-own-with-name");
+
+		context.runOnClient(client -> {
+			showOwnNametag.store(false);
+			WynnTitlesConfig.get().showOwnTitle = false;
+			client.options.setCameraType(CameraType.FIRST_PERSON);
+		});
 	}
 
 	private static void checkTitleDrawn(ClientGameTestContext context, String title, boolean expected, String when) {

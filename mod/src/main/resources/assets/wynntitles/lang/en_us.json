@@ -15,6 +15,8 @@
 	"text.autoconfig.wynntitles.option.titlePosition.@Tooltip": "Show titles above or below the player's name.",
 	"text.autoconfig.wynntitles.option.titlePosition.above": "Above name",
 	"text.autoconfig.wynntitles.option.titlePosition.below": "Below name",
+	"text.autoconfig.wynntitles.option.showOwnTitle": "Show my own title",
+	"text.autoconfig.wynntitles.option.showOwnTitle.@Tooltip": "Show your title above your head in third person. With Wynntils' Show Own Nametag on, it sits with your name; otherwise only the title shows.",
 	"text.autoconfig.wynntitles.option.animateTitles": "Animate titles",
 	"text.autoconfig.wynntitles.option.animateTitles.@Tooltip": "Let rainbow and animated palettes move and obfuscated letters scramble. Turn off for still titles everywhere.",
 	"text.autoconfig.wynntitles.option.announceUnlocks": "Unlock messages in chat",

@@ -11,6 +11,14 @@ Catalog size is noted where it changed (achievements / points earned, shop items
 
 ---
 
+## 0.21.2 · 2026-11-25
+**Show your own title**
+
+- New **Show my own title** option (off by default) shows your title above your head in third person.
+- With Wynntils' **Show Own Nametag** on, the title sits with your name, above or below it as **Title position** says. With it off, only the title shows.
+- With the option off, your own title stays hidden even when Wynntils shows your nametag.
+- `mod_version` goes from 0.21.1 to 0.21.2.
+
 ## 0.21.1 · 2026-11-21
 **Mod data moves out of the config folder**
 
